@@ -1,0 +1,959 @@
+:root {
+    --bg: #eff3f8;
+    --surface: #ffffff;
+    --surface-alt: #f6f8fb;
+    --surface-sunken: #eaeff5;
+    --border: #dde4ec;
+    --border-soft: #eaeff5;
+    --text: #1d2836;
+    --text-muted: #6b7a8d;
+
+    /* Verde: acción primaria. Azul: acción secundaria. */
+    --accent: #17a673;
+    --accent-hover: #128a5f;
+    --accent-soft: #d8f3e6;
+    --accent-text: #0b5138;
+    --info-soft: #e2eefb;
+    --info-border: #c2ddf6;
+    --info-text: #1d5f96;
+
+    /* Estados de validación. */
+    --ok-bg: #dcf3e7;
+    --ok-text: #146947;
+    --warn-bg: #fdf0d5;
+    --warn-text: #8a5a08;
+    --error-bg: #fdeaea;
+    --error-border: #f2c4c4;
+    --error-text: #b03636;
+
+    --radius-lg: 18px;
+    --radius-md: 12px;
+    --radius-sm: 9px;
+
+    /* La profundidad reemplaza a los bordes duros: separa sin encerrar. */
+    --shadow-sm: 0 1px 2px rgba(29, 40, 54, 0.06);
+    --shadow-md: 0 4px 14px rgba(29, 40, 54, 0.07);
+    --shadow-lg: 0 16px 36px rgba(29, 40, 54, 0.13);
+
+    --transicion: 0.18s ease;
+}
+
+html {
+    height: 100%;
+}
+
+body {
+    /* Un degradado muy tenue evita el gris plano de fondo sin robar atención. */
+    background: linear-gradient(180deg, #f4f7fb 0%, var(--bg) 42%);
+    color: var(--text);
+    display: flex;
+    flex-direction: column;
+    font-family: system-ui, -apple-system, "Segoe UI", "Inter", "Helvetica Neue", sans-serif;
+    font-size: 16px;
+    height: 100%;
+    line-height: 1.55;
+    margin: 0;
+    padding: 32px 28px;
+    -webkit-font-smoothing: antialiased;
+}
+
+/* Un anillo de foco visible y consistente en todo lo interactivo. */
+:where(button, input, select, a, [tabindex]):focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+}
+
+/* ---------- barra superior ---------- */
+
+.topbar {
+    align-items: baseline;
+    display: flex;
+    flex: 0 0 auto;
+    gap: 28px;
+    margin: 0 auto 28px;
+    max-width: 1080px;
+    width: 100%;
+}
+
+.brand {
+    color: var(--accent-text);
+    font-size: 23px;
+    font-weight: 700;
+    letter-spacing: -0.3px;
+}
+
+.greeting {
+    color: var(--text-muted);
+    font-size: 15px;
+}
+
+/* ---------- contenedor de pantalla ---------- */
+
+.screen {
+    background: var(--surface);
+    border: 1px solid var(--border-soft);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    margin: 0 auto;
+    max-width: 1080px;
+    min-height: 0;
+    padding: 28px 32px;
+    width: 100%;
+}
+
+.screen-actions {
+    align-items: center;
+    display: flex;
+    flex: 0 0 auto;
+    gap: 12px;
+    justify-content: space-between;
+    margin-bottom: 16px;
+}
+
+/* ---------- botones: sólo para acciones ---------- */
+
+.btn {
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    background: var(--surface);
+    box-shadow: var(--shadow-sm);
+    color: var(--text);
+    cursor: pointer;
+    font-size: 15px;
+    font-weight: 500;
+    padding: 9px 18px;
+    transition: background var(--transicion), border-color var(--transicion),
+        box-shadow var(--transicion), transform var(--transicion);
+}
+
+.btn:hover {
+    background: var(--surface-alt);
+    border-color: var(--text-muted);
+}
+
+/* Un hundimiento mínimo al presionar: confirma el clic sin animaciones ruidosas. */
+.btn:active {
+    transform: translateY(1px);
+}
+
+.btn-primary {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #ffffff;
+    font-weight: 600;
+}
+
+.btn-primary:hover {
+    background: var(--accent-hover);
+    border-color: var(--accent-hover);
+    box-shadow: var(--shadow-md);
+}
+
+.btn-info {
+    background: var(--info-soft);
+    border-color: var(--info-border);
+    color: var(--info-text);
+    font-weight: 600;
+}
+
+.btn-info:hover {
+    background: #d3e6fa;
+    border-color: var(--info-text);
+}
+
+/* Navegación hacia atrás: no compite con las acciones. */
+.btn-ghost {
+    background: none;
+    border-color: transparent;
+    box-shadow: none;
+    color: var(--text-muted);
+    padding-left: 8px;
+}
+
+.btn-ghost:hover {
+    background: var(--surface-sunken);
+    border-color: transparent;
+    color: var(--text);
+}
+
+/* ---------- tabs: indican dónde estás, no son acciones ---------- */
+
+.tabs {
+    background: var(--surface-sunken);
+    border-radius: 999px;
+    display: inline-flex;
+    flex: 0 0 auto;
+    gap: 3px;
+    padding: 4px;
+}
+
+.tab {
+    border-radius: 999px;
+    color: var(--text-muted);
+    cursor: pointer;
+    font-size: 15px;
+    font-weight: 500;
+    padding: 8px 20px;
+    transition: background var(--transicion), color var(--transicion);
+}
+
+.tab:hover {
+    background: rgba(255, 255, 255, 0.6);
+    color: var(--text);
+}
+
+.tab.is-active {
+    background: var(--surface);
+    box-shadow: var(--shadow-sm);
+    color: var(--accent-text);
+    font-weight: 600;
+}
+
+/* ---------- panel de escenarios ---------- */
+
+.panel-head {
+    align-items: center;
+    display: flex;
+    flex: 0 0 auto;
+    gap: 16px;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+.panel-title {
+    font-size: 21px;
+    font-weight: 700;
+    letter-spacing: -0.3px;
+}
+
+.escenario-list {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: 12px;
+    min-height: 0;
+    overflow-y: auto;
+    /* Espacio para que el relieve de la tarjeta al pasar el cursor no se recorte. */
+    padding: 4px;
+}
+
+.escenario-card {
+    align-items: center;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-sm);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    justify-content: space-between;
+    padding: 18px 22px;
+    position: relative;
+    transition: border-color var(--transicion), box-shadow var(--transicion),
+        transform var(--transicion);
+}
+
+/* La tarjeta reacciona al pasar el cursor: se siente tocable, no un renglón muerto. */
+.escenario-card:hover {
+    border-color: var(--info-border);
+    box-shadow: var(--shadow-md);
+    transform: translateY(-2px);
+}
+
+.escenario-id {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.escenario-titulo {
+    align-items: baseline;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.escenario-nombre {
+    font-size: 17px;
+    font-weight: 650;
+    letter-spacing: -0.2px;
+}
+
+.escenario-badge {
+    background: var(--accent-soft);
+    border-radius: 999px;
+    color: var(--accent-text);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    padding: 3px 10px;
+    text-transform: uppercase;
+}
+
+.escenario-fecha {
+    color: var(--text-muted);
+    font-size: 14px;
+}
+
+.escenario-resumen {
+    align-items: center;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 6px;
+}
+
+.escenario-conteo {
+    color: var(--text-muted);
+    font-size: 14px;
+}
+
+.escenario-cobertura {
+    border-radius: 999px;
+    font-size: 12.5px;
+    font-weight: 600;
+    padding: 4px 12px;
+    transition: filter var(--transicion);
+}
+
+.escenario-cobertura.is-ok {
+    background: var(--ok-bg);
+    color: var(--ok-text);
+}
+
+.escenario-cobertura.is-alerta {
+    background: var(--warn-bg);
+    color: var(--warn-text);
+    cursor: help;
+}
+
+.escenario-actions {
+    align-items: center;
+    display: flex;
+    gap: 6px;
+}
+
+/* Borrar un escenario entero pesa más que borrar una fila: queda detrás de
+   un menú en la esquina, apartado de "Abrir" en vez de competir con ella. */
+.escenario-menu {
+    position: absolute;
+    right: 10px;
+    top: 10px;
+}
+
+.btn-menu {
+    background: none;
+    border: none;
+    border-radius: var(--radius-sm);
+    color: var(--text-muted);
+    cursor: pointer;
+    font-size: 18px;
+    line-height: 1;
+    padding: 6px 10px;
+}
+
+.btn-menu:hover,
+.btn-menu[aria-expanded="true"] {
+    background: var(--surface-sunken);
+    color: var(--text);
+}
+
+.menu-desplegable {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-lg);
+    min-width: 175px;
+    overflow: hidden;
+    padding: 4px;
+    position: absolute;
+    right: 0;
+    top: calc(100% + 6px);
+    z-index: 10;
+}
+
+.menu-item {
+    background: none;
+    border: none;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    display: block;
+    font-size: 14px;
+    font-weight: 500;
+    padding: 9px 12px;
+    text-align: left;
+    transition: background var(--transicion);
+    width: 100%;
+}
+
+.menu-item:hover {
+    background: var(--surface-sunken);
+}
+
+.menu-item-peligro {
+    color: var(--error-text);
+}
+
+.menu-item-peligro:hover {
+    background: var(--error-bg);
+}
+
+/* ---------- detalle de escenario ---------- */
+
+.detalle-head {
+    flex: 0 0 auto;
+    margin-bottom: 10px;
+}
+
+.detalle-head-fila {
+    align-items: center;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: space-between;
+}
+
+.detalle-nombre {
+    font-size: 19px;
+    font-weight: 700;
+    letter-spacing: -0.3px;
+}
+
+.detalle-meta {
+    color: var(--text-muted);
+    font-size: 13px;
+}
+
+/* Cuando hay materias sin cubrir, el chip es un atajo hacia ellas. */
+.escenario-cobertura.es-accion {
+    cursor: pointer;
+    margin-top: 10px;
+}
+
+.escenario-cobertura.es-accion::after {
+    content: " →";
+}
+
+.escenario-cobertura.es-accion:hover {
+    filter: brightness(0.95);
+}
+
+#detalle-cobertura {
+    display: inline-block;
+}
+
+/* ---------- búsqueda y filtros ---------- */
+
+.detalle-controles {
+    align-items: center;
+    display: flex;
+    flex: 0 0 auto;
+    flex-wrap: wrap;
+    gap: 14px;
+    justify-content: space-between;
+}
+
+.barra-filtros {
+    align-items: center;
+    display: flex;
+    flex: 1 1 260px;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.input-busqueda {
+    background: var(--surface-alt);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    color: var(--text);
+    flex: 1 1 260px;
+    font: inherit;
+    font-size: 15px;
+    padding: 9px 16px;
+    transition: background var(--transicion), border-color var(--transicion);
+}
+
+.input-busqueda:focus {
+    background: var(--surface);
+    border-color: var(--accent);
+}
+
+.input-busqueda::placeholder {
+    color: var(--text-muted);
+}
+
+.filtros {
+    display: flex;
+    gap: 8px;
+}
+
+.chip-filtro {
+    background: var(--surface-alt);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    color: var(--text-muted);
+    cursor: pointer;
+    font-size: 14px;
+    padding: 7px 14px;
+    transition: background var(--transicion), color var(--transicion),
+        border-color var(--transicion);
+}
+
+.chip-filtro:hover {
+    background: var(--surface-sunken);
+    color: var(--text);
+}
+
+.chip-filtro.is-active {
+    background: var(--info-soft);
+    border-color: var(--info-text);
+    color: var(--info-text);
+    font-weight: 600;
+}
+
+.seccion-titulo {
+    color: var(--text-muted);
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.4px;
+    margin-bottom: 10px;
+    text-transform: uppercase;
+}
+
+.separador {
+    opacity: 0.5;
+    padding: 0 4px;
+}
+
+.detalle-contenido {
+    flex: 1;
+    margin-top: 18px;
+    min-height: 0;
+    overflow: auto;
+}
+
+.tabla {
+    border-collapse: collapse;
+    font-size: 15px;
+    width: 100%;
+}
+
+.tabla th {
+    background: var(--surface);
+    border-bottom: 1.5px solid var(--border);
+    color: var(--text-muted);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    padding: 11px 14px;
+    position: sticky;
+    text-align: left;
+    text-transform: uppercase;
+    top: 0;
+    z-index: 1;
+}
+
+.tabla td {
+    border-bottom: 1px solid var(--border-soft);
+    padding: 11px 14px;
+}
+
+.tabla tbody tr {
+    transition: background var(--transicion);
+}
+
+.tabla tbody tr:hover {
+    background: var(--surface-alt);
+}
+
+.tabla tr.is-alerta td {
+    background: var(--warn-bg);
+}
+
+.tabla tr.fila-separador td {
+    background: var(--surface-sunken);
+    color: var(--text-muted);
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.4px;
+    padding: 6px 10px;
+    text-transform: uppercase;
+}
+
+.tabla tr.fila-separador:hover td {
+    background: var(--surface-sunken);
+}
+
+/* Aire entre semestres. En una tabla el margin no aplica a <tr>, así que el
+   hueco se hace con un borde del color del fondo; `background-clip` evita que
+   el gris del separador se derrame sobre él. El primer semestre no lo lleva,
+   para no despegarse del encabezado de la tabla. */
+.tabla tr.fila-separador:not(.fila-subseparador):not(:first-child) td {
+    background-clip: padding-box;
+    border-top: 22px solid var(--surface);
+}
+
+/* Subgrupo dentro del semestre: sangrado y con una barra de color a la
+   izquierda, para que se lea como hijo del separador de arriba y no como
+   otro semestre. */
+.tabla tr.fila-subseparador td {
+    background: var(--info-soft);
+    border-left: 3px solid var(--info-border);
+    color: var(--info-text);
+    letter-spacing: 0.3px;
+    padding-left: 20px;
+    text-transform: none;
+}
+
+.tabla tr.fila-subseparador:hover td {
+    background: var(--info-soft);
+}
+
+/* ---------- catálogo de aulas ---------- */
+
+.aulas-grupos {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+/* ---------- especialidades ---------- */
+
+.especialidad-titulo {
+    align-items: center;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.especialidad-titulo .seccion-titulo {
+    margin-bottom: 0;
+}
+
+/* El conteo de docentes es un botón, pero debe leerse como dato en la tabla. */
+.celda-docentes {
+    background: none;
+    border: 1px solid transparent;
+    border-radius: var(--radius-sm);
+    color: inherit;
+    cursor: pointer;
+    font: inherit;
+    padding: 3px 8px;
+    transition: background var(--transicion), border-color var(--transicion);
+}
+
+.celda-docentes:hover {
+    background: var(--surface);
+    border-color: var(--border);
+}
+
+.materia-check-nota {
+    color: var(--text-muted);
+    font-size: 12px;
+    font-weight: 400;
+    margin-left: auto;
+    padding-left: 10px;
+}
+
+.formulario-nota {
+    color: var(--text-muted);
+    font-size: 14px;
+    margin: -10px 0 0;
+}
+
+.chip-alerta {
+    border-radius: 999px;
+    color: var(--warn-text);
+    font-size: 12px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+/* ---------- estados ---------- */
+
+.empty-state {
+    background: var(--surface-alt);
+    border: 1.5px dashed var(--border);
+    border-radius: var(--radius-md);
+    color: var(--text-muted);
+    padding: 40px 16px;
+    text-align: center;
+}
+
+.error-state {
+    background: var(--error-bg);
+    border: 1px solid var(--error-border);
+    border-radius: var(--radius-md);
+    color: var(--error-text);
+    padding: 18px 16px;
+    text-align: center;
+}
+
+.loading-state {
+    color: var(--text-muted);
+    padding: 26px 16px;
+    text-align: center;
+}
+
+/* ---------- edición: encabezados de sección y acciones por fila ---------- */
+
+.seccion-encabezado {
+    align-items: center;
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+}
+
+.seccion-encabezado .seccion-titulo {
+    margin-bottom: 0;
+}
+
+.btn-mini {
+    font-size: 13px;
+    padding: 6px 12px;
+}
+
+/* Discreto en reposo: una tabla con un botón rojo por fila es puro ruido.
+   El rojo aparece al apuntarlo, que es cuando la advertencia importa. */
+.btn-peligro {
+    background: var(--surface);
+    border-color: var(--border);
+    color: var(--text-muted);
+    font-weight: 500;
+}
+
+.btn-peligro:hover {
+    background: var(--error-bg);
+    border-color: var(--error-border);
+    color: var(--error-text);
+}
+
+.fila-acciones {
+    display: flex;
+    gap: 6px;
+    white-space: nowrap;
+}
+
+.detalle-head-acciones {
+    align-items: center;
+    display: flex;
+    gap: 10px;
+}
+
+.detalle-head-acciones .btn {
+    font-size: 14px;
+    padding: 7px 16px;
+}
+
+/* ---------- diálogos de edición ---------- */
+
+.dialogo {
+    border: none;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-lg);
+    max-width: 480px;
+    padding: 0;
+    width: calc(100% - 40px);
+}
+
+.dialogo-ancho {
+    max-width: 760px;
+}
+
+.dialogo::backdrop {
+    background: rgba(20, 30, 44, 0.42);
+    backdrop-filter: blur(2px);
+}
+
+.formulario {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    max-height: 80vh;
+    overflow-y: auto;
+    padding: 28px;
+}
+
+.formulario-titulo {
+    font-size: 20px;
+    font-weight: 700;
+    letter-spacing: -0.3px;
+}
+
+.campo {
+    display: flex;
+    flex: 1 1 0;
+    flex-direction: column;
+    font-size: 14px;
+    font-weight: 600;
+    gap: 6px;
+    /* Sin esto el ancho intrínseco del <input> impide que tres campos
+       quepan en una fila, y el tercero se cae solo al renglón siguiente. */
+    min-width: 0;
+}
+
+.campo input,
+.campo select {
+    min-width: 0;
+}
+
+.campo span {
+    color: var(--text-muted);
+}
+
+/* background-color, no el atajo `background`: el shorthand borraría la flecha
+   que .campo select dibuja como background-image. */
+.campo input,
+.campo select {
+    background-color: var(--surface-alt);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    color: var(--text);
+    font: inherit;
+    font-size: 15px;
+    font-weight: 400;
+    padding: 9px 12px;
+    transition: background-color var(--transicion), border-color var(--transicion);
+}
+
+.campo input:focus,
+.campo select:focus {
+    background-color: var(--surface);
+    border-color: var(--accent);
+}
+
+/* El <select> nativo desentona junto a los inputs; se le dibuja la misma caja
+   y su propia flecha (SVG embebido: no depende de archivos externos).
+   Va después de la regla base para que su padding no quede pisado. */
+.campo select {
+    appearance: none;
+    background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='none' stroke='%236b7a8d' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round' d='M1 1.5 6 6.5l5-5'/%3E%3C/svg%3E");
+    background-position: right 12px center;
+    background-repeat: no-repeat;
+    background-size: 12px 8px;
+    cursor: pointer;
+    padding-right: 32px;
+}
+
+.campo-fila {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px;
+}
+
+.campo-check {
+    align-items: center;
+    flex-direction: row;
+    gap: 8px;
+    justify-content: flex-start;
+}
+
+.campo-grupo {
+    border: 1px solid var(--border-soft);
+    border-radius: var(--radius-md);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 16px;
+}
+
+.campo-grupo legend {
+    color: var(--text-muted);
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+    padding: 0 4px;
+    text-transform: uppercase;
+}
+
+.dias {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 12px;
+}
+
+.dia-check {
+    align-items: center;
+    display: flex;
+    font-size: 13px;
+    font-weight: 400;
+    gap: 5px;
+}
+
+.materias-checklist {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    max-height: 280px;
+    overflow-y: auto;
+}
+
+.materias-checklist-grupo {
+    border: none;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 0;
+}
+
+.materias-checklist-grupo legend {
+    color: var(--text-muted);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+    text-transform: uppercase;
+}
+
+.materia-check {
+    align-items: center;
+    display: flex;
+    font-size: 13px;
+    font-weight: 400;
+    gap: 6px;
+}
+
+.formulario-error {
+    background: var(--error-bg);
+    border: 1px solid var(--error-border);
+    border-radius: var(--radius-sm);
+    color: var(--error-text);
+    font-size: 13px;
+    padding: 8px 12px;
+}
+
+.formulario-acciones {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+}
+
+/* ---------- accesibilidad y pantallas angostas ---------- */
+
+:focus-visible {
+    border-radius: var(--radius-sm);
+    outline: 2px solid var(--info-border);
+    outline-offset: 2px;
+}
+
+@media (max-width: 640px) {
+    .topbar {
+        flex-wrap: wrap;
+        gap: 4px 16px;
+    }
+
+    .screen-actions {
+        flex-wrap: wrap;
+    }
+
+    .escenario-card {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .escenario-actions {
+        justify-content: flex-end;
+    }
+}

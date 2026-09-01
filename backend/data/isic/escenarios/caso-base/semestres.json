@@ -1,0 +1,13 @@
+[
+  {
+    "id": "sem-2026-ago-dic-isic",
+    "periodo": "Agosto-Diciembre 2026",
+    "carrera": "ISIC",
+    "semanas": 16,
+    "turnos": [
+      "matutino",
+      "vespertino"
+    ],
+    "estado": "activo"
+  }
+]

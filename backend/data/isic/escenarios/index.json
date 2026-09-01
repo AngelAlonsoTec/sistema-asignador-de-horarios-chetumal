@@ -1,0 +1,16 @@
+[
+  {
+    "id": "caso-base",
+    "carrera": "ISIC",
+    "nombre": "Caso base",
+    "fecha": "2026-08-25",
+    "esBase": true
+  },
+  {
+    "id": "especialidades-2026",
+    "carrera": "ISIC",
+    "nombre": "Especialidades 2026",
+    "fecha": "2026-08-28",
+    "esBase": false
+  }
+]

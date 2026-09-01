@@ -1,0 +1,572 @@
+[
+  {
+    "id": "acf_0901",
+    "clave": "ACF-0901",
+    "nombre": "Cálculo Diferencial",
+    "semestre": 1,
+    "horasSemana": 5,
+    "creditos": 5,
+    "carrera": "ISIC",
+    "especialidadId": null
+  },
+  {
+    "id": "aed_1285",
+    "clave": "AED-1285",
+    "nombre": "Fundamentos de Programación",
+    "semestre": 1,
+    "horasSemana": 5,
+    "creditos": 5,
+    "carrera": "ISIC",
+    "especialidadId": null
+  },
+  {
+    "id": "aca_0907",
+    "clave": "ACA-0907",
+    "nombre": "Taller de Ética",
+    "semestre": 1,
+    "horasSemana": 4,
+    "creditos": 4,
+    "carrera": "ISIC",
+    "especialidadId": null
+  },
+  {
+    "id": "aef_1041",
+    "clave": "AEF-1041",
+    "nombre": "Matemáticas Discretas",
+    "semestre": 1,
+    "horasSemana": 5,
+    "creditos": 5,
+    "carrera": "ISIC",
+    "especialidadId": null
+  },
+  {
+    "id": "sch_1024",
+    "clave": "SCH-1024",
+    "nombre": "Taller de Administración",
+    "semestre": 1,
+    "horasSemana": 4,
+    "creditos": 4,
+    "carrera": "ISIC",
+    "especialidadId": null
+  },
+  {
+    "id": "acc_0906",
+    "clave": "ACC-0906",
+    "nombre": "Fundamentos de Investigación",
+    "semestre": 1,
+    "horasSemana": 4,
+    "creditos": 4,
+    "carrera": "ISIC",
+    "especialidadId": null
+  },
+  {
+    "id": "acf_0902",
+    "clave": "ACF-0902",
+    "nombre": "Cálculo Integral",
+    "semestre": 2,
+    "horasSemana": 5,
+    "creditos": 5,
+    "carrera": "ISIC",
+    "especialidadId": null
+  },
+  {
+    "id": "aed_1286",
+    "clave": "AED-1286",
+    "nombre": "Programación Orientada a Objetos",
+    "semestre": 2,
+    "horasSemana": 5,
+    "creditos": 5,
+    "carrera": "ISIC",
+    "especialidadId": null
+  },
+  {
+    "id": "aec_1008",
+    "clave": "AEC-1008",
+    "nombre": "Contabilidad Financiera",
+    "semestre": 2,
+    "horasSemana": 4,
+    "creditos": 4,
+    "carrera": "ISIC",
+    "especialidadId": null
+  },
+  {
+    "id": "aec_1058",
+    "clave": "AEC-1058",
+    "nombre": "Química",
+    "semestre": 2,
+    "horasSemana": 4,
+    "creditos": 4,
+    "carrera": "ISIC",
+    "especialidadId": null
+  },
+  {
+    "id": "acf_0903",
+    "clave": "ACF-0903",
+    "nombre": "Álgebra Lineal",
+    "semestre": 2,
+    "horasSemana": 5,
+    "creditos": 5,
+    "carrera": "ISIC",
+    "especialidadId": null
+  },
+  {
+    "id": "aef_1052",
+    "clave": "AEF-1052",
+    "nombre": "Probabilidad y Estadística",
+    "semestre": 2,
+    "horasSemana": 5,
+    "creditos": 5,
+    "carrera": "ISIC",
+    "especialidadId": null
+  },
+  {
+    "id": "acf_0904",
+    "clave": "ACF-0904",
+    "nombre": "Cálculo Vectorial",
+    "semestre": 3,
+    "horasSemana": 5,
+    "creditos": 5,
+    "carrera": "ISIC",
+    "especialidadId": null
+  },
+  {
+    "id": "aed_1026",
+    "clave": "AED-1026",
+    "nombre": "Estructura de Datos",
+    "semestre": 3,
+    "horasSemana": 5,
+    "creditos": 5,
+    "carrera": "ISIC",
+    "especialidadId": null
+  },
+  {
+    "id": "scc_1005",
+    "clave": "SCC-1005",
+    "nombre": "Cultura Empresarial",
+    "semestre": 3,
+    "horasSemana": 4,
+    "creditos": 4,
+    "carrera": "ISIC",
+    "especialidadId": null
+  },
+  {
+    "id": "scc_1013",
+    "clave": "SCC-1013",
+    "nombre": "Investigación de Operaciones",
+    "semestre": 3,
+    "horasSemana": 4,
+    "creditos": 4,
+    "carrera": "ISIC",
+    "especialidadId": null
+  },
+  {
+    "id": "acd_0908",
+    "clave": "ACD-0908",
+    "nombre": "Desarrollo Sustentable",
+    "semestre": 3,
+    "horasSemana": 5,
+    "creditos": 5,
+    "carrera": "ISIC",
+    "especialidadId": null
+  },
+  {
+    "id": "scf_1006",
+    "clave": "SCF-1006",
+    "nombre": "Física General",
+    "semestre": 3,
+    "horasSemana": 5,
+    "creditos": 5,
+    "carrera": "ISIC",
+    "especialidadId": null
+  },
+  {
+    "id": "acf_0905",
+    "clave": "ACF-0905",
+    "nombre": "Ecuaciones Diferenciales",
+    "semestre": 4,
+    "horasSemana": 5,
+    "creditos": 5,
+    "carrera": "ISIC",
+    "especialidadId": null
+  },
+  {
+    "id": "scc_1017",
+    "clave": "SCC-1017",
+    "nombre": "Métodos Numéricos",
+    "semestre": 4,
+    "horasSemana": 4,
+    "creditos": 4,
+    "carrera": "ISIC",
+    "especialidadId": null
+  },
+  {
+    "id": "scd_1027",
+    "clave": "SCD-1027",
+    "nombre": "Tópicos Avanzados de Programación",
+    "semestre": 4,
+    "horasSemana": 5,
+    "creditos": 5,
+    "carrera": "ISIC",
+    "especialidadId": null
+  },
+  {
+    "id": "aef_1031",
+    "clave": "AEF-1031",
+    "nombre": "Fundamentos de Base de Datos",
+    "semestre": 4,
+    "horasSemana": 5,
+    "creditos": 5,
+    "carrera": "ISIC",
+    "especialidadId": null
+  },
+  {
+    "id": "scd_1022",
+    "clave": "SCD-1022",
+    "nombre": "Simulación",
+    "semestre": 4,
+    "horasSemana": 5,
+    "creditos": 5,
+    "carrera": "ISIC",
+    "especialidadId": null
+  },
+  {
+    "id": "scd_1018",
+    "clave": "SCD-1018",
+    "nombre": "Principios Eléctricos y Aplicaciones Digitales",
+    "semestre": 4,
+    "horasSemana": 5,
+    "creditos": 5,
+    "carrera": "ISIC",
+    "especialidadId": null
+  },
+  {
+    "id": "scc_1010",
+    "clave": "SCC-1010",
+    "nombre": "Graficación",
+    "semestre": 5,
+    "horasSemana": 4,
+    "creditos": 4,
+    "carrera": "ISIC",
+    "especialidadId": null
+  },
+  {
+    "id": "aec_1034",
+    "clave": "AEC-1034",
+    "nombre": "Fundamentos de Telecomunicaciones",
+    "semestre": 5,
+    "horasSemana": 4,
+    "creditos": 4,
+    "carrera": "ISIC",
+    "especialidadId": null
+  },
+  {
+    "id": "aec_1061",
+    "clave": "AEC-1061",
+    "nombre": "Sistemas Operativos",
+    "semestre": 5,
+    "horasSemana": 4,
+    "creditos": 4,
+    "carrera": "ISIC",
+    "especialidadId": null
+  },
+  {
+    "id": "sca_1025",
+    "clave": "SCA-1025",
+    "nombre": "Taller de Base de Datos",
+    "semestre": 5,
+    "horasSemana": 4,
+    "creditos": 4,
+    "carrera": "ISIC",
+    "especialidadId": null
+  },
+  {
+    "id": "scc_1007",
+    "clave": "SCC-1007",
+    "nombre": "Fundamentos de Ingeniería de Software",
+    "semestre": 5,
+    "horasSemana": 4,
+    "creditos": 4,
+    "carrera": "ISIC",
+    "especialidadId": null
+  },
+  {
+    "id": "scd_1003",
+    "clave": "SCD-1003",
+    "nombre": "Arquitectura de Computadoras",
+    "semestre": 5,
+    "horasSemana": 4,
+    "creditos": 4,
+    "carrera": "ISIC",
+    "especialidadId": null
+  },
+  {
+    "id": "scd_1015",
+    "clave": "SCD-1015",
+    "nombre": "Lenguajes y Autómatas I",
+    "semestre": 7,
+    "horasSemana": 5,
+    "creditos": 5,
+    "carrera": "ISIC",
+    "especialidadId": null
+  },
+  {
+    "id": "scd_1021",
+    "clave": "SCD-1021",
+    "nombre": "Redes de Computadoras",
+    "semestre": 6,
+    "horasSemana": 5,
+    "creditos": 5,
+    "carrera": "ISIC",
+    "especialidadId": null
+  },
+  {
+    "id": "sca_1026",
+    "clave": "SCA-1026",
+    "nombre": "Taller de Sistemas Operativos",
+    "semestre": 6,
+    "horasSemana": 4,
+    "creditos": 4,
+    "carrera": "ISIC",
+    "especialidadId": null
+  },
+  {
+    "id": "scb_1001",
+    "clave": "SCB-1001",
+    "nombre": "Administración de Base de Datos",
+    "semestre": 6,
+    "horasSemana": 5,
+    "creditos": 5,
+    "carrera": "ISIC",
+    "especialidadId": null
+  },
+  {
+    "id": "scd_1011",
+    "clave": "SCD-1011",
+    "nombre": "Ingeniería de Software",
+    "semestre": 6,
+    "horasSemana": 5,
+    "creditos": 5,
+    "carrera": "ISIC",
+    "especialidadId": null
+  },
+  {
+    "id": "scc_1014",
+    "clave": "SCC-1014",
+    "nombre": "Lenguajes de Interfaz",
+    "semestre": 6,
+    "horasSemana": 4,
+    "creditos": 4,
+    "carrera": "ISIC",
+    "especialidadId": null
+  },
+  {
+    "id": "scd_1016",
+    "clave": "SCD-1016",
+    "nombre": "Lenguajes y Autómatas II",
+    "semestre": 8,
+    "horasSemana": 5,
+    "creditos": 5,
+    "carrera": "ISIC",
+    "especialidadId": null
+  },
+  {
+    "id": "scd_1004",
+    "clave": "SCD-1004",
+    "nombre": "Conmutación y Enrutamiento en Redes de Datos",
+    "semestre": 7,
+    "horasSemana": 5,
+    "creditos": 5,
+    "carrera": "ISIC",
+    "especialidadId": null
+  },
+  {
+    "id": "aca_0909",
+    "clave": "ACA-0909",
+    "nombre": "Taller de Investigación I",
+    "semestre": 7,
+    "horasSemana": 4,
+    "creditos": 4,
+    "carrera": "ISIC",
+    "especialidadId": null
+  },
+  {
+    "id": "scg_1009",
+    "clave": "SCG-1009",
+    "nombre": "Gestión de Proyectos de Software",
+    "semestre": 7,
+    "horasSemana": 6,
+    "creditos": 6,
+    "carrera": "ISIC",
+    "especialidadId": null
+  },
+  {
+    "id": "scc_1023",
+    "clave": "SCC-1023",
+    "nombre": "Sistemas Programables",
+    "semestre": 7,
+    "horasSemana": 4,
+    "creditos": 4,
+    "carrera": "ISIC",
+    "especialidadId": null
+  },
+  {
+    "id": "scc_1019",
+    "clave": "SCC-1019",
+    "nombre": "Programación Lógica y Funcional",
+    "semestre": 8,
+    "horasSemana": 4,
+    "creditos": 4,
+    "carrera": "ISIC",
+    "especialidadId": null
+  },
+  {
+    "id": "sca_1002",
+    "clave": "SCA-1002",
+    "nombre": "Administración de Redes",
+    "semestre": 8,
+    "horasSemana": 4,
+    "creditos": 4,
+    "carrera": "ISIC",
+    "especialidadId": null
+  },
+  {
+    "id": "aca_0910",
+    "clave": "ACA-0910",
+    "nombre": "Taller de Investigación II",
+    "semestre": 8,
+    "horasSemana": 4,
+    "creditos": 4,
+    "carrera": "ISIC",
+    "especialidadId": null
+  },
+  {
+    "id": "aeb_1055",
+    "clave": "AEB-1055",
+    "nombre": "Programación Web",
+    "semestre": 6,
+    "horasSemana": 5,
+    "creditos": 5,
+    "carrera": "ISIC",
+    "especialidadId": null
+  },
+  {
+    "id": "scc_1012",
+    "clave": "SCC-1012",
+    "nombre": "Inteligencia Artificial",
+    "semestre": 6,
+    "horasSemana": 4,
+    "creditos": 4,
+    "carrera": "ISIC",
+    "especialidadId": null
+  },
+  {
+    "id": "wec_2401",
+    "clave": "WEC-2401",
+    "nombre": "Desarrollo Web I",
+    "semestre": 7,
+    "horasSemana": 4,
+    "creditos": 4,
+    "especialidadId": "desarrollo-web",
+    "carrera": "ISIC"
+  },
+  {
+    "id": "wef_2002",
+    "clave": "WEF-2002",
+    "nombre": "Desarrollo Web II",
+    "semestre": 8,
+    "horasSemana": 5,
+    "creditos": 5,
+    "especialidadId": "desarrollo-web",
+    "carrera": "ISIC"
+  },
+  {
+    "id": "wec_2009",
+    "clave": "WEC-2009",
+    "nombre": "Electiva Programación de Dispositivos Móviles I (Optativa)",
+    "semestre": 9,
+    "horasSemana": 4,
+    "creditos": 4,
+    "especialidadId": "desarrollo-web",
+    "carrera": "ISIC"
+  },
+  {
+    "id": "wec_2005",
+    "clave": "WEC-2005",
+    "nombre": "Framework para Frontend (Optativa)",
+    "semestre": 8,
+    "horasSemana": 4,
+    "creditos": 4,
+    "especialidadId": "desarrollo-web",
+    "carrera": "ISIC"
+  },
+  {
+    "id": "wec_2003",
+    "clave": "WEC-2003",
+    "nombre": "Framework Backend",
+    "semestre": 9,
+    "horasSemana": 4,
+    "creditos": 4,
+    "especialidadId": "desarrollo-web",
+    "carrera": "ISIC"
+  },
+  {
+    "id": "wec_2007",
+    "clave": "WEC-2007",
+    "nombre": "Computación en la Nube (Optativa)",
+    "semestre": 9,
+    "horasSemana": 4,
+    "creditos": 4,
+    "especialidadId": "desarrollo-web",
+    "carrera": "ISIC"
+  },
+  {
+    "id": "nef_2001",
+    "clave": "NEF-2001",
+    "nombre": "Investigación de Mercado I",
+    "semestre": 7,
+    "horasSemana": 5,
+    "creditos": 5,
+    "especialidadId": "negocios-digitales",
+    "carrera": "ISIC"
+  },
+  {
+    "id": "nef_2002",
+    "clave": "NEF-2002",
+    "nombre": "Administración de Negocios Digitales",
+    "semestre": 8,
+    "horasSemana": 5,
+    "creditos": 5,
+    "especialidadId": "negocios-digitales",
+    "carrera": "ISIC"
+  },
+  {
+    "id": "nef_2003",
+    "clave": "NEF-2003",
+    "nombre": "Mercadotecnia Digital",
+    "semestre": 9,
+    "horasSemana": 5,
+    "creditos": 5,
+    "especialidadId": "negocios-digitales",
+    "carrera": "ISIC"
+  },
+  {
+    "id": "nef_2004",
+    "clave": "NEF-2004",
+    "nombre": "Investigación de Mercado II",
+    "semestre": 8,
+    "horasSemana": 5,
+    "creditos": 5,
+    "especialidadId": "negocios-digitales",
+    "carrera": "ISIC"
+  },
+  {
+    "id": "nef_2005",
+    "clave": "NEF-2005",
+    "nombre": "Ingeniería Económica",
+    "semestre": 9,
+    "horasSemana": 5,
+    "creditos": 5,
+    "especialidadId": "negocios-digitales",
+    "carrera": "ISIC"
+  }
+]

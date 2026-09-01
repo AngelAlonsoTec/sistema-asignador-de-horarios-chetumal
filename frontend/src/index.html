@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SchedulAI — Datos base</title>
+    <link rel="stylesheet" href="assets/normalize.css">
+    <link rel="stylesheet" href="assets/main.css">
+</head>
+
+<body>
+    <header class="topbar">
+        <span class="brand">SchedulAI</span>
+        <span class="greeting">Bienvenido Administrador</span>
+    </header>
+
+    <!-- Vista 1: escenarios de una carrera -->
+    <main class="screen" id="vista-lista">
+        <div class="screen-actions">
+            <button class="btn btn-ghost" id="btn-volver">← Semestres</button>
+            <nav class="tabs" id="tabs-carrera" aria-label="Carrera">
+                <button class="tab is-active" data-carrera="ISIC">ISIC</button>
+                <button class="tab" data-carrera="ITIC">ITIC</button>
+                <button class="tab" data-carrera="IDAP">IDAP</button>
+            </nav>
+        </div>
+
+        <div class="panel-head">
+            <h1 class="panel-title">Escenarios <span id="carrera-nombre"></span></h1>
+            <button class="btn btn-primary" id="btn-nuevo">Nuevo Escenario</button>
+        </div>
+
+        <ul class="escenario-list" id="escenario-list"></ul>
+    </main>
+
+    <!-- Vista 2: dataset completo de un escenario -->
+    <main class="screen" id="vista-detalle" hidden>
+        <div class="screen-actions">
+            <button class="btn btn-ghost" id="btn-volver-lista">← Escenarios</button>
+            <div class="detalle-head-acciones">
+                <button type="button" class="btn" id="detalle-agregar"></button>
+                <button type="button" class="btn btn-primary" id="detalle-guardar">Guardar cambios</button>
+            </div>
+        </div>
+
+        <header class="detalle-head">
+            <div class="detalle-head-fila">
+                <div class="escenario-titulo">
+                    <h1 class="detalle-nombre" id="detalle-nombre"></h1>
+                    <span class="escenario-badge" id="detalle-badge" hidden>Base</span>
+                    <span class="detalle-meta">
+                        <span id="detalle-semestre"></span>
+                        <span class="separador">·</span>
+                        <span id="detalle-fecha"></span>
+                    </span>
+                </div>
+                <button type="button" class="escenario-cobertura" id="detalle-cobertura"></button>
+            </div>
+        </header>
+
+        <div class="detalle-controles">
+            <nav class="tabs" id="tabs-entidad" role="tablist" aria-label="Entidad">
+                <button class="tab is-active" role="tab" aria-selected="true" data-entidad="docentes">Docentes</button>
+                <button class="tab" role="tab" aria-selected="false" data-entidad="materias">Materias</button>
+                <button class="tab" role="tab" aria-selected="false"
+                    data-entidad="especialidades">Especialidades</button>
+                <button class="tab" role="tab" aria-selected="false" data-entidad="aulas">Aulas</button>
+            </nav>
+
+            <div class="barra-filtros" id="barra-filtros">
+                <input type="search" class="input-busqueda" id="busqueda" autocomplete="off"
+                    aria-label="Buscar en la tabla">
+                <div class="filtros" id="filtros-materia" hidden>
+                    <button class="chip-filtro is-active" data-filtro="todas">Todas</button>
+                    <button class="chip-filtro" data-filtro="sin-docente">Sin docente</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="detalle-contenido" id="detalle-contenido"></div>
+    </main>
+
+    <template id="tpl-escenario">
+        <li class="escenario-card">
+            <div class="escenario-menu">
+                <button type="button" class="btn-menu" data-accion="menu-toggle" aria-haspopup="true"
+                    aria-expanded="false" aria-label="Más acciones">⋮</button>
+                <div class="menu-desplegable" hidden>
+                    <button type="button" class="menu-item menu-item-peligro" data-accion="eliminar">Eliminar
+                        escenario</button>
+                </div>
+            </div>
+            <div class="escenario-id">
+                <div class="escenario-titulo">
+                    <span class="escenario-nombre"></span>
+                    <span class="escenario-badge" hidden>Base</span>
+                </div>
+                <span class="escenario-fecha"></span>
+                <div class="escenario-resumen">
+                    <span class="escenario-conteo"></span>
+                    <span class="escenario-cobertura"></span>
+                </div>
+            </div>
+            <div class="escenario-actions">
+                <button class="btn btn-info" data-accion="abrir">Abrir →</button>
+            </div>
+        </li>
+    </template>
+
+    <dialog id="dialog-escenario" class="dialogo">
+        <form id="form-escenario" class="formulario">
+            <h2 class="formulario-titulo">Nuevo escenario</h2>
+
+            <label class="campo">
+                <span>Nombre</span>
+                <input type="text" id="escenario-nombre" placeholder="Ej. + Especialidad IA" required>
+            </label>
+            <label class="campo">
+                <span>Basado en</span>
+                <select id="escenario-basado-en"></select>
+            </label>
+
+            <p class="formulario-error" id="escenario-form-error" hidden></p>
+
+            <div class="formulario-acciones">
+                <button type="button" class="btn btn-ghost" id="escenario-cancelar">Cancelar</button>
+                <button type="submit" class="btn btn-primary">Crear</button>
+            </div>
+        </form>
+    </dialog>
+
+    <dialog id="dialog-materia" class="dialogo">
+        <form id="form-materia" class="formulario">
+            <h2 class="formulario-titulo" id="materia-form-titulo">Nueva materia</h2>
+
+            <label class="campo">
+                <span>Clave</span>
+                <input type="text" id="materia-clave" placeholder="ACF-0901" required>
+            </label>
+            <label class="campo">
+                <span>Nombre</span>
+                <input type="text" id="materia-nombre" required>
+            </label>
+            <div class="campo-fila">
+                <label class="campo">
+                    <span>Semestre</span>
+                    <input type="number" id="materia-semestre" min="1" max="9" required>
+                </label>
+                <label class="campo">
+                    <span>Horas/semana</span>
+                    <input type="number" id="materia-horas" min="1" required>
+                </label>
+                <label class="campo">
+                    <span>Créditos</span>
+                    <input type="number" id="materia-creditos" min="1" required>
+                </label>
+            </div>
+            <label class="campo">
+                <span>Especialidad</span>
+                <select id="materia-especialidad"></select>
+            </label>
+
+            <p class="formulario-error" id="materia-form-error" hidden></p>
+
+            <div class="formulario-acciones">
+                <button type="button" class="btn btn-ghost" id="materia-cancelar">Cancelar</button>
+                <button type="submit" class="btn btn-primary">Guardar</button>
+            </div>
+        </form>
+    </dialog>
+
+    <dialog id="dialog-aula" class="dialogo">
+        <form id="form-aula" class="formulario">
+            <h2 class="formulario-titulo" id="aula-form-titulo">Nueva aula</h2>
+
+            <label class="campo">
+                <span>Clave</span>
+                <input type="text" id="aula-clave" placeholder="V-13" required>
+            </label>
+            <label class="campo">
+                <span>Tipo</span>
+                <select id="aula-tipo">
+                    <option value="aula">Aula</option>
+                    <option value="laboratorio">Laboratorio</option>
+                </select>
+            </label>
+
+            <p class="formulario-error" id="aula-form-error" hidden></p>
+
+            <div class="formulario-acciones">
+                <button type="button" class="btn btn-ghost" id="aula-cancelar">Cancelar</button>
+                <button type="submit" class="btn btn-primary">Guardar</button>
+            </div>
+        </form>
+    </dialog>
+
+    <dialog id="dialog-especialidad" class="dialogo dialogo-ancho">
+        <form id="form-especialidad" class="formulario">
+            <h2 class="formulario-titulo" id="especialidad-form-titulo">Nueva especialidad</h2>
+
+            <label class="campo">
+                <span>Nombre</span>
+                <input type="text" id="especialidad-nombre" placeholder="Ej. Inteligencia Artificial" required>
+            </label>
+
+            <fieldset class="campo-grupo">
+                <legend>Materias que la componen</legend>
+                <div class="materias-checklist" id="especialidad-materias-checklist"></div>
+            </fieldset>
+
+            <p class="formulario-error" id="especialidad-form-error" hidden></p>
+
+            <div class="formulario-acciones">
+                <button type="button" class="btn btn-ghost" id="especialidad-cancelar">Cancelar</button>
+                <button type="submit" class="btn btn-primary">Guardar</button>
+            </div>
+        </form>
+    </dialog>
+
+    <dialog id="dialog-docentes-materia" class="dialogo">
+        <form id="form-docentes-materia" class="formulario">
+            <h2 class="formulario-titulo" id="docentes-materia-form-titulo">Docentes que pueden impartirla</h2>
+            <p class="formulario-nota" id="docentes-materia-nota"></p>
+
+            <fieldset class="campo-grupo">
+                <legend>Docentes</legend>
+                <div class="materias-checklist" id="docentes-materia-checklist"></div>
+            </fieldset>
+
+            <div class="formulario-acciones">
+                <button type="button" class="btn btn-ghost" id="docentes-materia-cancelar">Cancelar</button>
+                <button type="submit" class="btn btn-primary">Guardar</button>
+            </div>
+        </form>
+    </dialog>
+
+    <dialog id="dialog-docente" class="dialogo dialogo-ancho">
+        <form id="form-docente" class="formulario">
+            <h2 class="formulario-titulo" id="docente-form-titulo">Nuevo docente</h2>
+
+            <label class="campo">
+                <span>Nombre</span>
+                <input type="text" id="docente-nombre" required>
+            </label>
+
+            <div class="campo-fila">
+                <label class="campo">
+                    <span>Categoría</span>
+                    <select id="docente-categoria">
+                        <option value="Titular">Titular</option>
+                        <option value="Asociado">Asociado</option>
+                        <option value="Tecnico-docente">Técnico-docente</option>
+                    </select>
+                </label>
+                <label class="campo">
+                    <span>Nivel</span>
+                    <select id="docente-nivel">
+                        <option value="A">A</option>
+                        <option value="B">B</option>
+                        <option value="C">C</option>
+                    </select>
+                </label>
+            </div>
+
+            <div class="campo-fila">
+                <label class="campo">
+                    <span>Horas mín.</span>
+                    <input type="number" id="docente-horas-min" min="0" required>
+                </label>
+                <label class="campo">
+                    <span>Horas máx.</span>
+                    <input type="number" id="docente-horas-max" min="0" required>
+                </label>
+                <label class="campo">
+                    <span>Máx. materias</span>
+                    <input type="number" id="docente-max-materias" min="1" required>
+                </label>
+                <label class="campo">
+                    <span>Máx. grupos</span>
+                    <input type="number" id="docente-max-grupos" min="1" required>
+                </label>
+            </div>
+
+            <div class="campo-fila">
+                <label class="campo">
+                    <span>Antigüedad (año)</span>
+                    <input type="number" id="docente-antiguedad" min="1970">
+                </label>
+                <label class="campo">
+                    <span>Carrera base</span>
+                    <input type="text" id="docente-carrera-base" placeholder="ISIC">
+                </label>
+                <label class="campo campo-check">
+                    <input type="checkbox" id="docente-otra-area">
+                    <span>Es de otra área</span>
+                </label>
+            </div>
+
+            <fieldset class="campo-grupo">
+                <legend>Disponibilidad</legend>
+                <div class="campo-fila">
+                    <label class="campo">
+                        <span>Turno</span>
+                        <select id="docente-turno">
+                            <option value="matutino">Matutino</option>
+                            <option value="vespertino">Vespertino</option>
+                        </select>
+                    </label>
+                    <label class="campo">
+                        <span>Horas a evitar</span>
+                        <input type="text" id="docente-horas-evitar" placeholder="07:00, 13:00">
+                    </label>
+                </div>
+                <div class="campo-fila">
+                    <div class="campo">
+                        <span>Días preferidos</span>
+                        <div class="dias" id="docente-dias-preferidos"></div>
+                    </div>
+                    <div class="campo">
+                        <span>Días a evitar</span>
+                        <div class="dias" id="docente-dias-evitar"></div>
+                    </div>
+                </div>
+            </fieldset>
+
+            <fieldset class="campo-grupo">
+                <legend>Materias que puede impartir</legend>
+                <div class="materias-checklist" id="docente-materias-checklist"></div>
+            </fieldset>
+
+            <p class="formulario-error" id="docente-form-error" hidden></p>
+
+            <div class="formulario-acciones">
+                <button type="button" class="btn btn-ghost" id="docente-cancelar">Cancelar</button>
+                <button type="submit" class="btn btn-primary">Guardar</button>
+            </div>
+        </form>
+    </dialog>
+
+    <script type="module" src="js/main.js"></script>
+</body>
+
+</html>

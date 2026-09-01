@@ -1,0 +1,82 @@
+[
+  {
+    "id": "v_1",
+    "clave": "V-1",
+    "tipo": "aula"
+  },
+  {
+    "id": "v_2",
+    "clave": "V-2",
+    "tipo": "aula"
+  },
+  {
+    "id": "v_3",
+    "clave": "V-3",
+    "tipo": "aula"
+  },
+  {
+    "id": "v_4",
+    "clave": "V-4",
+    "tipo": "aula"
+  },
+  {
+    "id": "v_5",
+    "clave": "V-5",
+    "tipo": "aula"
+  },
+  {
+    "id": "v_6",
+    "clave": "V-6",
+    "tipo": "aula"
+  },
+  {
+    "id": "v_7",
+    "clave": "V-7",
+    "tipo": "aula"
+  },
+  {
+    "id": "v_8",
+    "clave": "V-8",
+    "tipo": "aula"
+  },
+  {
+    "id": "v_9",
+    "clave": "V-9",
+    "tipo": "aula"
+  },
+  {
+    "id": "v_10",
+    "clave": "V-10",
+    "tipo": "aula"
+  },
+  {
+    "id": "v_11",
+    "clave": "V-11",
+    "tipo": "aula"
+  },
+  {
+    "id": "v_12",
+    "clave": "V-12",
+    "tipo": "aula"
+  },
+  {
+    "id": "n_1",
+    "clave": "N-1",
+    "tipo": "laboratorio"
+  },
+  {
+    "id": "n_2",
+    "clave": "N-2",
+    "tipo": "laboratorio"
+  },
+  {
+    "id": "n_3",
+    "clave": "N-3",
+    "tipo": "laboratorio"
+  },
+  {
+    "id": "n_4",
+    "clave": "N-4",
+    "tipo": "laboratorio"
+  }
+]
