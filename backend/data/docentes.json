@@ -1,0 +1,1984 @@
+[
+  {
+    "id": "doc001",
+    "nombre": "Laura Beatriz Mendoza Rivas",
+    "categoria": "Titular",
+    "nivel": "B",
+    "horasMin": 6,
+    "horasMax": 22,
+    "maxMaterias": 3,
+    "maxGrupos": 5,
+    "antiguedad": 2011,
+    "carreraBase": "CBAS",
+    "esDeOtraArea": true,
+    "materiasCapacitadas": [
+      "acf_0901",
+      "acf_0902",
+      "acf_0903",
+      "acf_0904",
+      "acf_0905",
+      "aef_1041",
+      "scc_1017"
+    ],
+    "disponibilidad": {
+      "declarada": [
+        {
+          "dia": "lunes",
+          "inicio": 7,
+          "fin": 14
+        },
+        {
+          "dia": "martes",
+          "inicio": 7,
+          "fin": 14
+        },
+        {
+          "dia": "miercoles",
+          "inicio": 7,
+          "fin": 14
+        },
+        {
+          "dia": "jueves",
+          "inicio": 7,
+          "fin": 14
+        },
+        {
+          "dia": "viernes",
+          "inicio": 7,
+          "fin": 14
+        }
+      ],
+      "evitar": [
+        {
+          "dia": "viernes",
+          "inicio": 7,
+          "fin": 14
+        }
+      ]
+    },
+    "descargas": [
+      {
+        "dia": "lunes",
+        "inicio": 7,
+        "fin": 10,
+        "motivo": "Jefatura de academia"
+      }
+    ],
+    "dedicacion": "tiempo completo"
+  },
+  {
+    "id": "doc002",
+    "nombre": "Ricardo Nava Cortés",
+    "categoria": "Asociado",
+    "nivel": "C",
+    "horasMin": 6,
+    "horasMax": 24,
+    "maxMaterias": 3,
+    "maxGrupos": 5,
+    "antiguedad": 2014,
+    "carreraBase": "CBAS",
+    "esDeOtraArea": true,
+    "materiasCapacitadas": [
+      "acf_0901",
+      "acf_0902",
+      "acf_0903",
+      "acf_0904",
+      "acf_0905",
+      "aef_1041",
+      "aef_1052",
+      "scc_1012",
+      "scc_1013",
+      "scc_1017",
+      "scd_1015",
+      "scd_1016",
+      "scd_1022"
+    ],
+    "disponibilidad": {
+      "declarada": [
+        {
+          "dia": "lunes",
+          "inicio": 7,
+          "fin": 14
+        },
+        {
+          "dia": "martes",
+          "inicio": 7,
+          "fin": 14
+        },
+        {
+          "dia": "miercoles",
+          "inicio": 7,
+          "fin": 14
+        },
+        {
+          "dia": "jueves",
+          "inicio": 7,
+          "fin": 14
+        },
+        {
+          "dia": "viernes",
+          "inicio": 7,
+          "fin": 14
+        }
+      ],
+      "evitar": []
+    },
+    "descargas": [],
+    "dedicacion": "tiempo completo"
+  },
+  {
+    "id": "doc003",
+    "nombre": "Diana Sofía Peralta Cano",
+    "categoria": "Titular",
+    "nivel": "A",
+    "horasMin": 6,
+    "horasMax": 22,
+    "maxMaterias": 3,
+    "maxGrupos": 5,
+    "antiguedad": 2009,
+    "carreraBase": "CBAS",
+    "esDeOtraArea": true,
+    "materiasCapacitadas": [
+      "aca_0907",
+      "aca_0909",
+      "aca_0910",
+      "acc_0906",
+      "acd_0908",
+      "aef_1052",
+      "nef_2001",
+      "nef_2002",
+      "nef_2003",
+      "nef_2004",
+      "nef_2005",
+      "scc_1013",
+      "scd_1022"
+    ],
+    "disponibilidad": {
+      "declarada": [
+        {
+          "dia": "lunes",
+          "inicio": 14,
+          "fin": 22
+        },
+        {
+          "dia": "martes",
+          "inicio": 14,
+          "fin": 22
+        },
+        {
+          "dia": "miercoles",
+          "inicio": 14,
+          "fin": 22
+        },
+        {
+          "dia": "jueves",
+          "inicio": 14,
+          "fin": 22
+        },
+        {
+          "dia": "viernes",
+          "inicio": 14,
+          "fin": 22
+        }
+      ],
+      "evitar": [
+        {
+          "dia": "lunes",
+          "inicio": 21,
+          "fin": 22
+        },
+        {
+          "dia": "martes",
+          "inicio": 21,
+          "fin": 22
+        },
+        {
+          "dia": "miercoles",
+          "inicio": 21,
+          "fin": 22
+        },
+        {
+          "dia": "jueves",
+          "inicio": 21,
+          "fin": 22
+        },
+        {
+          "dia": "viernes",
+          "inicio": 21,
+          "fin": 22
+        }
+      ]
+    },
+    "descargas": [],
+    "dedicacion": "tiempo completo"
+  },
+  {
+    "id": "doc004",
+    "nombre": "Jorge Emilio Salas Duarte",
+    "categoria": "Asociado",
+    "nivel": "B",
+    "horasMin": 5,
+    "horasMax": 24,
+    "maxMaterias": 3,
+    "maxGrupos": 5,
+    "antiguedad": 2016,
+    "carreraBase": "CBAS",
+    "esDeOtraArea": true,
+    "materiasCapacitadas": [
+      "aec_1058",
+      "scd_1018",
+      "scf_1006"
+    ],
+    "disponibilidad": {
+      "declarada": [
+        {
+          "dia": "lunes",
+          "inicio": 7,
+          "fin": 14
+        },
+        {
+          "dia": "martes",
+          "inicio": 7,
+          "fin": 14
+        },
+        {
+          "dia": "miercoles",
+          "inicio": 7,
+          "fin": 14
+        },
+        {
+          "dia": "jueves",
+          "inicio": 7,
+          "fin": 14
+        },
+        {
+          "dia": "viernes",
+          "inicio": 7,
+          "fin": 14
+        }
+      ],
+      "evitar": []
+    },
+    "descargas": [],
+    "dedicacion": "tiempo completo"
+  },
+  {
+    "id": "doc005",
+    "nombre": "Marisol Aguilar Trejo",
+    "categoria": "Asociado",
+    "nivel": "C",
+    "horasMin": 5,
+    "horasMax": 24,
+    "maxMaterias": 3,
+    "maxGrupos": 5,
+    "antiguedad": 2015,
+    "carreraBase": "ECAD",
+    "esDeOtraArea": true,
+    "materiasCapacitadas": [
+      "aec_1008",
+      "nef_2001",
+      "nef_2002",
+      "nef_2003",
+      "nef_2004",
+      "nef_2005",
+      "scc_1005",
+      "sch_1024"
+    ],
+    "disponibilidad": {
+      "declarada": [
+        {
+          "dia": "lunes",
+          "inicio": 7,
+          "fin": 14
+        },
+        {
+          "dia": "martes",
+          "inicio": 7,
+          "fin": 14
+        },
+        {
+          "dia": "miercoles",
+          "inicio": 7,
+          "fin": 14
+        },
+        {
+          "dia": "jueves",
+          "inicio": 7,
+          "fin": 14
+        },
+        {
+          "dia": "viernes",
+          "inicio": 7,
+          "fin": 14
+        }
+      ],
+      "evitar": [
+        {
+          "dia": "lunes",
+          "inicio": 7,
+          "fin": 14
+        }
+      ]
+    },
+    "descargas": [],
+    "dedicacion": "tiempo completo"
+  },
+  {
+    "id": "doc006",
+    "nombre": "Héctor Iván Loera Fuentes",
+    "categoria": "Titular",
+    "nivel": "B",
+    "horasMin": 6,
+    "horasMax": 22,
+    "maxMaterias": 3,
+    "maxGrupos": 5,
+    "antiguedad": 2010,
+    "carreraBase": "CSOC",
+    "esDeOtraArea": true,
+    "materiasCapacitadas": [
+      "aca_0907",
+      "aca_0909",
+      "aca_0910",
+      "acc_0906",
+      "acd_0908"
+    ],
+    "disponibilidad": {
+      "declarada": [
+        {
+          "dia": "lunes",
+          "inicio": 7,
+          "fin": 14
+        },
+        {
+          "dia": "martes",
+          "inicio": 7,
+          "fin": 14
+        },
+        {
+          "dia": "miercoles",
+          "inicio": 7,
+          "fin": 14
+        },
+        {
+          "dia": "jueves",
+          "inicio": 7,
+          "fin": 14
+        },
+        {
+          "dia": "viernes",
+          "inicio": 7,
+          "fin": 14
+        }
+      ],
+      "evitar": [
+        {
+          "dia": "lunes",
+          "inicio": 7,
+          "fin": 8
+        },
+        {
+          "dia": "martes",
+          "inicio": 7,
+          "fin": 8
+        },
+        {
+          "dia": "miercoles",
+          "inicio": 7,
+          "fin": 8
+        },
+        {
+          "dia": "jueves",
+          "inicio": 7,
+          "fin": 8
+        },
+        {
+          "dia": "viernes",
+          "inicio": 7,
+          "fin": 8
+        }
+      ]
+    },
+    "descargas": [
+      {
+        "dia": "jueves",
+        "inicio": 10,
+        "fin": 12,
+        "motivo": "Tutorías"
+      }
+    ],
+    "dedicacion": "tiempo completo"
+  },
+  {
+    "id": "doc007",
+    "nombre": "Ana Karen Villalobos Ríos",
+    "categoria": "Titular",
+    "nivel": "A",
+    "horasMin": 14,
+    "horasMax": 22,
+    "maxMaterias": 3,
+    "maxGrupos": 5,
+    "antiguedad": 2012,
+    "carreraBase": "ISIC",
+    "esDeOtraArea": false,
+    "materiasCapacitadas": [
+      "aed_1026",
+      "aed_1285",
+      "aed_1286",
+      "scc_1019",
+      "scd_1027"
+    ],
+    "disponibilidad": {
+      "declarada": [
+        {
+          "dia": "lunes",
+          "inicio": 7,
+          "fin": 14
+        },
+        {
+          "dia": "martes",
+          "inicio": 7,
+          "fin": 14
+        },
+        {
+          "dia": "miercoles",
+          "inicio": 7,
+          "fin": 14
+        },
+        {
+          "dia": "jueves",
+          "inicio": 7,
+          "fin": 14
+        },
+        {
+          "dia": "viernes",
+          "inicio": 7,
+          "fin": 14
+        }
+      ],
+      "evitar": []
+    },
+    "descargas": [
+      {
+        "dia": "miercoles",
+        "inicio": 7,
+        "fin": 10,
+        "motivo": "Coordinación de tutorías"
+      }
+    ],
+    "dedicacion": "tiempo completo"
+  },
+  {
+    "id": "doc008",
+    "nombre": "Fernando Quiroz Balam",
+    "categoria": "Titular",
+    "nivel": "B",
+    "horasMin": 14,
+    "horasMax": 22,
+    "maxMaterias": 3,
+    "maxGrupos": 5,
+    "antiguedad": 2013,
+    "carreraBase": "ISIC",
+    "esDeOtraArea": false,
+    "materiasCapacitadas": [
+      "aef_1031",
+      "sca_1025",
+      "scb_1001",
+      "scc_1007",
+      "scd_1011",
+      "scg_1009"
+    ],
+    "disponibilidad": {
+      "declarada": [
+        {
+          "dia": "lunes",
+          "inicio": 7,
+          "fin": 14
+        },
+        {
+          "dia": "martes",
+          "inicio": 7,
+          "fin": 14
+        },
+        {
+          "dia": "miercoles",
+          "inicio": 7,
+          "fin": 14
+        },
+        {
+          "dia": "jueves",
+          "inicio": 7,
+          "fin": 14
+        },
+        {
+          "dia": "viernes",
+          "inicio": 7,
+          "fin": 14
+        }
+      ],
+      "evitar": [
+        {
+          "dia": "viernes",
+          "inicio": 7,
+          "fin": 14
+        },
+        {
+          "dia": "lunes",
+          "inicio": 7,
+          "fin": 8
+        },
+        {
+          "dia": "martes",
+          "inicio": 7,
+          "fin": 8
+        },
+        {
+          "dia": "miercoles",
+          "inicio": 7,
+          "fin": 8
+        },
+        {
+          "dia": "jueves",
+          "inicio": 7,
+          "fin": 8
+        }
+      ]
+    },
+    "descargas": [],
+    "dedicacion": "tiempo completo"
+  },
+  {
+    "id": "doc009",
+    "nombre": "Gabriela Ucán Pech",
+    "categoria": "Asociado",
+    "nivel": "B",
+    "horasMin": 12,
+    "horasMax": 24,
+    "maxMaterias": 3,
+    "maxGrupos": 5,
+    "antiguedad": 2017,
+    "carreraBase": "ISIC",
+    "esDeOtraArea": false,
+    "materiasCapacitadas": [
+      "aec_1034",
+      "aec_1061",
+      "sca_1002",
+      "sca_1026",
+      "scc_1014",
+      "scc_1023",
+      "scd_1003",
+      "scd_1004",
+      "scd_1021"
+    ],
+    "disponibilidad": {
+      "declarada": [
+        {
+          "dia": "lunes",
+          "inicio": 14,
+          "fin": 22
+        },
+        {
+          "dia": "martes",
+          "inicio": 14,
+          "fin": 22
+        },
+        {
+          "dia": "miercoles",
+          "inicio": 14,
+          "fin": 22
+        },
+        {
+          "dia": "jueves",
+          "inicio": 14,
+          "fin": 22
+        },
+        {
+          "dia": "viernes",
+          "inicio": 14,
+          "fin": 22
+        }
+      ],
+      "evitar": [
+        {
+          "dia": "viernes",
+          "inicio": 14,
+          "fin": 22
+        },
+        {
+          "dia": "lunes",
+          "inicio": 21,
+          "fin": 22
+        },
+        {
+          "dia": "martes",
+          "inicio": 21,
+          "fin": 22
+        },
+        {
+          "dia": "miercoles",
+          "inicio": 21,
+          "fin": 22
+        },
+        {
+          "dia": "jueves",
+          "inicio": 21,
+          "fin": 22
+        }
+      ]
+    },
+    "descargas": [],
+    "dedicacion": "tiempo completo"
+  },
+  {
+    "id": "doc010",
+    "nombre": "Luis Alberto Canché Moo",
+    "categoria": "Titular",
+    "nivel": "A",
+    "horasMin": 14,
+    "horasMax": 22,
+    "maxMaterias": 3,
+    "maxGrupos": 5,
+    "antiguedad": 2011,
+    "carreraBase": "ISIC",
+    "esDeOtraArea": false,
+    "materiasCapacitadas": [
+      "aef_1031",
+      "sca_1025",
+      "scb_1001",
+      "scc_1007",
+      "scd_1011",
+      "scg_1009"
+    ],
+    "disponibilidad": {
+      "declarada": [
+        {
+          "dia": "lunes",
+          "inicio": 14,
+          "fin": 22
+        },
+        {
+          "dia": "martes",
+          "inicio": 14,
+          "fin": 22
+        },
+        {
+          "dia": "miercoles",
+          "inicio": 14,
+          "fin": 22
+        },
+        {
+          "dia": "jueves",
+          "inicio": 14,
+          "fin": 22
+        },
+        {
+          "dia": "viernes",
+          "inicio": 14,
+          "fin": 22
+        }
+      ],
+      "evitar": []
+    },
+    "descargas": [
+      {
+        "dia": "martes",
+        "inicio": 14,
+        "fin": 17,
+        "motivo": "Gestión de vinculación"
+      }
+    ],
+    "dedicacion": "tiempo completo"
+  },
+  {
+    "id": "doc011",
+    "nombre": "Paola Zamudio Herrera",
+    "categoria": "Tecnico-docente",
+    "nivel": "B",
+    "horasMin": 14,
+    "horasMax": 36,
+    "maxMaterias": 3,
+    "maxGrupos": 5,
+    "antiguedad": 2018,
+    "carreraBase": "ISIC",
+    "esDeOtraArea": false,
+    "materiasCapacitadas": [
+      "aec_1034",
+      "aec_1061",
+      "sca_1002",
+      "sca_1026",
+      "scc_1014",
+      "scc_1023",
+      "scd_1003",
+      "scd_1004",
+      "scd_1021"
+    ],
+    "disponibilidad": {
+      "declarada": [
+        {
+          "dia": "lunes",
+          "inicio": 14,
+          "fin": 22
+        },
+        {
+          "dia": "martes",
+          "inicio": 14,
+          "fin": 22
+        },
+        {
+          "dia": "miercoles",
+          "inicio": 14,
+          "fin": 22
+        },
+        {
+          "dia": "jueves",
+          "inicio": 14,
+          "fin": 22
+        },
+        {
+          "dia": "viernes",
+          "inicio": 14,
+          "fin": 22
+        }
+      ],
+      "evitar": []
+    },
+    "descargas": [
+      {
+        "dia": "viernes",
+        "inicio": 14,
+        "fin": 18,
+        "motivo": "Responsable de laboratorio"
+      }
+    ],
+    "dedicacion": "tiempo completo"
+  },
+  {
+    "id": "doc012",
+    "nombre": "Sergio Tun Arceo",
+    "categoria": "Asociado",
+    "nivel": "C",
+    "horasMin": 12,
+    "horasMax": 24,
+    "maxMaterias": 3,
+    "maxGrupos": 5,
+    "antiguedad": 2019,
+    "carreraBase": "ISIC",
+    "esDeOtraArea": false,
+    "materiasCapacitadas": [
+      "scd_1015",
+      "scd_1016"
+    ],
+    "disponibilidad": {
+      "declarada": [
+        {
+          "dia": "lunes",
+          "inicio": 14,
+          "fin": 22
+        },
+        {
+          "dia": "martes",
+          "inicio": 14,
+          "fin": 22
+        },
+        {
+          "dia": "miercoles",
+          "inicio": 14,
+          "fin": 22
+        },
+        {
+          "dia": "jueves",
+          "inicio": 14,
+          "fin": 22
+        },
+        {
+          "dia": "viernes",
+          "inicio": 14,
+          "fin": 22
+        }
+      ],
+      "evitar": [
+        {
+          "dia": "miercoles",
+          "inicio": 14,
+          "fin": 22
+        }
+      ]
+    },
+    "descargas": [],
+    "dedicacion": "tiempo completo"
+  },
+  {
+    "id": "doc013",
+    "nombre": "Nayeli Chan Poot",
+    "categoria": "Tecnico-docente",
+    "nivel": "A",
+    "horasMin": 14,
+    "horasMax": 36,
+    "maxMaterias": 3,
+    "maxGrupos": 5,
+    "antiguedad": 2016,
+    "carreraBase": "ISIC",
+    "esDeOtraArea": false,
+    "materiasCapacitadas": [
+      "aeb_1055",
+      "aed_1026",
+      "aed_1285",
+      "aed_1286",
+      "scc_1010",
+      "scc_1019",
+      "scd_1027",
+      "wec_2003",
+      "wec_2005",
+      "wec_2007",
+      "wec_2009",
+      "wec_2401",
+      "wef_2002"
+    ],
+    "disponibilidad": {
+      "declarada": [
+        {
+          "dia": "lunes",
+          "inicio": 14,
+          "fin": 22
+        },
+        {
+          "dia": "martes",
+          "inicio": 14,
+          "fin": 22
+        },
+        {
+          "dia": "miercoles",
+          "inicio": 14,
+          "fin": 22
+        },
+        {
+          "dia": "jueves",
+          "inicio": 14,
+          "fin": 22
+        },
+        {
+          "dia": "viernes",
+          "inicio": 14,
+          "fin": 22
+        }
+      ],
+      "evitar": [
+        {
+          "dia": "lunes",
+          "inicio": 14,
+          "fin": 15
+        },
+        {
+          "dia": "martes",
+          "inicio": 14,
+          "fin": 15
+        },
+        {
+          "dia": "miercoles",
+          "inicio": 14,
+          "fin": 15
+        },
+        {
+          "dia": "jueves",
+          "inicio": 14,
+          "fin": 15
+        },
+        {
+          "dia": "viernes",
+          "inicio": 14,
+          "fin": 15
+        }
+      ]
+    },
+    "descargas": [
+      {
+        "dia": "lunes",
+        "inicio": 14,
+        "fin": 16,
+        "motivo": "Seguimiento de residencias"
+      }
+    ],
+    "dedicacion": "tiempo completo"
+  },
+  {
+    "id": "doc014",
+    "nombre": "Numeritos May Jimenez",
+    "categoria": "Titular",
+    "nivel": "B",
+    "horasMin": 12,
+    "horasMax": 22,
+    "maxMaterias": 3,
+    "maxGrupos": 5,
+    "antiguedad": 2014,
+    "carreraBase": "ISIC",
+    "esDeOtraArea": false,
+    "materiasCapacitadas": [
+      "aec_1008",
+      "nef_2001",
+      "nef_2002",
+      "nef_2003",
+      "nef_2004",
+      "nef_2005",
+      "scc_1005",
+      "sch_1024"
+    ],
+    "disponibilidad": {
+      "declarada": [
+        {
+          "dia": "lunes",
+          "inicio": 14,
+          "fin": 22
+        },
+        {
+          "dia": "martes",
+          "inicio": 14,
+          "fin": 22
+        },
+        {
+          "dia": "miercoles",
+          "inicio": 14,
+          "fin": 22
+        },
+        {
+          "dia": "jueves",
+          "inicio": 14,
+          "fin": 22
+        },
+        {
+          "dia": "viernes",
+          "inicio": 14,
+          "fin": 22
+        }
+      ],
+      "evitar": [
+        {
+          "dia": "jueves",
+          "inicio": 14,
+          "fin": 22
+        },
+        {
+          "dia": "lunes",
+          "inicio": 21,
+          "fin": 22
+        },
+        {
+          "dia": "martes",
+          "inicio": 21,
+          "fin": 22
+        },
+        {
+          "dia": "miercoles",
+          "inicio": 21,
+          "fin": 22
+        },
+        {
+          "dia": "viernes",
+          "inicio": 21,
+          "fin": 22
+        }
+      ]
+    },
+    "descargas": [],
+    "dedicacion": "tiempo completo"
+  },
+  {
+    "id": "doc015",
+    "nombre": "Álvaro Medina Sosa",
+    "categoria": "Asignatura",
+    "nivel": "A",
+    "horasMin": 0,
+    "horasMax": 15,
+    "maxMaterias": 3,
+    "maxGrupos": 4,
+    "antiguedad": 2022,
+    "carreraBase": "CBAS",
+    "esDeOtraArea": true,
+    "materiasCapacitadas": [
+      "acf_0901",
+      "acf_0902",
+      "acf_0903",
+      "acf_0904",
+      "acf_0905",
+      "aef_1041",
+      "scc_1017"
+    ],
+    "disponibilidad": {
+      "declarada": [
+        {
+          "dia": "lunes",
+          "inicio": 14,
+          "fin": 22
+        },
+        {
+          "dia": "martes",
+          "inicio": 14,
+          "fin": 22
+        },
+        {
+          "dia": "miercoles",
+          "inicio": 14,
+          "fin": 22
+        },
+        {
+          "dia": "jueves",
+          "inicio": 14,
+          "fin": 22
+        },
+        {
+          "dia": "viernes",
+          "inicio": 14,
+          "fin": 22
+        }
+      ],
+      "evitar": [
+        {
+          "dia": "lunes",
+          "inicio": 14,
+          "fin": 22
+        },
+        {
+          "dia": "martes",
+          "inicio": 14,
+          "fin": 22
+        }
+      ]
+    },
+    "descargas": [],
+    "dedicacion": "asignatura"
+  },
+  {
+    "id": "doc016",
+    "nombre": "Claudia Pech Uicab",
+    "categoria": "Asignatura",
+    "nivel": "A",
+    "horasMin": 0,
+    "horasMax": 12,
+    "maxMaterias": 3,
+    "maxGrupos": 4,
+    "antiguedad": 2023,
+    "carreraBase": "CBAS",
+    "esDeOtraArea": true,
+    "materiasCapacitadas": [
+      "acf_0901",
+      "acf_0902",
+      "acf_0903",
+      "acf_0904",
+      "acf_0905",
+      "aec_1058",
+      "aef_1041",
+      "scc_1017",
+      "scd_1018",
+      "scf_1006"
+    ],
+    "disponibilidad": {
+      "declarada": [
+        {
+          "dia": "lunes",
+          "inicio": 7,
+          "fin": 14
+        },
+        {
+          "dia": "martes",
+          "inicio": 7,
+          "fin": 14
+        },
+        {
+          "dia": "miercoles",
+          "inicio": 7,
+          "fin": 14
+        },
+        {
+          "dia": "jueves",
+          "inicio": 7,
+          "fin": 14
+        },
+        {
+          "dia": "viernes",
+          "inicio": 7,
+          "fin": 14
+        }
+      ],
+      "evitar": [
+        {
+          "dia": "jueves",
+          "inicio": 7,
+          "fin": 14
+        },
+        {
+          "dia": "lunes",
+          "inicio": 7,
+          "fin": 8
+        },
+        {
+          "dia": "martes",
+          "inicio": 7,
+          "fin": 8
+        },
+        {
+          "dia": "miercoles",
+          "inicio": 7,
+          "fin": 8
+        },
+        {
+          "dia": "viernes",
+          "inicio": 7,
+          "fin": 8
+        }
+      ]
+    },
+    "descargas": [],
+    "dedicacion": "asignatura"
+  },
+  {
+    "id": "doc017",
+    "nombre": "Ernesto Baeza Gómez",
+    "categoria": "Asignatura",
+    "nivel": "A",
+    "horasMin": 0,
+    "horasMax": 12,
+    "maxMaterias": 3,
+    "maxGrupos": 4,
+    "antiguedad": 2021,
+    "carreraBase": "CBAS",
+    "esDeOtraArea": true,
+    "materiasCapacitadas": [
+      "aef_1052",
+      "scc_1013",
+      "scd_1022"
+    ],
+    "disponibilidad": {
+      "declarada": [
+        {
+          "dia": "lunes",
+          "inicio": 7,
+          "fin": 14
+        },
+        {
+          "dia": "martes",
+          "inicio": 7,
+          "fin": 14
+        },
+        {
+          "dia": "miercoles",
+          "inicio": 7,
+          "fin": 14
+        },
+        {
+          "dia": "jueves",
+          "inicio": 7,
+          "fin": 14
+        },
+        {
+          "dia": "viernes",
+          "inicio": 7,
+          "fin": 14
+        }
+      ],
+      "evitar": []
+    },
+    "descargas": [],
+    "dedicacion": "asignatura"
+  },
+  {
+    "id": "doc018",
+    "nombre": "Silvia Poot Dzul",
+    "categoria": "Asignatura",
+    "nivel": "A",
+    "horasMin": 0,
+    "horasMax": 12,
+    "maxMaterias": 3,
+    "maxGrupos": 4,
+    "antiguedad": 2022,
+    "carreraBase": "CBAS",
+    "esDeOtraArea": true,
+    "materiasCapacitadas": [
+      "aec_1058",
+      "scd_1018",
+      "scf_1006"
+    ],
+    "disponibilidad": {
+      "declarada": [
+        {
+          "dia": "lunes",
+          "inicio": 14,
+          "fin": 22
+        },
+        {
+          "dia": "martes",
+          "inicio": 14,
+          "fin": 22
+        },
+        {
+          "dia": "miercoles",
+          "inicio": 14,
+          "fin": 22
+        },
+        {
+          "dia": "jueves",
+          "inicio": 14,
+          "fin": 22
+        },
+        {
+          "dia": "viernes",
+          "inicio": 14,
+          "fin": 22
+        }
+      ],
+      "evitar": [
+        {
+          "dia": "miercoles",
+          "inicio": 14,
+          "fin": 22
+        }
+      ]
+    },
+    "descargas": [],
+    "dedicacion": "asignatura"
+  },
+  {
+    "id": "doc019",
+    "nombre": "Manuel Cetina Ávila",
+    "categoria": "Asignatura",
+    "nivel": "A",
+    "horasMin": 0,
+    "horasMax": 18,
+    "maxMaterias": 3,
+    "maxGrupos": 4,
+    "antiguedad": 2020,
+    "carreraBase": "ISIC",
+    "esDeOtraArea": false,
+    "materiasCapacitadas": [
+      "aeb_1055",
+      "aed_1026",
+      "aed_1285",
+      "aed_1286",
+      "aef_1031",
+      "sca_1025",
+      "scb_1001",
+      "scc_1010",
+      "scc_1019",
+      "scd_1027",
+      "wec_2003",
+      "wec_2005",
+      "wec_2007",
+      "wec_2009",
+      "wec_2401",
+      "wef_2002"
+    ],
+    "disponibilidad": {
+      "declarada": [
+        {
+          "dia": "lunes",
+          "inicio": 7,
+          "fin": 14
+        },
+        {
+          "dia": "martes",
+          "inicio": 7,
+          "fin": 14
+        },
+        {
+          "dia": "miercoles",
+          "inicio": 7,
+          "fin": 14
+        },
+        {
+          "dia": "jueves",
+          "inicio": 7,
+          "fin": 14
+        },
+        {
+          "dia": "viernes",
+          "inicio": 7,
+          "fin": 14
+        }
+      ],
+      "evitar": []
+    },
+    "descargas": [],
+    "dedicacion": "asignatura"
+  },
+  {
+    "id": "doc020",
+    "nombre": "Karla Novelo Tamay",
+    "categoria": "Asignatura",
+    "nivel": "A",
+    "horasMin": 0,
+    "horasMax": 18,
+    "maxMaterias": 3,
+    "maxGrupos": 4,
+    "antiguedad": 2021,
+    "carreraBase": "ISIC",
+    "esDeOtraArea": false,
+    "materiasCapacitadas": [
+      "aed_1026",
+      "aed_1285",
+      "aed_1286",
+      "scc_1012",
+      "scc_1019",
+      "scd_1027",
+      "wec_2003",
+      "wec_2005",
+      "wec_2007",
+      "wec_2009",
+      "wec_2401",
+      "wef_2002"
+    ],
+    "disponibilidad": {
+      "declarada": [
+        {
+          "dia": "lunes",
+          "inicio": 14,
+          "fin": 22
+        },
+        {
+          "dia": "martes",
+          "inicio": 14,
+          "fin": 22
+        },
+        {
+          "dia": "miercoles",
+          "inicio": 14,
+          "fin": 22
+        },
+        {
+          "dia": "jueves",
+          "inicio": 14,
+          "fin": 22
+        },
+        {
+          "dia": "viernes",
+          "inicio": 14,
+          "fin": 22
+        }
+      ],
+      "evitar": []
+    },
+    "descargas": [],
+    "dedicacion": "asignatura"
+  },
+  {
+    "id": "doc021",
+    "nombre": "Óscar Interián Pool",
+    "categoria": "Asignatura",
+    "nivel": "A",
+    "horasMin": 0,
+    "horasMax": 15,
+    "maxMaterias": 3,
+    "maxGrupos": 4,
+    "antiguedad": 2023,
+    "carreraBase": "ISIC",
+    "esDeOtraArea": false,
+    "materiasCapacitadas": [
+      "scc_1007",
+      "scd_1011",
+      "scg_1009"
+    ],
+    "disponibilidad": {
+      "declarada": [
+        {
+          "dia": "lunes",
+          "inicio": 7,
+          "fin": 14
+        },
+        {
+          "dia": "martes",
+          "inicio": 7,
+          "fin": 14
+        },
+        {
+          "dia": "miercoles",
+          "inicio": 7,
+          "fin": 14
+        },
+        {
+          "dia": "jueves",
+          "inicio": 7,
+          "fin": 14
+        },
+        {
+          "dia": "viernes",
+          "inicio": 7,
+          "fin": 14
+        }
+      ],
+      "evitar": [
+        {
+          "dia": "viernes",
+          "inicio": 7,
+          "fin": 14
+        }
+      ]
+    },
+    "descargas": [],
+    "dedicacion": "asignatura"
+  },
+  {
+    "id": "doc022",
+    "nombre": "Fátima Góngora Ruiz",
+    "categoria": "Asignatura",
+    "nivel": "A",
+    "horasMin": 0,
+    "horasMax": 15,
+    "maxMaterias": 3,
+    "maxGrupos": 4,
+    "antiguedad": 2022,
+    "carreraBase": "ISIC",
+    "esDeOtraArea": false,
+    "materiasCapacitadas": [
+      "aef_1031",
+      "sca_1025",
+      "scb_1001"
+    ],
+    "disponibilidad": {
+      "declarada": [
+        {
+          "dia": "lunes",
+          "inicio": 14,
+          "fin": 22
+        },
+        {
+          "dia": "martes",
+          "inicio": 14,
+          "fin": 22
+        },
+        {
+          "dia": "miercoles",
+          "inicio": 14,
+          "fin": 22
+        },
+        {
+          "dia": "jueves",
+          "inicio": 14,
+          "fin": 22
+        },
+        {
+          "dia": "viernes",
+          "inicio": 14,
+          "fin": 22
+        }
+      ],
+      "evitar": []
+    },
+    "descargas": [],
+    "dedicacion": "asignatura"
+  },
+  {
+    "id": "doc023",
+    "nombre": "Bernardo Ceh Balam",
+    "categoria": "Asignatura",
+    "nivel": "A",
+    "horasMin": 0,
+    "horasMax": 15,
+    "maxMaterias": 3,
+    "maxGrupos": 4,
+    "antiguedad": 2021,
+    "carreraBase": "ISIC",
+    "esDeOtraArea": false,
+    "materiasCapacitadas": [
+      "aec_1034",
+      "aec_1061",
+      "sca_1002",
+      "sca_1026",
+      "scc_1014",
+      "scc_1023",
+      "scd_1003",
+      "scd_1004",
+      "scd_1021"
+    ],
+    "disponibilidad": {
+      "declarada": [
+        {
+          "dia": "lunes",
+          "inicio": 7,
+          "fin": 14
+        },
+        {
+          "dia": "martes",
+          "inicio": 7,
+          "fin": 14
+        },
+        {
+          "dia": "miercoles",
+          "inicio": 7,
+          "fin": 14
+        },
+        {
+          "dia": "jueves",
+          "inicio": 7,
+          "fin": 14
+        },
+        {
+          "dia": "viernes",
+          "inicio": 7,
+          "fin": 14
+        }
+      ],
+      "evitar": []
+    },
+    "descargas": [],
+    "dedicacion": "asignatura"
+  },
+  {
+    "id": "doc024",
+    "nombre": "Andrea Sulub Caamal",
+    "categoria": "Asignatura",
+    "nivel": "A",
+    "horasMin": 0,
+    "horasMax": 15,
+    "maxMaterias": 3,
+    "maxGrupos": 4,
+    "antiguedad": 2023,
+    "carreraBase": "ISIC",
+    "esDeOtraArea": false,
+    "materiasCapacitadas": [
+      "aec_1061",
+      "sca_1026",
+      "scc_1014",
+      "scc_1023",
+      "scd_1003"
+    ],
+    "disponibilidad": {
+      "declarada": [
+        {
+          "dia": "lunes",
+          "inicio": 7,
+          "fin": 14
+        },
+        {
+          "dia": "martes",
+          "inicio": 7,
+          "fin": 14
+        },
+        {
+          "dia": "miercoles",
+          "inicio": 7,
+          "fin": 14
+        },
+        {
+          "dia": "jueves",
+          "inicio": 7,
+          "fin": 14
+        },
+        {
+          "dia": "viernes",
+          "inicio": 7,
+          "fin": 14
+        }
+      ],
+      "evitar": [
+        {
+          "dia": "lunes",
+          "inicio": 7,
+          "fin": 8
+        },
+        {
+          "dia": "martes",
+          "inicio": 7,
+          "fin": 8
+        },
+        {
+          "dia": "miercoles",
+          "inicio": 7,
+          "fin": 8
+        },
+        {
+          "dia": "jueves",
+          "inicio": 7,
+          "fin": 8
+        },
+        {
+          "dia": "viernes",
+          "inicio": 7,
+          "fin": 8
+        }
+      ]
+    },
+    "descargas": [],
+    "dedicacion": "asignatura"
+  },
+  {
+    "id": "doc025",
+    "nombre": "Raúl Chablé Huchín",
+    "categoria": "Asignatura",
+    "nivel": "A",
+    "horasMin": 0,
+    "horasMax": 12,
+    "maxMaterias": 3,
+    "maxGrupos": 4,
+    "antiguedad": 2022,
+    "carreraBase": "ISIC",
+    "esDeOtraArea": false,
+    "materiasCapacitadas": [
+      "scd_1015",
+      "scd_1016"
+    ],
+    "disponibilidad": {
+      "declarada": [
+        {
+          "dia": "lunes",
+          "inicio": 7,
+          "fin": 14
+        },
+        {
+          "dia": "martes",
+          "inicio": 7,
+          "fin": 14
+        },
+        {
+          "dia": "miercoles",
+          "inicio": 7,
+          "fin": 14
+        },
+        {
+          "dia": "jueves",
+          "inicio": 7,
+          "fin": 14
+        },
+        {
+          "dia": "viernes",
+          "inicio": 7,
+          "fin": 14
+        }
+      ],
+      "evitar": []
+    },
+    "descargas": [],
+    "dedicacion": "asignatura"
+  },
+  {
+    "id": "doc026",
+    "nombre": "Iván Cauich Sansores",
+    "categoria": "Titular",
+    "nivel": "A",
+    "horasMin": 14,
+    "horasMax": 22,
+    "maxMaterias": 3,
+    "maxGrupos": 5,
+    "antiguedad": 2020,
+    "carreraBase": "ISIC",
+    "esDeOtraArea": false,
+    "materiasCapacitadas": [
+      "scc_1012",
+      "wec_2003",
+      "wec_2005",
+      "wec_2007",
+      "wec_2009",
+      "wec_2401",
+      "wef_2002"
+    ],
+    "disponibilidad": {
+      "declarada": [
+        {
+          "dia": "lunes",
+          "inicio": 14,
+          "fin": 22
+        },
+        {
+          "dia": "martes",
+          "inicio": 14,
+          "fin": 22
+        },
+        {
+          "dia": "miercoles",
+          "inicio": 14,
+          "fin": 22
+        },
+        {
+          "dia": "jueves",
+          "inicio": 14,
+          "fin": 22
+        },
+        {
+          "dia": "viernes",
+          "inicio": 14,
+          "fin": 22
+        }
+      ],
+      "evitar": []
+    },
+    "descargas": [],
+    "dedicacion": "tiempo completo"
+  },
+  {
+    "id": "doc027",
+    "nombre": "Nadia Solís Barrera",
+    "categoria": "Asignatura",
+    "nivel": "A",
+    "horasMin": 0,
+    "horasMax": 12,
+    "maxMaterias": 3,
+    "maxGrupos": 4,
+    "antiguedad": 2023,
+    "carreraBase": "ECAD",
+    "esDeOtraArea": true,
+    "materiasCapacitadas": [
+      "aec_1008",
+      "nef_2001",
+      "nef_2002",
+      "nef_2003",
+      "nef_2004",
+      "nef_2005",
+      "scc_1005",
+      "sch_1024"
+    ],
+    "disponibilidad": {
+      "declarada": [
+        {
+          "dia": "lunes",
+          "inicio": 14,
+          "fin": 22
+        },
+        {
+          "dia": "martes",
+          "inicio": 14,
+          "fin": 22
+        },
+        {
+          "dia": "miercoles",
+          "inicio": 14,
+          "fin": 22
+        },
+        {
+          "dia": "jueves",
+          "inicio": 14,
+          "fin": 22
+        },
+        {
+          "dia": "viernes",
+          "inicio": 14,
+          "fin": 22
+        }
+      ],
+      "evitar": [
+        {
+          "dia": "martes",
+          "inicio": 14,
+          "fin": 22
+        }
+      ]
+    },
+    "descargas": [],
+    "dedicacion": "asignatura"
+  },
+  {
+    "id": "doc028",
+    "nombre": "Emilio Kantún Vera",
+    "categoria": "Asignatura",
+    "nivel": "A",
+    "horasMin": 0,
+    "horasMax": 12,
+    "maxMaterias": 3,
+    "maxGrupos": 4,
+    "antiguedad": 2022,
+    "carreraBase": "CSOC",
+    "esDeOtraArea": true,
+    "materiasCapacitadas": [
+      "aca_0907",
+      "aca_0909",
+      "aca_0910",
+      "acc_0906",
+      "acd_0908"
+    ],
+    "disponibilidad": {
+      "declarada": [
+        {
+          "dia": "lunes",
+          "inicio": 14,
+          "fin": 22
+        },
+        {
+          "dia": "martes",
+          "inicio": 14,
+          "fin": 22
+        },
+        {
+          "dia": "miercoles",
+          "inicio": 14,
+          "fin": 22
+        },
+        {
+          "dia": "jueves",
+          "inicio": 14,
+          "fin": 22
+        },
+        {
+          "dia": "viernes",
+          "inicio": 14,
+          "fin": 22
+        }
+      ],
+      "evitar": []
+    },
+    "descargas": [],
+    "dedicacion": "asignatura"
+  },
+  {
+    "id": "doc029",
+    "nombre": "Rosa María Ek Chuc",
+    "categoria": "Asociado",
+    "nivel": "B",
+    "horasMin": 12,
+    "horasMax": 24,
+    "maxMaterias": 3,
+    "maxGrupos": 5,
+    "antiguedad": 2021,
+    "carreraBase": "ISIC",
+    "esDeOtraArea": false,
+    "materiasCapacitadas": [
+      "aeb_1055",
+      "aed_1026",
+      "aed_1285",
+      "aed_1286",
+      "scc_1007",
+      "scc_1010",
+      "scc_1019",
+      "scd_1011",
+      "scd_1027",
+      "scg_1009",
+      "wec_2003",
+      "wec_2005",
+      "wec_2007",
+      "wec_2009",
+      "wec_2401",
+      "wef_2002"
+    ],
+    "disponibilidad": {
+      "declarada": [
+        {
+          "dia": "lunes",
+          "inicio": 7,
+          "fin": 14
+        },
+        {
+          "dia": "martes",
+          "inicio": 7,
+          "fin": 14
+        },
+        {
+          "dia": "miercoles",
+          "inicio": 7,
+          "fin": 14
+        },
+        {
+          "dia": "jueves",
+          "inicio": 7,
+          "fin": 14
+        },
+        {
+          "dia": "viernes",
+          "inicio": 7,
+          "fin": 14
+        }
+      ],
+      "evitar": []
+    },
+    "descargas": [],
+    "dedicacion": "tiempo completo"
+  },
+  {
+    "id": "doc030",
+    "nombre": "Talía Herrera Mex",
+    "categoria": "Asignatura",
+    "nivel": "A",
+    "horasMin": 0,
+    "horasMax": 18,
+    "maxMaterias": 3,
+    "maxGrupos": 4,
+    "antiguedad": 2024,
+    "carreraBase": "ISIC",
+    "esDeOtraArea": false,
+    "materiasCapacitadas": [
+      "aeb_1055",
+      "scc_1010",
+      "wec_2003",
+      "wec_2005",
+      "wec_2007",
+      "wec_2009",
+      "wec_2401",
+      "wef_2002"
+    ],
+    "disponibilidad": {
+      "declarada": [
+        {
+          "dia": "lunes",
+          "inicio": 14,
+          "fin": 22
+        },
+        {
+          "dia": "martes",
+          "inicio": 14,
+          "fin": 22
+        },
+        {
+          "dia": "miercoles",
+          "inicio": 14,
+          "fin": 22
+        },
+        {
+          "dia": "jueves",
+          "inicio": 14,
+          "fin": 22
+        },
+        {
+          "dia": "viernes",
+          "inicio": 14,
+          "fin": 22
+        }
+      ],
+      "evitar": [
+        {
+          "dia": "lunes",
+          "inicio": 20,
+          "fin": 21
+        },
+        {
+          "dia": "martes",
+          "inicio": 20,
+          "fin": 21
+        },
+        {
+          "dia": "miercoles",
+          "inicio": 20,
+          "fin": 21
+        },
+        {
+          "dia": "jueves",
+          "inicio": 20,
+          "fin": 21
+        },
+        {
+          "dia": "viernes",
+          "inicio": 20,
+          "fin": 21
+        },
+        {
+          "dia": "lunes",
+          "inicio": 21,
+          "fin": 22
+        },
+        {
+          "dia": "martes",
+          "inicio": 21,
+          "fin": 22
+        },
+        {
+          "dia": "miercoles",
+          "inicio": 21,
+          "fin": 22
+        },
+        {
+          "dia": "jueves",
+          "inicio": 21,
+          "fin": 22
+        },
+        {
+          "dia": "viernes",
+          "inicio": 21,
+          "fin": 22
+        }
+      ]
+    },
+    "descargas": [],
+    "dedicacion": "asignatura"
+  }
+]

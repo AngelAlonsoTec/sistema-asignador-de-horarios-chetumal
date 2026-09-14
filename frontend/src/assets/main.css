@@ -1,362 +1,636 @@
-:root {
-    --bg: #eff3f8;
-    --surface: #ffffff;
-    --surface-alt: #f6f8fb;
-    --surface-sunken: #eaeff5;
-    --border: #dde4ec;
-    --border-soft: #eaeff5;
-    --text: #1d2836;
-    --text-muted: #6b7a8d;
+/* =========================================================================
+   SchedulAI — hoja de estilos
+   =========================================================================
 
-    /* Verde: acción primaria. Azul: acción secundaria. */
+   La aplicación es un panel de trabajo, no un documento: barra lateral fija
+   con el contexto, cabecera fija con las acciones y una sola zona que se
+   desplaza. Quien la usa pasa horas revisando tablas y horarios, así que el
+   criterio en todo el archivo es dar aire y tamaño antes que meter más cosas
+   en pantalla.
+   ========================================================================= */
+
+/* ---------------------------------------------------------------- tokens */
+
+:root {
+    --bg: #eef2f7;
+    --surface: #ffffff;
+    --surface-alt: #f7f9fc;
+    --surface-sunken: #eaeff6;
+    --border: #dce3ec;
+    --border-soft: #e9eef4;
+    --text: #1b2634;
+    --text-suave: #5c6b7f;
+    --text-tenue: #8494a8;
+
+    /* Verde: acción primaria y estado correcto. Azul: acción secundaria. */
     --accent: #17a673;
     --accent-hover: #128a5f;
-    --accent-soft: #d8f3e6;
-    --accent-text: #0b5138;
-    --info-soft: #e2eefb;
-    --info-border: #c2ddf6;
-    --info-text: #1d5f96;
+    --accent-soft: #dcf3e8;
+    --accent-borde: #b5e4cf;
+    --accent-texto: #0b5138;
 
-    /* Estados de validación. */
+    --info: #2a7ab9;
+    --info-soft: #e4effa;
+    --info-borde: #c4dcf3;
+    --info-texto: #1b5c90;
+
     --ok-bg: #dcf3e7;
-    --ok-text: #146947;
-    --warn-bg: #fdf0d5;
-    --warn-text: #8a5a08;
+    --ok-texto: #146947;
+    --warn-bg: #fdf2da;
+    --warn-borde: #f3ddad;
+    --warn-texto: #8a5a08;
     --error-bg: #fdeaea;
-    --error-border: #f2c4c4;
-    --error-text: #b03636;
+    --error-borde: #f2c4c4;
+    --error-texto: #b03636;
 
-    --radius-lg: 18px;
-    --radius-md: 12px;
-    --radius-sm: 9px;
+    /* Escala de espacio. Que sea una escala y no números sueltos es lo que
+       mantiene el ritmo vertical parejo entre secciones distintas. */
+    --e1: 4px;
+    --e2: 8px;
+    --e3: 12px;
+    --e4: 16px;
+    --e5: 24px;
+    --e6: 32px;
+    --e7: 48px;
 
-    /* La profundidad reemplaza a los bordes duros: separa sin encerrar. */
-    --shadow-sm: 0 1px 2px rgba(29, 40, 54, 0.06);
-    --shadow-md: 0 4px 14px rgba(29, 40, 54, 0.07);
-    --shadow-lg: 0 16px 36px rgba(29, 40, 54, 0.13);
+    --radio-lg: 16px;
+    --radio-md: 10px;
+    --radio-sm: 7px;
 
-    --transicion: 0.18s ease;
+    --sombra-sm: 0 1px 2px rgba(27, 38, 52, 0.05);
+    --sombra-md: 0 2px 10px rgba(27, 38, 52, 0.06);
+    --sombra-lg: 0 18px 40px rgba(27, 38, 52, 0.14);
+
+    --lateral-ancho: 268px;
+    /* Desplazamiento al que se pegan los encabezados de tabla: el alto real de
+       la barra de filtros menos su corrimiento negativo.
+       42 (buscador) + 24 (relleno superior) + 16 (inferior) − 32 = 50. */
+    --barra-alto: 50px;
+    --transicion: 0.16s ease;
+
+    /* Tonos de las clases en la rejilla, uno por especialidad. Son suaves a
+       propósito: el color agrupa, no compite con el texto que va encima. */
+    --tono-0-bg: #d5e6f8;
+    --tono-0-linea: #4a90cf;
+    --tono-1-bg: #fbe3d0;
+    --tono-1-linea: #d98a4e;
+    --tono-2-bg: #e6dbf8;
+    --tono-2-linea: #8f6ecd;
+    --tono-3-bg: #fadbe7;
+    --tono-3-linea: #d0688f;
+    --tono-4-bg: #d6ecdf;
+    --tono-4-linea: #4faa80;
+    --tono-5-bg: #f8ebc4;
+    --tono-5-linea: #cfae4a;
 }
 
-html {
+/* ---------------------------------------------------------------- base */
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+html,
+body,
+#app {
     height: 100%;
 }
 
 body {
-    /* Un degradado muy tenue evita el gris plano de fondo sin robar atención. */
-    background: linear-gradient(180deg, #f4f7fb 0%, var(--bg) 42%);
+    background: var(--bg);
     color: var(--text);
-    display: flex;
-    flex-direction: column;
     font-family: system-ui, -apple-system, "Segoe UI", "Inter", "Helvetica Neue", sans-serif;
     font-size: 16px;
-    height: 100%;
     line-height: 1.55;
     margin: 0;
-    padding: 32px 28px;
     -webkit-font-smoothing: antialiased;
 }
 
-/* Un anillo de foco visible y consistente en todo lo interactivo. */
-:where(button, input, select, a, [tabindex]):focus-visible {
+h1,
+h2,
+h3,
+p,
+dl,
+dd,
+figure {
+    margin: 0;
+}
+
+ul,
+ol {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+button {
+    font: inherit;
+}
+
+:where(button, input, select, textarea, a, [tabindex]):focus-visible {
     outline: 2px solid var(--accent);
     outline-offset: 2px;
 }
 
-/* ---------- barra superior ---------- */
+/* ---------------------------------------------------------------- shell */
 
-.topbar {
-    align-items: baseline;
+.app {
     display: flex;
-    flex: 0 0 auto;
-    gap: 28px;
-    margin: 0 auto 28px;
-    max-width: 1080px;
+    height: 100%;
+}
+
+.lateral {
+    background: var(--surface);
+    border-right: 1px solid var(--border-soft);
+    display: flex;
+    flex: 0 0 var(--lateral-ancho);
+    flex-direction: column;
+    gap: var(--e2);
+    overflow-y: auto;
+    padding: var(--e5) var(--e4);
+}
+
+.lateral-marca {
+    align-items: center;
+    display: flex;
+    gap: 10px;
+    margin-bottom: var(--e5);
+    padding: 0 var(--e3);
+}
+
+/* "SchedulAI" = Schedule + AI. Destacar las dos últimas letras explica el
+   nombre sin tener que contarlo. */
+.marca-ia {
+    color: var(--accent);
+}
+
+.marca-texto {
+    color: var(--text);
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: -0.2px;
+}
+
+.lateral-rotulo {
+    color: var(--text-tenue);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.8px;
+    margin: var(--e4) 0 var(--e2);
+    padding: 0 var(--e3);
+    text-transform: uppercase;
+}
+
+.lateral-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.lateral-item {
+    align-items: center;
+    background: none;
+    border: 0;
+    border-radius: var(--radio-md);
+    color: var(--text-suave);
+    cursor: pointer;
+    display: flex;
+    font-size: 14.5px;
+    font-weight: 500;
+    gap: var(--e2);
+    justify-content: space-between;
+    padding: 10px var(--e3);
+    text-align: left;
+    transition: background var(--transicion), color var(--transicion);
     width: 100%;
 }
 
-.brand {
-    color: var(--accent-text);
-    font-size: 23px;
-    font-weight: 700;
-    letter-spacing: -0.3px;
+.lateral-item:hover {
+    background: var(--surface-alt);
+    color: var(--text);
 }
 
-.greeting {
-    color: var(--text-muted);
-    font-size: 15px;
+.lateral-item.is-activo {
+    background: var(--accent-soft);
+    color: var(--accent-texto);
+    font-weight: 600;
 }
 
-/* ---------- contenedor de pantalla ---------- */
+.lateral-item-conteo {
+    background: var(--surface-sunken);
+    border-radius: 999px;
+    color: var(--text-tenue);
+    font-size: 12px;
+    font-variant-numeric: tabular-nums;
+    font-weight: 600;
+    min-width: 28px;
+    padding: 1px 8px;
+    text-align: center;
+}
 
-.screen {
-    background: var(--surface);
+.lateral-item.is-activo .lateral-item-conteo {
+    background: rgba(255, 255, 255, 0.7);
+    color: var(--accent-texto);
+}
+
+.lateral-volver {
+    align-items: center;
+    background: none;
+    border: 0;
+    border-radius: var(--radio-md);
+    color: var(--text-suave);
+    cursor: pointer;
+    display: flex;
+    font-size: 13.5px;
+    gap: 6px;
+    padding: 8px var(--e3);
+    transition: background var(--transicion), color var(--transicion);
+}
+
+.lateral-volver:hover {
+    background: var(--surface-alt);
+    color: var(--text);
+}
+
+/* El escenario abierto queda siempre a la vista: es el contexto de todo lo
+   que se está editando, y perderlo al bajar en una tabla larga desorienta. */
+.lateral-escenario {
+    background: var(--surface-alt);
     border: 1px solid var(--border-soft);
-    border-radius: var(--radius-lg);
-    box-shadow: var(--shadow-md);
+    border-radius: var(--radio-md);
+    margin-top: var(--e3);
+    padding: var(--e3) var(--e4);
+}
+
+.lateral-escenario-nombre {
+    font-size: 15.5px;
+    font-weight: 650;
+    letter-spacing: -0.1px;
+    line-height: 1.35;
+}
+
+.lateral-escenario-meta {
+    align-items: center;
+    color: var(--text-tenue);
+    display: flex;
+    font-size: 12.5px;
+    gap: var(--e2);
+    margin-top: 2px;
+}
+
+.lateral-cobertura {
+    background: var(--ok-bg);
+    border: 0;
+    border-radius: var(--radio-sm);
+    color: var(--ok-texto);
+    cursor: pointer;
+    display: block;
+    font-size: 12.5px;
+    font-weight: 600;
+    margin-top: var(--e3);
+    padding: 6px 10px;
+    text-align: left;
+    transition: filter var(--transicion);
+    width: 100%;
+}
+
+.lateral-cobertura.is-alerta {
+    background: var(--warn-bg);
+    color: var(--warn-texto);
+}
+
+.lateral-cobertura:hover {
+    filter: brightness(0.96);
+}
+
+.lateral-pie {
+    border-top: 1px solid var(--border-soft);
+    color: var(--text-tenue);
+    display: flex;
+    flex-direction: column;
+    font-size: 11.5px;
+    line-height: 1.5;
+    margin-top: auto;
+    padding: var(--e4) var(--e3) 0;
+}
+
+.principal {
     display: flex;
     flex: 1;
     flex-direction: column;
-    margin: 0 auto;
-    max-width: 1080px;
-    min-height: 0;
-    padding: 28px 32px;
-    width: 100%;
+    min-width: 0;
 }
 
-.screen-actions {
+.cabecera {
+    align-items: center;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border-soft);
+    display: flex;
+    flex: 0 0 auto;
+    gap: var(--e5);
+    justify-content: space-between;
+    padding: var(--e5) var(--e6);
+}
+
+.cabecera-titulo h1 {
+    font-size: 23px;
+    font-weight: 680;
+    letter-spacing: -0.4px;
+    line-height: 1.25;
+}
+
+.cabecera-subtitulo {
+    color: var(--text-suave);
+    font-size: 14px;
+    margin-top: 3px;
+    max-width: 68ch;
+}
+
+.cabecera-acciones {
     align-items: center;
     display: flex;
     flex: 0 0 auto;
-    gap: 12px;
-    justify-content: space-between;
-    margin-bottom: 16px;
+    gap: var(--e3);
 }
 
-/* ---------- botones: sólo para acciones ---------- */
+.contenido {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    padding: var(--e6);
+}
+
+/* ---------------------------------------------------------------- botones */
 
 .btn {
-    border: 1px solid var(--border);
-    border-radius: var(--radius-sm);
     background: var(--surface);
-    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--border);
+    border-radius: var(--radio-md);
     color: var(--text);
     cursor: pointer;
-    font-size: 15px;
-    font-weight: 500;
+    font-size: 14.5px;
+    font-weight: 550;
     padding: 9px 18px;
     transition: background var(--transicion), border-color var(--transicion),
-        box-shadow var(--transicion), transform var(--transicion);
+        color var(--transicion), transform var(--transicion);
+    white-space: nowrap;
 }
 
-.btn:hover {
+.btn:hover:not(:disabled) {
     background: var(--surface-alt);
-    border-color: var(--text-muted);
+    border-color: var(--text-tenue);
 }
 
-/* Un hundimiento mínimo al presionar: confirma el clic sin animaciones ruidosas. */
-.btn:active {
+.btn:active:not(:disabled) {
     transform: translateY(1px);
+}
+
+.btn:disabled {
+    cursor: not-allowed;
+    opacity: 0.45;
 }
 
 .btn-primary {
     background: var(--accent);
     border-color: var(--accent);
-    color: #ffffff;
-    font-weight: 600;
+    color: #fff;
 }
 
-.btn-primary:hover {
+.btn-primary:hover:not(:disabled) {
     background: var(--accent-hover);
     border-color: var(--accent-hover);
-    box-shadow: var(--shadow-md);
 }
 
 .btn-info {
     background: var(--info-soft);
-    border-color: var(--info-border);
-    color: var(--info-text);
-    font-weight: 600;
+    border-color: var(--info-borde);
+    color: var(--info-texto);
 }
 
-.btn-info:hover {
-    background: #d3e6fa;
-    border-color: var(--info-text);
+.btn-info:hover:not(:disabled) {
+    background: #d6e7f7;
+    border-color: var(--info);
 }
 
-/* Navegación hacia atrás: no compite con las acciones. */
 .btn-ghost {
     background: none;
     border-color: transparent;
-    box-shadow: none;
-    color: var(--text-muted);
-    padding-left: 8px;
+    color: var(--text-suave);
 }
 
-.btn-ghost:hover {
+.btn-ghost:hover:not(:disabled) {
     background: var(--surface-sunken);
     border-color: transparent;
     color: var(--text);
 }
 
-/* ---------- tabs: indican dónde estás, no son acciones ---------- */
-
-.tabs {
-    background: var(--surface-sunken);
-    border-radius: 999px;
-    display: inline-flex;
-    flex: 0 0 auto;
-    gap: 3px;
-    padding: 4px;
-}
-
-.tab {
-    border-radius: 999px;
-    color: var(--text-muted);
-    cursor: pointer;
-    font-size: 15px;
+/* Borrar aparece una vez por fila. En rojo permanente, cuarenta filas
+   convierten la tabla en una alarma; el color llega al pasar el cursor. */
+.btn-peligro {
+    background: var(--surface);
+    border-color: var(--border);
+    color: var(--text-tenue);
     font-weight: 500;
-    padding: 8px 20px;
-    transition: background var(--transicion), color var(--transicion);
 }
 
-.tab:hover {
-    background: rgba(255, 255, 255, 0.6);
-    color: var(--text);
+.btn-peligro:hover:not(:disabled) {
+    background: var(--error-bg);
+    border-color: var(--error-borde);
+    color: var(--error-texto);
 }
 
-.tab.is-active {
+.btn-chico {
+    border-radius: var(--radio-sm);
+    font-size: 13px;
+    padding: 5px 12px;
+}
+
+/* ---------------------------------------------------------------- tarjetas de escenario */
+
+.tarjetas {
+    display: grid;
+    gap: var(--e5);
+    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+}
+
+.tarjeta {
     background: var(--surface);
-    box-shadow: var(--shadow-sm);
-    color: var(--accent-text);
-    font-weight: 600;
-}
-
-/* ---------- panel de escenarios ---------- */
-
-.panel-head {
-    align-items: center;
+    border: 1px solid var(--border-soft);
+    border-radius: var(--radio-lg);
+    box-shadow: var(--sombra-sm);
     display: flex;
-    flex: 0 0 auto;
-    gap: 16px;
-    justify-content: space-between;
-    margin-bottom: 20px;
-}
-
-.panel-title {
-    font-size: 21px;
-    font-weight: 700;
-    letter-spacing: -0.3px;
-}
-
-.escenario-list {
-    display: flex;
-    flex: 1;
     flex-direction: column;
-    gap: 12px;
-    min-height: 0;
-    overflow-y: auto;
-    /* Espacio para que el relieve de la tarjeta al pasar el cursor no se recorte. */
-    padding: 4px;
-}
-
-.escenario-card {
-    align-items: center;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-md);
-    box-shadow: var(--shadow-sm);
-    display: flex;
-    flex-wrap: wrap;
-    gap: 16px;
-    justify-content: space-between;
-    padding: 18px 22px;
+    gap: var(--e4);
+    padding: var(--e5);
     position: relative;
-    transition: border-color var(--transicion), box-shadow var(--transicion),
-        transform var(--transicion);
+    transition: box-shadow var(--transicion), transform var(--transicion);
 }
 
-/* La tarjeta reacciona al pasar el cursor: se siente tocable, no un renglón muerto. */
-.escenario-card:hover {
-    border-color: var(--info-border);
-    box-shadow: var(--shadow-md);
+.tarjeta:hover {
+    box-shadow: var(--sombra-md);
     transform: translateY(-2px);
 }
 
-.escenario-id {
+.tarjeta-cabeza {
+    align-items: flex-start;
     display: flex;
-    flex-direction: column;
-    gap: 5px;
+    gap: var(--e3);
+    justify-content: space-between;
 }
 
-.escenario-titulo {
-    align-items: baseline;
+.tarjeta-identidad {
+    align-items: center;
     display: flex;
     flex-wrap: wrap;
-    gap: 10px;
+    gap: var(--e2);
 }
 
-.escenario-nombre {
-    font-size: 17px;
-    font-weight: 650;
+.tarjeta-nombre {
+    font-size: 18px;
+    font-weight: 660;
     letter-spacing: -0.2px;
+    line-height: 1.3;
 }
 
-.escenario-badge {
-    background: var(--accent-soft);
-    border-radius: 999px;
-    color: var(--accent-text);
-    font-size: 11px;
-    font-weight: 700;
-    letter-spacing: 0.5px;
-    padding: 3px 10px;
+.tarjeta-fecha {
+    color: var(--text-tenue);
+    font-size: 13px;
+    margin-top: calc(var(--e4) * -1 + 2px);
+}
+
+.tarjeta-cifras {
+    background: var(--surface-alt);
+    border-radius: var(--radio-md);
+    display: grid;
+    gap: var(--e2);
+    grid-template-columns: repeat(3, 1fr);
+    padding: var(--e3) var(--e4);
+}
+
+.tarjeta-cifras dt {
+    color: var(--text-tenue);
+    font-size: 11.5px;
+    font-weight: 600;
+    letter-spacing: 0.4px;
     text-transform: uppercase;
 }
 
-.escenario-fecha {
-    color: var(--text-muted);
-    font-size: 14px;
+.tarjeta-cifras dd {
+    font-size: 20px;
+    font-variant-numeric: tabular-nums;
+    font-weight: 660;
+    line-height: 1.2;
 }
 
-.escenario-resumen {
-    align-items: center;
+.cobertura-encabezado {
     display: flex;
-    flex-wrap: wrap;
-    gap: 12px;
+    font-size: 13px;
+    justify-content: space-between;
+    margin-bottom: 6px;
+}
+
+.cobertura-encabezado span:first-child {
+    color: var(--text-suave);
+}
+
+.cobertura-barra {
+    background: var(--surface-sunken);
+    border-radius: 999px;
+    height: 7px;
+    overflow: hidden;
+}
+
+.cobertura-relleno {
+    border-radius: 999px;
+    display: block;
+    height: 100%;
+    transition: width var(--transicion);
+}
+
+.cobertura-relleno.is-ok {
+    background: var(--accent);
+}
+
+.cobertura-relleno.is-alerta {
+    background: #e0a33c;
+}
+
+.cobertura-detalle {
+    color: var(--warn-texto);
+    font-size: 12.5px;
     margin-top: 6px;
 }
 
-.escenario-conteo {
-    color: var(--text-muted);
-    font-size: 14px;
-}
-
-.escenario-cobertura {
-    border-radius: 999px;
-    font-size: 12.5px;
+.texto-ok {
+    color: var(--ok-texto);
     font-weight: 600;
-    padding: 4px 12px;
-    transition: filter var(--transicion);
 }
 
-.escenario-cobertura.is-ok {
-    background: var(--ok-bg);
-    color: var(--ok-text);
+.texto-alerta {
+    color: var(--warn-texto);
+    font-weight: 600;
 }
 
-.escenario-cobertura.is-alerta {
-    background: var(--warn-bg);
-    color: var(--warn-text);
-    cursor: help;
+.tarjeta-pie {
+    margin-top: auto;
 }
 
-.escenario-actions {
-    align-items: center;
-    display: flex;
-    gap: 6px;
+/* La acción principal de la tarjeta va sólida: en versión clara se leía como
+   un bloque inerte, no como el botón que abre el escenario. */
+.tarjeta-pie .btn {
+    background: var(--info);
+    border-color: var(--info);
+    color: #fff;
+    font-weight: 600;
+    width: 100%;
 }
 
-/* Borrar un escenario entero pesa más que borrar una fila: queda detrás de
-   un menú en la esquina, apartado de "Abrir" en vez de competir con ella. */
+.tarjeta-pie .btn:hover:not(:disabled) {
+    background: var(--info-texto);
+    border-color: var(--info-texto);
+}
+
+.tarjeta-roto {
+    background: var(--error-bg);
+    border-radius: var(--radio-md);
+    color: var(--error-texto);
+    font-size: 13px;
+    padding: var(--e3) var(--e4);
+}
+
+.escenario-badge {
+    background: var(--info-soft);
+    border: 1px solid var(--info-borde);
+    border-radius: 999px;
+    color: var(--info-texto);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.4px;
+    padding: 2px 9px;
+    text-transform: uppercase;
+}
+
+/* ---------------------------------------------------------------- menú de acciones */
+
 .escenario-menu {
-    position: absolute;
-    right: 10px;
-    top: 10px;
+    position: relative;
 }
 
 .btn-menu {
     background: none;
-    border: none;
-    border-radius: var(--radius-sm);
-    color: var(--text-muted);
+    border: 1px solid transparent;
+    border-radius: var(--radio-sm);
+    color: var(--text-tenue);
     cursor: pointer;
     font-size: 18px;
     line-height: 1;
-    padding: 6px 10px;
+    padding: 4px 9px;
+    transition: background var(--transicion), color var(--transicion);
 }
 
-.btn-menu:hover,
-.btn-menu[aria-expanded="true"] {
+.btn-menu:hover {
     background: var(--surface-sunken);
     color: var(--text);
 }
@@ -364,596 +638,2357 @@ body {
 .menu-desplegable {
     background: var(--surface);
     border: 1px solid var(--border);
-    border-radius: var(--radius-md);
-    box-shadow: var(--shadow-lg);
-    min-width: 175px;
+    border-radius: var(--radio-md);
+    box-shadow: var(--sombra-lg);
+    min-width: 200px;
     overflow: hidden;
-    padding: 4px;
+    padding: var(--e1);
     position: absolute;
     right: 0;
     top: calc(100% + 6px);
-    z-index: 10;
+    z-index: 20;
 }
 
 .menu-item {
     background: none;
-    border: none;
-    border-radius: var(--radius-sm);
+    border: 0;
+    border-radius: var(--radio-sm);
+    color: var(--text);
     cursor: pointer;
     display: block;
     font-size: 14px;
-    font-weight: 500;
     padding: 9px 12px;
     text-align: left;
-    transition: background var(--transicion);
     width: 100%;
 }
 
 .menu-item:hover {
-    background: var(--surface-sunken);
+    background: var(--surface-alt);
 }
 
 .menu-item-peligro {
-    color: var(--error-text);
+    color: var(--error-texto);
 }
 
 .menu-item-peligro:hover {
     background: var(--error-bg);
 }
 
-/* ---------- detalle de escenario ---------- */
-
-.detalle-head {
-    flex: 0 0 auto;
-    margin-bottom: 10px;
-}
-
-.detalle-head-fila {
-    align-items: center;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    justify-content: space-between;
-}
-
-.detalle-nombre {
-    font-size: 19px;
-    font-weight: 700;
-    letter-spacing: -0.3px;
-}
-
-.detalle-meta {
-    color: var(--text-muted);
-    font-size: 13px;
-}
-
-/* Cuando hay materias sin cubrir, el chip es un atajo hacia ellas. */
-.escenario-cobertura.es-accion {
-    cursor: pointer;
-    margin-top: 10px;
-}
-
-.escenario-cobertura.es-accion::after {
-    content: " →";
-}
-
-.escenario-cobertura.es-accion:hover {
-    filter: brightness(0.95);
-}
-
-#detalle-cobertura {
-    display: inline-block;
-}
-
-/* ---------- búsqueda y filtros ---------- */
-
-.detalle-controles {
-    align-items: center;
-    display: flex;
-    flex: 0 0 auto;
-    flex-wrap: wrap;
-    gap: 14px;
-    justify-content: space-between;
-}
+/* ---------------------------------------------------------------- barra de filtros */
 
 .barra-filtros {
     align-items: center;
+    /* Se estira hasta los bordes del área de contenido y se compensa con
+       padding, para que nada asome por los costados al pasar por debajo. */
+    background: var(--bg);
     display: flex;
-    flex: 1 1 260px;
     flex-wrap: wrap;
-    gap: 12px;
+    gap: var(--e3);
+    margin: calc(var(--e6) * -1) calc(var(--e6) * -1) 0;
+    min-height: var(--barra-alto);
+    padding: var(--e5) var(--e6) var(--e4);
+    position: sticky;
+    top: calc(var(--e6) * -1);
+    z-index: 3;
 }
 
 .input-busqueda {
-    background: var(--surface-alt);
+    background: var(--surface);
     border: 1px solid var(--border);
-    border-radius: 999px;
-    color: var(--text);
-    flex: 1 1 260px;
+    border-radius: var(--radio-md);
+    flex: 1 1 320px;
     font: inherit;
-    font-size: 15px;
-    padding: 9px 16px;
-    transition: background var(--transicion), border-color var(--transicion);
+    font-size: 14.5px;
+    /* Alto explícito y no derivado del interlineado: el encabezado de la tabla
+       se pega justo debajo de esta barra, y ese cálculo necesita un número
+       fijo (ver --barra-alto). */
+    height: 42px;
+    min-width: 0;
+    padding: 0 var(--e4);
+    transition: border-color var(--transicion), box-shadow var(--transicion);
 }
 
 .input-busqueda:focus {
-    background: var(--surface);
     border-color: var(--accent);
-}
-
-.input-busqueda::placeholder {
-    color: var(--text-muted);
+    box-shadow: 0 0 0 3px var(--accent-soft);
+    outline: none;
 }
 
 .filtros {
+    background: var(--surface-sunken);
+    border-radius: 999px;
     display: flex;
-    gap: 8px;
+    gap: 2px;
+    padding: 3px;
 }
 
 .chip-filtro {
-    background: var(--surface-alt);
-    border: 1px solid var(--border);
+    background: none;
+    border: 0;
     border-radius: 999px;
-    color: var(--text-muted);
+    color: var(--text-suave);
     cursor: pointer;
-    font-size: 14px;
-    padding: 7px 14px;
-    transition: background var(--transicion), color var(--transicion),
-        border-color var(--transicion);
+    font-size: 13.5px;
+    font-weight: 550;
+    padding: 6px 15px;
+    transition: background var(--transicion), color var(--transicion);
 }
 
 .chip-filtro:hover {
-    background: var(--surface-sunken);
     color: var(--text);
 }
 
 .chip-filtro.is-active {
-    background: var(--info-soft);
-    border-color: var(--info-text);
-    color: var(--info-text);
-    font-weight: 600;
+    background: var(--surface);
+    box-shadow: var(--sombra-sm);
+    color: var(--text);
 }
 
-.seccion-titulo {
-    color: var(--text-muted);
-    font-size: 13px;
-    font-weight: 600;
-    letter-spacing: 0.4px;
-    margin-bottom: 10px;
-    text-transform: uppercase;
+.conteo-resultados {
+    color: var(--text-tenue);
+    font-size: 13.5px;
+    margin-left: auto;
+    white-space: nowrap;
 }
 
-.separador {
-    opacity: 0.5;
-    padding: 0 4px;
+/* ---------------------------------------------------------------- tablas */
+
+/* Sin `overflow: hidden`: recorta el desbordamiento pero también convierte al
+   panel en contenedor de desplazamiento, y eso anula el `position: sticky` de
+   los encabezados de la tabla. Las esquinas se redondean en las celdas. */
+.panel {
+    background: var(--surface);
+    border: 1px solid var(--border-soft);
+    border-radius: var(--radio-lg);
+    box-shadow: var(--sombra-sm);
 }
 
-.detalle-contenido {
-    flex: 1;
-    margin-top: 18px;
-    min-height: 0;
-    overflow: auto;
+.panel .tabla thead th:first-child {
+    border-top-left-radius: var(--radio-lg);
+}
+
+.panel .tabla thead th:last-child {
+    border-top-right-radius: var(--radio-lg);
+}
+
+.panel .tabla tbody tr:last-child td:first-child {
+    border-bottom-left-radius: var(--radio-lg);
+}
+
+.panel .tabla tbody tr:last-child td:last-child {
+    border-bottom-right-radius: var(--radio-lg);
 }
 
 .tabla {
     border-collapse: collapse;
-    font-size: 15px;
     width: 100%;
 }
 
-.tabla th {
-    background: var(--surface);
-    border-bottom: 1.5px solid var(--border);
-    color: var(--text-muted);
-    font-size: 12px;
+.tabla thead th {
+    background: var(--surface-alt);
+    border-bottom: 1px solid var(--border-soft);
+    color: var(--text-tenue);
+    font-size: 11.5px;
     font-weight: 700;
-    letter-spacing: 0.5px;
-    padding: 11px 14px;
+    letter-spacing: 0.7px;
+    padding: var(--e3) var(--e4);
     position: sticky;
     text-align: left;
     text-transform: uppercase;
     top: 0;
-    z-index: 1;
+    z-index: 2;
+}
+
+/* Cuando hay barra de filtros fija, los encabezados se pegan debajo de ella;
+   sin barra (aulas, especialidades) se pegan hasta arriba. */
+.contenido:has(> .barra-filtros) .tabla thead th {
+    top: var(--barra-alto);
+}
+
+/* Dentro de una tarjeta las tablas son cortas y tienen su propio encabezado
+   arriba: fijarlas ahí solo produciría un salto raro al desplazar. */
+.tarjeta-panel .tabla thead th,
+.bloque-especialidad .tabla thead th {
+    position: static;
 }
 
 .tabla td {
     border-bottom: 1px solid var(--border-soft);
-    padding: 11px 14px;
+    font-size: 14.5px;
+    padding: var(--e3) var(--e4);
+    vertical-align: middle;
 }
 
-.tabla tbody tr {
-    transition: background var(--transicion);
+.tabla tbody tr:last-child td {
+    border-bottom: 0;
 }
 
-.tabla tbody tr:hover {
+.tabla tbody tr:hover td {
     background: var(--surface-alt);
 }
 
-.tabla tr.is-alerta td {
-    background: var(--warn-bg);
-}
-
-.tabla tr.fila-separador td {
+/* Fila que rotula un semestre. */
+.fila-separador td {
     background: var(--surface-sunken);
-    color: var(--text-muted);
-    font-size: 12px;
-    font-weight: 600;
-    letter-spacing: 0.4px;
-    padding: 6px 10px;
+    color: var(--text-suave);
+    font-size: 11.5px;
+    font-weight: 700;
+    letter-spacing: 0.8px;
+    padding: 9px var(--e4);
     text-transform: uppercase;
 }
 
-.tabla tr.fila-separador:hover td {
+.fila-separador:hover td {
     background: var(--surface-sunken);
 }
 
-/* Aire entre semestres. En una tabla el margin no aplica a <tr>, así que el
-   hueco se hace con un borde del color del fondo; `background-clip` evita que
-   el gris del separador se derrame sobre él. El primer semestre no lo lleva,
-   para no despegarse del encabezado de la tabla. */
+/* Aire entre semestres. El margin no aplica a <tr>, así que el hueco se hace
+   con un borde del color del fondo; `background-clip` evita que el gris del
+   separador se derrame sobre él. El primero no lo lleva, para no despegarse
+   del encabezado. */
 .tabla tr.fila-separador:not(.fila-subseparador):not(:first-child) td {
     background-clip: padding-box;
-    border-top: 22px solid var(--surface);
+    border-top: var(--e5) solid var(--surface);
 }
 
-/* Subgrupo dentro del semestre: sangrado y con una barra de color a la
-   izquierda, para que se lea como hijo del separador de arriba y no como
-   otro semestre. */
-.tabla tr.fila-subseparador td {
+/* Subnivel: la especialidad dentro del semestre. */
+.fila-subseparador td {
     background: var(--info-soft);
-    border-left: 3px solid var(--info-border);
-    color: var(--info-text);
+    border-left: 3px solid var(--info-borde);
+    color: var(--info-texto);
     letter-spacing: 0.3px;
-    padding-left: 20px;
+    padding-left: var(--e5);
     text-transform: none;
 }
 
-.tabla tr.fila-subseparador:hover td {
+.fila-subseparador:hover td {
     background: var(--info-soft);
 }
 
-/* ---------- catálogo de aulas ---------- */
-
-.aulas-grupos {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
+.tabla tbody tr.is-alerta td {
+    background: #fffaf0;
 }
 
-/* ---------- especialidades ---------- */
-
-.especialidad-titulo {
-    align-items: center;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
+.tabla tbody tr.is-alerta:hover td {
+    background: #fef5e6;
 }
 
-.especialidad-titulo .seccion-titulo {
-    margin-bottom: 0;
+.tabla-compacta td,
+.tabla-compacta th {
+    padding: 9px var(--e3);
 }
 
-/* El conteo de docentes es un botón, pero debe leerse como dato en la tabla. */
+.celda-principal {
+    font-weight: 550;
+}
+
+.celda-tenue {
+    color: var(--text-tenue);
+    font-size: 13.5px;
+}
+
+.celda-clave {
+    color: var(--text-suave);
+    font-family: ui-monospace, "SF Mono", "Cascadia Mono", Menlo, monospace;
+    font-size: 13px;
+    letter-spacing: 0.2px;
+    white-space: nowrap;
+}
+
+/* Sin `display: flex`: aplicarlo a un <td> lo saca del algoritmo de tabla y
+   la fila deja de alinearse con las demás. */
+.celda-acciones {
+    text-align: right;
+    white-space: nowrap;
+    width: 1%;
+}
+
+.celda-acciones .btn + .btn {
+    margin-left: 6px;
+}
+
+/* Cifras que se leen en columna: comparar 8 con 12 de un vistazo solo funciona
+   si los dígitos ocupan lo mismo. */
+.celda-numero {
+    font-variant-numeric: tabular-nums;
+    text-align: right;
+    white-space: nowrap;
+    width: 1%;
+}
+
+/* Encabezado de grupo dentro de la tabla: la hoja de 1A, luego la de 1B. Es un
+   separador, no una fila de datos, y por eso no responde al hover. */
+.tabla tbody th.fila-grupo,
+.tabla tbody .fila-grupo th {
+    background: var(--surface-sunken);
+    border-bottom: 1px solid var(--border-soft);
+    color: var(--text-suave);
+    font-size: 12.5px;
+    font-weight: 700;
+    letter-spacing: 0.4px;
+    padding: var(--e2) var(--e4);
+    text-align: left;
+}
+
+.tabla tbody tr.fila-grupo:hover th {
+    background: var(--surface-sunken);
+}
+
+/* Cada grupo es su propio <tbody>; sin esto la última fila de cada uno perdería
+   la línea que la separa del encabezado del siguiente. */
+.tabla tbody:not(:last-child) tr:last-child td {
+    border-bottom: 1px solid var(--border-soft);
+}
+
+.etiqueta-suave {
+    background: var(--surface-sunken);
+    border-radius: 999px;
+    color: var(--text-tenue);
+    font-size: 11.5px;
+    margin-left: var(--e2);
+    padding: 2px 9px;
+    white-space: nowrap;
+}
+
+/* El conteo de docentes es un botón: lleva directo a arreglar lo que señala. */
 .celda-docentes {
     background: none;
     border: 1px solid transparent;
-    border-radius: var(--radius-sm);
+    border-radius: var(--radio-sm);
     color: inherit;
     cursor: pointer;
     font: inherit;
-    padding: 3px 8px;
+    font-variant-numeric: tabular-nums;
+    padding: 4px 12px;
     transition: background var(--transicion), border-color var(--transicion);
 }
 
 .celda-docentes:hover {
-    background: var(--surface);
+    background: var(--surface-sunken);
     border-color: var(--border);
-}
-
-.materia-check-nota {
-    color: var(--text-muted);
-    font-size: 12px;
-    font-weight: 400;
-    margin-left: auto;
-    padding-left: 10px;
-}
-
-.formulario-nota {
-    color: var(--text-muted);
-    font-size: 14px;
-    margin: -10px 0 0;
 }
 
 .chip-alerta {
+    background: var(--warn-bg);
     border-radius: 999px;
-    color: var(--warn-text);
+    color: var(--warn-texto);
     font-size: 12px;
-    font-weight: 600;
+    font-weight: 650;
+    padding: 3px 10px;
     white-space: nowrap;
 }
 
-/* ---------- estados ---------- */
+/* ---------------------------------------------------------------- estados */
 
-.empty-state {
-    background: var(--surface-alt);
-    border: 1.5px dashed var(--border);
-    border-radius: var(--radius-md);
-    color: var(--text-muted);
-    padding: 40px 16px;
+.estado-vacio {
+    color: var(--text-tenue);
+    font-size: 14.5px;
+    padding: var(--e7) var(--e4);
     text-align: center;
 }
 
-.error-state {
-    background: var(--error-bg);
-    border: 1px solid var(--error-border);
-    border-radius: var(--radius-md);
-    color: var(--error-text);
-    padding: 18px 16px;
-    text-align: center;
-}
-
-.loading-state {
-    color: var(--text-muted);
-    padding: 26px 16px;
-    text-align: center;
-}
-
-/* ---------- edición: encabezados de sección y acciones por fila ---------- */
-
-.seccion-encabezado {
+.estado-vacio-grande {
     align-items: center;
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 8px;
-}
-
-.seccion-encabezado .seccion-titulo {
-    margin-bottom: 0;
-}
-
-.btn-mini {
-    font-size: 13px;
-    padding: 6px 12px;
-}
-
-/* Discreto en reposo: una tabla con un botón rojo por fila es puro ruido.
-   El rojo aparece al apuntarlo, que es cuando la advertencia importa. */
-.btn-peligro {
     background: var(--surface);
-    border-color: var(--border);
-    color: var(--text-muted);
-    font-weight: 500;
-}
-
-.btn-peligro:hover {
-    background: var(--error-bg);
-    border-color: var(--error-border);
-    color: var(--error-text);
-}
-
-.fila-acciones {
+    border: 1px dashed var(--border);
+    border-radius: var(--radio-lg);
+    color: var(--text-suave);
     display: flex;
-    gap: 6px;
+    flex-direction: column;
+    gap: var(--e3);
+    padding: var(--e7);
+    text-align: center;
+}
+
+.estado-vacio-titulo {
+    color: var(--text);
+    font-size: 18px;
+    font-weight: 650;
+}
+
+.panel-nota {
+    color: var(--text-suave);
+    font-size: 14px;
+    line-height: 1.6;
+    margin-bottom: var(--e4);
+    max-width: 78ch;
+}
+
+.campo-ayuda {
+    color: var(--text-tenue);
+    font-size: 13px;
+    line-height: 1.55;
+    margin-top: 6px;
+    max-width: 78ch;
+}
+
+.banda {
+    align-items: center;
+    display: flex;
+    font-size: 14px;
+    gap: var(--e3);
+    justify-content: space-between;
+    margin: var(--e4) var(--e6) 0;
+    padding: var(--e3) var(--e4);
+}
+
+.banda-error {
+    background: var(--error-bg);
+    border: 1px solid var(--error-borde);
+    border-radius: var(--radio-md);
+    color: var(--error-texto);
+}
+
+.banda-ok {
+    background: var(--ok-bg);
+    border-radius: var(--radio-md);
+    color: var(--ok-texto);
+}
+
+.banda-cerrar {
+    background: none;
+    border: 0;
+    color: inherit;
+    cursor: pointer;
+    font-size: 20px;
+    line-height: 1;
+    opacity: 0.6;
+    padding: 0 var(--e1);
+}
+
+.banda-cerrar:hover {
+    opacity: 1;
+}
+
+.marca-sucio {
+    background: var(--warn-bg);
+    border-radius: 999px;
+    color: var(--warn-texto);
+    font-size: 12.5px;
+    font-weight: 650;
+    padding: 5px 13px;
     white-space: nowrap;
 }
 
-.detalle-head-acciones {
+.detalle-meta {
+    align-items: center;
+    color: var(--text-tenue);
+    display: inline-flex;
+    font-size: 13.5px;
+    gap: 6px;
+}
+
+.separador {
+    opacity: 0.5;
+}
+
+.escenario-cobertura {
+    background: var(--ok-bg);
+    border: 0;
+    border-radius: 999px;
+    color: var(--ok-texto);
+    font-size: 12.5px;
+    font-weight: 650;
+    padding: 5px 13px;
+    white-space: nowrap;
+}
+
+.escenario-cobertura.is-alerta {
+    background: var(--warn-bg);
+    color: var(--warn-texto);
+}
+
+button.escenario-cobertura {
+    cursor: pointer;
+}
+
+/* ---------------------------------------------------------------- especialidades */
+
+.bloque-especialidad {
+    background: var(--surface);
+    border: 1px solid var(--border-soft);
+    border-radius: var(--radio-lg);
+    box-shadow: var(--sombra-sm);
+    margin-bottom: var(--e5);
+    overflow: hidden;
+}
+
+.bloque-head {
+    align-items: center;
+    border-bottom: 1px solid var(--border-soft);
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--e3);
+    justify-content: space-between;
+    padding: var(--e4) var(--e5);
+}
+
+.bloque-nombre {
+    font-size: 17px;
+    font-weight: 660;
+    letter-spacing: -0.2px;
+}
+
+.bloque-acciones {
     align-items: center;
     display: flex;
-    gap: 10px;
+    gap: var(--e3);
 }
 
-.detalle-head-acciones .btn {
+.escenario-titulo {
+    align-items: center;
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--e3);
+}
+
+/* ---------------------------------------------------------------- horario */
+
+.seccion-horario {
+    display: flex;
+    flex-direction: column;
+    gap: var(--e5);
+}
+
+.tarjeta-panel {
+    background: var(--surface);
+    border: 1px solid var(--border-soft);
+    border-radius: var(--radio-lg);
+    box-shadow: var(--sombra-sm);
+    overflow: hidden;
+}
+
+.tarjeta-panel-cabeza {
+    align-items: center;
+    border-bottom: 1px solid var(--border-soft);
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--e3);
+    justify-content: space-between;
+    padding: var(--e4) var(--e5);
+}
+
+.tarjeta-panel-titulo {
+    font-size: 15.5px;
+    font-weight: 650;
+}
+
+.tarjeta-panel-cuerpo {
+    padding: var(--e5);
+}
+
+.tarjeta-panel-cuerpo.sin-relleno {
+    padding: 0;
+}
+
+/* Tarjetas de cifra del resultado. Un renglón de texto con seis números se
+   lee como una nota al pie; en tarjetas, cada dato se distingue. */
+.cifras {
+    display: grid;
+    gap: var(--e4);
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+}
+
+.cifra {
+    background: var(--surface-alt);
+    border: 1px solid var(--border-soft);
+    border-radius: var(--radio-md);
+    padding: var(--e3) var(--e4);
+}
+
+.cifra-rotulo {
+    color: var(--text-tenue);
+    font-size: 11.5px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+}
+
+.cifra-valor {
+    font-size: 24px;
+    font-variant-numeric: tabular-nums;
+    font-weight: 660;
+    letter-spacing: -0.5px;
+    line-height: 1.25;
+}
+
+.cifra-nota {
+    color: var(--text-tenue);
+    font-size: 12.5px;
+}
+
+.cifra.is-ok {
+    background: var(--ok-bg);
+    border-color: var(--accent-borde);
+}
+
+.cifra.is-ok .cifra-valor,
+.cifra.is-ok .cifra-rotulo,
+.cifra.is-ok .cifra-nota {
+    color: var(--ok-texto);
+}
+
+.cifra.is-alerta {
+    background: var(--warn-bg);
+    border-color: var(--warn-borde);
+}
+
+.cifra.is-alerta .cifra-valor,
+.cifra.is-alerta .cifra-rotulo,
+.cifra.is-alerta .cifra-nota {
+    color: var(--warn-texto);
+}
+
+.lista-avisos {
+    background: var(--warn-bg);
+    border: 1px solid var(--warn-borde);
+    border-radius: var(--radio-md);
+    color: var(--warn-texto);
+    font-size: 13.5px;
+    line-height: 1.6;
+    padding: var(--e3) var(--e4) var(--e3) var(--e5);
+}
+
+.lista-avisos li {
+    list-style: disc;
+    margin-left: var(--e2);
+}
+
+.lista-avisos li + li {
+    margin-top: 6px;
+}
+
+.violaciones {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--e2);
+}
+
+/* Duras en rojo y blandas en gris: el color separa "no se puede aplicar" de
+   "se puede mejorar". */
+.violacion {
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 550;
+    padding: 5px 13px;
+}
+
+.violacion.is-dura {
+    background: var(--error-bg);
+    border: 1px solid var(--error-borde);
+    color: var(--error-texto);
+}
+
+.violacion.is-blanda {
+    background: var(--surface-sunken);
+    color: var(--text-suave);
+}
+
+.selector-grupos {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--e2);
+}
+
+.grupo-pastilla {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radio-md);
+    cursor: pointer;
+    line-height: 1.3;
+    min-width: 76px;
+    padding: 7px 14px;
+    text-align: center;
+    transition: border-color var(--transicion), background var(--transicion);
+}
+
+.grupo-pastilla:hover {
+    border-color: var(--text-tenue);
+}
+
+.grupo-pastilla.is-activo {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+}
+
+.grupo-pastilla-clave {
+    display: block;
+    font-size: 15px;
+    font-weight: 660;
+}
+
+.grupo-pastilla-turno {
+    color: var(--text-tenue);
+    display: block;
+    font-size: 11px;
+    letter-spacing: 0.3px;
+    text-transform: uppercase;
+}
+
+.grupo-pastilla-aula {
+    color: var(--text-tenue);
+    display: block;
+    font-family: ui-monospace, "SF Mono", "Cascadia Mono", Menlo, monospace;
+    font-size: 10.5px;
+    margin-top: 2px;
+}
+
+.grupo-pastilla.is-activo .grupo-pastilla-turno,
+.grupo-pastilla.is-activo .grupo-pastilla-aula {
+    color: rgba(255, 255, 255, 0.85);
+}
+
+.leyenda {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--e2) var(--e4);
+}
+
+.leyenda-item {
+    align-items: center;
+    color: var(--text-suave);
+    display: flex;
+    font-size: 13px;
+    gap: 7px;
+}
+
+.leyenda-muestra {
+    border-left: 3px solid;
+    border-radius: 3px;
+    height: 14px;
+    width: 22px;
+}
+
+/* --- rejilla semanal ---
+   Aquí es donde más importa el tamaño: es la pantalla que se queda abierta
+   revisando. Las filas son altas y el texto grande a propósito, aunque eso
+   signifique desplazarse un poco más. */
+
+.rejilla-envoltura {
+    overflow-x: auto;
+}
+
+.rejilla {
+    border-collapse: collapse;
+    min-width: 940px;
+    table-layout: fixed;
+    width: 100%;
+}
+
+.rejilla th,
+.rejilla td {
+    border: 1px solid var(--border-soft);
+    padding: 0;
+    text-align: center;
+    vertical-align: middle;
+}
+
+.rejilla thead th {
+    background: var(--surface-alt);
+    color: var(--text-suave);
+    font-size: 12.5px;
+    font-weight: 700;
+    letter-spacing: 0.8px;
+    padding: var(--e3) var(--e2);
+    text-transform: uppercase;
+}
+
+/* La altura va en la fila, no en la celda vacía: una fila cuyas columnas están
+   todas cubiertas por el `rowspan` de un bloque anterior no tiene celdas
+   propias y sin esto colapsaría, descuadrando la columna de horas. */
+.rejilla tbody tr {
+    height: 78px;
+}
+
+.rejilla-hora {
+    background: var(--surface-alt);
+    color: var(--text-tenue);
+    font-size: 13px;
+    font-variant-numeric: tabular-nums;
+    font-weight: 600;
+    padding: var(--e2) var(--e3);
+    white-space: nowrap;
+    width: 84px;
+}
+
+/* La hora se alinea arriba, no al centro: marca el inicio de la franja, como
+   en cualquier calendario. Centrada parecía correrse respecto a los bloques. */
+.rejilla tbody .rejilla-hora {
+    padding-top: var(--e3);
+    vertical-align: top;
+}
+
+
+.rejilla-libre {
+    background: var(--surface);
+}
+
+/* `td.` y no solo la clase: `.rejilla td` centra el texto y tiene más
+   especificidad, así que sin el elemento el título quedaba centrado mientras
+   el resto del bloque se alineaba a la izquierda. */
+/* `td.` y no solo la clase: `.rejilla td` centra el texto y tiene más
+   especificidad, así que sin el elemento el título quedaba centrado mientras
+   el resto del bloque se alineaba a la izquierda.
+   El color no se define aquí: lo ponen las clases de tono, que tienen menos
+   especificidad y quedarían pisadas. Aquí solo va lo que comparten todas. */
+.rejilla td.rejilla-clase {
+    border-left-style: solid;
+    border-left-width: 4px;
+    line-height: 1.4;
+    padding: var(--e3);
+    text-align: left;
+    vertical-align: top;
+}
+
+.rejilla-materia {
+    color: var(--text);
+    display: block;
     font-size: 14px;
-    padding: 7px 16px;
+    font-weight: 650;
+    letter-spacing: -0.1px;
+    margin-bottom: 3px;
 }
 
-/* ---------- diálogos de edición ---------- */
+.rejilla-linea {
+    align-items: center;
+    color: var(--text-suave);
+    display: flex;
+    font-size: 12.5px;
+    gap: 5px;
+}
+
+/* Marca de clase compartida con otro grupo, casi siempre de otra carrera. */
+.rejilla-fusion {
+    background: rgba(255, 255, 255, 0.75);
+    border-radius: 4px;
+    font-size: 10.5px;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+    padding: 1px 6px;
+    text-transform: uppercase;
+}
+
+.rejilla-aula {
+    background: rgba(255, 255, 255, 0.75);
+    border-radius: 4px;
+    color: var(--text-suave);
+    font-family: ui-monospace, "SF Mono", "Cascadia Mono", Menlo, monospace;
+    font-size: 11.5px;
+    padding: 1px 6px;
+}
+
+.clase-tono-base {
+    background: var(--surface-sunken);
+    border-left-color: var(--text-tenue);
+}
+
+.clase-tono-0 {
+    background: var(--tono-0-bg);
+    border-left-color: var(--tono-0-linea);
+}
+
+.clase-tono-1 {
+    background: var(--tono-1-bg);
+    border-left-color: var(--tono-1-linea);
+}
+
+.clase-tono-2 {
+    background: var(--tono-2-bg);
+    border-left-color: var(--tono-2-linea);
+}
+
+.clase-tono-3 {
+    background: var(--tono-3-bg);
+    border-left-color: var(--tono-3-linea);
+}
+
+.clase-tono-4 {
+    background: var(--tono-4-bg);
+    border-left-color: var(--tono-4-linea);
+}
+
+.clase-tono-5 {
+    background: var(--tono-5-bg);
+    border-left-color: var(--tono-5-linea);
+}
+
+.input-chico {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radio-sm);
+    font: inherit;
+    font-size: 14px;
+    max-width: 140px;
+    padding: 6px 10px;
+    transition: border-color var(--transicion), box-shadow var(--transicion);
+}
+
+.input-chico:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-soft);
+    outline: none;
+}
+
+/* Mismo chevron que en los formularios: un select con la flecha del sistema
+   junto a otros dibujados a mano delata el remiendo. */
+/* Columna de conteo: angosta, porque solo lleva un dígito. */
+.input-conteo {
+    max-width: 72px;
+    text-align: center;
+}
+
+select.input-chico {
+    appearance: none;
+    background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='none' stroke='%235c6b7f' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round' d='M1 1.5 6 6.5 11 1.5'/%3E%3C/svg%3E");
+    background-position: right 10px center;
+    background-repeat: no-repeat;
+    background-size: 11px 7px;
+    cursor: pointer;
+    padding-right: 30px;
+}
+
+.config-acciones {
+    align-items: center;
+    border-top: 1px solid var(--border-soft);
+    display: flex;
+    gap: var(--e4);
+    justify-content: flex-end;
+    margin-top: var(--e5);
+    padding-top: var(--e4);
+}
+
+.config-acciones .campo-ayuda {
+    margin: 0 auto 0 0;
+    text-align: left;
+}
+
+/* ---------------------------------------------------------------- diálogos */
 
 .dialogo {
-    border: none;
-    border-radius: var(--radius-lg);
-    box-shadow: var(--shadow-lg);
-    max-width: 480px;
+    background: var(--surface);
+    border: 0;
+    border-radius: var(--radio-lg);
+    box-shadow: var(--sombra-lg);
+    color: var(--text);
+    max-height: 88vh;
+    max-width: 520px;
     padding: 0;
-    width: calc(100% - 40px);
+    width: calc(100% - 48px);
 }
 
 .dialogo-ancho {
-    max-width: 760px;
+    max-width: 800px;
 }
 
 .dialogo::backdrop {
-    background: rgba(20, 30, 44, 0.42);
     backdrop-filter: blur(2px);
+    background: rgba(27, 38, 52, 0.42);
 }
 
 .formulario {
     display: flex;
     flex-direction: column;
-    gap: 18px;
-    max-height: 80vh;
+    gap: var(--e4);
+    max-height: 88vh;
     overflow-y: auto;
-    padding: 28px;
+    padding: var(--e5) var(--e6) var(--e6);
 }
 
 .formulario-titulo {
-    font-size: 20px;
-    font-weight: 700;
+    font-size: 19px;
+    font-weight: 660;
     letter-spacing: -0.3px;
 }
 
+.formulario-nota {
+    background: var(--surface-alt);
+    border-radius: var(--radio-md);
+    color: var(--text-suave);
+    font-size: 13.5px;
+    padding: var(--e2) var(--e3);
+}
+
+.formulario-error {
+    background: var(--error-bg);
+    border: 1px solid var(--error-borde);
+    border-radius: var(--radio-md);
+    color: var(--error-texto);
+    font-size: 13.5px;
+    padding: var(--e2) var(--e3);
+}
+
+.formulario-acciones {
+    border-top: 1px solid var(--border-soft);
+    display: flex;
+    gap: var(--e3);
+    justify-content: flex-end;
+    margin-top: var(--e2);
+    padding-top: var(--e4);
+    position: sticky;
+    bottom: 0;
+}
+
+/* ---------------------------------------------------------------- campos */
+
 .campo {
     display: flex;
-    flex: 1 1 0;
     flex-direction: column;
-    font-size: 14px;
-    font-weight: 600;
     gap: 6px;
-    /* Sin esto el ancho intrínseco del <input> impide que tres campos
-       quepan en una fila, y el tercero se cae solo al renglón siguiente. */
+    /* Sin esto, el ancho intrínseco de un <input> impide que el campo se
+       encoja y una fila de tres campos se parte en dos renglones. */
     min-width: 0;
+}
+
+.campo > span,
+.campo-grupo legend {
+    color: var(--text-suave);
+    font-size: 13px;
+    font-weight: 600;
 }
 
 .campo input,
 .campo select {
-    min-width: 0;
-}
-
-.campo span {
-    color: var(--text-muted);
-}
-
-/* background-color, no el atajo `background`: el shorthand borraría la flecha
-   que .campo select dibuja como background-image. */
-.campo input,
-.campo select {
-    background-color: var(--surface-alt);
+    background: var(--surface-alt);
     border: 1px solid var(--border);
-    border-radius: var(--radius-sm);
+    border-radius: var(--radio-md);
     color: var(--text);
     font: inherit;
-    font-size: 15px;
-    font-weight: 400;
-    padding: 9px 12px;
-    transition: background-color var(--transicion), border-color var(--transicion);
+    font-size: 14.5px;
+    min-width: 0;
+    padding: 10px var(--e3);
+    transition: background-color var(--transicion), border-color var(--transicion),
+        box-shadow var(--transicion);
+    width: 100%;
 }
 
 .campo input:focus,
 .campo select:focus {
-    background-color: var(--surface);
+    background: var(--surface);
     border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-soft);
+    outline: none;
 }
 
-/* El <select> nativo desentona junto a los inputs; se le dibuja la misma caja
-   y su propia flecha (SVG embebido: no depende de archivos externos).
-   Va después de la regla base para que su padding no quede pisado. */
+/* El chevron va después de la regla base a propósito: esa usa
+   `background-color` y no el atajo `background`, que borraría esta imagen. */
 .campo select {
     appearance: none;
-    background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='none' stroke='%236b7a8d' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round' d='M1 1.5 6 6.5l5-5'/%3E%3C/svg%3E");
-    background-position: right 12px center;
+    background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='none' stroke='%235c6b7f' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round' d='M1 1.5 6 6.5 11 1.5'/%3E%3C/svg%3E");
+    background-position: right var(--e3) center;
     background-repeat: no-repeat;
     background-size: 12px 8px;
     cursor: pointer;
-    padding-right: 32px;
+    padding-right: var(--e6);
 }
 
 .campo-fila {
     display: flex;
     flex-wrap: wrap;
-    gap: 14px;
+    gap: var(--e3);
+}
+
+.campo-fila > .campo {
+    flex: 1 1 140px;
 }
 
 .campo-check {
     align-items: center;
     flex-direction: row;
-    gap: 8px;
-    justify-content: flex-start;
+    gap: var(--e2);
+}
+
+.campo-check input {
+    accent-color: var(--accent);
+    height: 17px;
+    width: 17px;
+}
+
+.campo-check > span {
+    color: var(--text);
+    font-size: 14.5px;
+    font-weight: 400;
 }
 
 .campo-grupo {
     border: 1px solid var(--border-soft);
-    border-radius: var(--radius-md);
+    border-radius: var(--radio-md);
     display: flex;
     flex-direction: column;
-    gap: 12px;
-    padding: 16px;
+    gap: var(--e3);
+    margin: 0;
+    padding: var(--e4);
 }
 
 .campo-grupo legend {
-    color: var(--text-muted);
-    font-size: 12px;
-    font-weight: 600;
-    letter-spacing: 0.3px;
-    padding: 0 4px;
-    text-transform: uppercase;
+    padding: 0 6px;
 }
 
 .dias {
     display: flex;
     flex-wrap: wrap;
-    gap: 8px 12px;
+    gap: 6px;
 }
 
-.dia-check {
-    align-items: center;
-    display: flex;
-    font-size: 13px;
-    font-weight: 400;
-    gap: 5px;
+.dia {
+    background: var(--surface-alt);
+    border: 1px solid var(--border);
+    border-radius: var(--radio-sm);
+    color: var(--text-suave);
+    cursor: pointer;
+    font-size: 12.5px;
+    font-weight: 600;
+    padding: 6px 11px;
+    text-transform: capitalize;
+    transition: background var(--transicion), border-color var(--transicion), color var(--transicion);
 }
+
+.dia:hover {
+    border-color: var(--text-tenue);
+}
+
+.dia.is-active {
+    background: var(--accent-soft);
+    border-color: var(--accent-borde);
+    color: var(--accent-texto);
+}
+
+/* --- franjas de disponibilidad --- */
+
+.franjas {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.franja {
+    align-items: center;
+    background: var(--surface-alt);
+    border-radius: var(--radio-sm);
+    display: flex;
+    gap: var(--e2);
+    padding: 6px 10px;
+}
+
+.franja-dia {
+    align-items: center;
+    cursor: pointer;
+    display: flex;
+    flex: 0 0 130px;
+    gap: var(--e2);
+    font-size: 14px;
+    text-transform: capitalize;
+}
+
+.franja-dia input {
+    accent-color: var(--accent);
+    height: 16px;
+    width: 16px;
+}
+
+.franja-a {
+    color: var(--text-tenue);
+    font-size: 13px;
+}
+
+.lista-descargas {
+    display: flex;
+    flex-direction: column;
+    font-size: 13.5px;
+    gap: 6px;
+}
+
+.lista-descargas li {
+    align-items: center;
+    color: var(--text-suave);
+    display: flex;
+    gap: var(--e2);
+}
+
+/* --- listas de casillas --- */
 
 .materias-checklist {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    max-height: 280px;
+    background: var(--surface-alt);
+    border: 1px solid var(--border-soft);
+    border-radius: var(--radio-md);
+    max-height: 320px;
     overflow-y: auto;
+    padding: var(--e3);
 }
 
-.materias-checklist-grupo {
-    border: none;
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-    padding: 0;
+.checklist-grupo + .checklist-grupo {
+    margin-top: var(--e4);
 }
 
-.materias-checklist-grupo legend {
-    color: var(--text-muted);
+.checklist-titulo {
+    background: var(--surface-alt);
+    color: var(--text-tenue);
     font-size: 11px;
-    font-weight: 600;
-    letter-spacing: 0.3px;
+    font-weight: 700;
+    letter-spacing: 0.7px;
+    margin-bottom: var(--e1);
+    padding: var(--e1) 6px;
+    position: sticky;
     text-transform: uppercase;
+    top: calc(var(--e3) * -1);
+    z-index: 1;
 }
 
 .materia-check {
     align-items: center;
+    border-radius: var(--radio-sm);
+    cursor: pointer;
     display: flex;
+    font-size: 14px;
+    gap: var(--e2);
+    padding: 6px 8px;
+    transition: background var(--transicion);
+}
+
+.materia-check:hover {
+    background: var(--surface-sunken);
+}
+
+.materia-check input {
+    accent-color: var(--accent);
+    flex: 0 0 auto;
+    height: 16px;
+    width: 16px;
+}
+
+.materia-check-nota {
+    background: var(--info-soft);
+    border-radius: 999px;
+    color: var(--info-texto);
+    font-size: 11px;
+    margin-left: auto;
+    padding: 2px 9px;
+    white-space: nowrap;
+}
+
+/* ---------------------------------------------------------------- pantallas estrechas */
+
+@media (max-width: 900px) {
+    .app {
+        flex-direction: column;
+        height: auto;
+        min-height: 100%;
+    }
+
+    .lateral {
+        flex: 0 0 auto;
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: var(--e3);
+        overflow-x: auto;
+        padding: var(--e3) var(--e4);
+    }
+
+    .lateral-marca,
+    .lateral-rotulo,
+    .lateral-pie,
+    .lateral-escenario {
+        display: none;
+    }
+
+    .lateral-nav {
+        flex-direction: row;
+    }
+
+    .cabecera,
+    .contenido {
+        padding: var(--e4);
+    }
+
+    .banda {
+        margin: var(--e3) var(--e4) 0;
+    }
+
+    /* La barra envuelve en varias líneas y su alto deja de ser predecible, así
+       que aquí nada se queda fijo: es preferible desplazar a que los
+       encabezados se peguen en el lugar equivocado. */
+    .barra-filtros {
+        margin: 0 0 var(--e3);
+        padding: 0;
+        position: static;
+    }
+
+    .tabla thead th {
+        position: static;
+    }
+
+    /* Con el sticky ya desactivado arriba, el panel puede desplazarse en
+       horizontal sin romperlo: es preferible a que la columna de acciones
+       quede cortada contra el borde. */
+    .panel {
+        overflow-x: auto;
+    }
+
+    .panel .tabla {
+        min-width: 720px;
+    }
+}
+
+/* =========================================================================
+   Preparación del horario
+   ========================================================================= */
+
+.filtros-grandes {
+    background: none;
+    gap: var(--e3);
+    padding: 0;
+}
+
+.filtros-grandes .chip-filtro {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radio-md);
+    line-height: 1.35;
+    padding: var(--e3) var(--e5);
+    text-align: left;
+}
+
+.filtros-grandes .chip-filtro.is-active {
+    background: var(--accent-soft);
+    border-color: var(--accent-borde);
+    box-shadow: none;
+    color: var(--accent-texto);
+}
+
+.chip-filtro-nota {
+    display: block;
+    font-size: 12px;
+    font-weight: 500;
+    opacity: 0.75;
+}
+
+.etiqueta-modulo {
+    background: var(--info-soft);
+    border: 1px solid var(--info-borde);
+    border-radius: 999px;
+    color: var(--info-texto);
+    font-size: 12.5px;
+    font-weight: 600;
+    padding: 3px 11px;
+    white-space: nowrap;
+}
+
+.aviso-listo {
+    align-items: center;
+    background: var(--ok-bg);
+    border: 1px solid var(--accent-borde);
+    border-radius: var(--radio-md);
+    color: var(--ok-texto);
+    display: flex;
+    flex-wrap: wrap;
+    font-size: 14px;
+    gap: var(--e3);
+    padding: var(--e3) var(--e4);
+}
+
+.aviso-listo-marca {
+    background: var(--accent);
+    border-radius: 999px;
+    color: #fff;
+    font-size: 12.5px;
+    font-weight: 650;
+    padding: 3px 12px;
+    white-space: nowrap;
+}
+
+/* Cada bloqueo dice qué falta y lleva a arreglarlo. Enumerarlos sin salida
+   sería igual de inútil que el horario imposible que evitan. */
+.lista-bloqueos {
+    display: flex;
+    flex-direction: column;
+    gap: var(--e2);
+}
+
+.lista-bloqueos > li {
+    background: var(--error-bg);
+    border: 1px solid var(--error-borde);
+    border-radius: var(--radio-md);
+    padding: var(--e3) var(--e4);
+}
+
+.bloqueo-fila {
+    align-items: center;
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--e3);
+    justify-content: space-between;
+}
+
+.bloqueo-mensaje {
+    color: var(--error-texto);
+    font-size: 14px;
+    font-weight: 550;
+}
+
+.bloqueo-acciones {
+    display: flex;
+    flex: 0 0 auto;
+    gap: var(--e2);
+}
+
+.bloqueo-detalle {
+    border-top: 1px solid var(--error-borde);
+    color: var(--error-texto);
+    columns: 2;
     font-size: 13px;
-    font-weight: 400;
+    line-height: 1.6;
+    margin-top: var(--e3);
+    padding-top: var(--e3);
+}
+
+@media (max-width: 900px) {
+    .bloqueo-detalle {
+        columns: 1;
+    }
+}
+
+/* =========================================================================
+   Hoja de saturación
+   ========================================================================= */
+
+.pastilla-docente {
+    min-width: 210px;
+    text-align: left;
+}
+
+.pastilla-docente .grupo-pastilla-clave {
+    font-size: 13.5px;
+    font-weight: 600;
+}
+
+.rejilla-saturacion tbody tr {
+    height: 42px;
+}
+
+.rejilla-saturacion td {
+    font-size: 11.5px;
+    line-height: 1.3;
+    padding: 3px 6px;
+    text-align: left;
+    vertical-align: middle;
+}
+
+/* Los cuatro estados de la hoja. El "libre" es el gris del documento original:
+   las horas que el docente ofreció y nadie ha apartado. */
+.celda-no-declarada {
+    background: repeating-linear-gradient(
+        45deg,
+        var(--surface-alt),
+        var(--surface-alt) 5px,
+        var(--surface-sunken) 5px,
+        var(--surface-sunken) 10px
+    );
+}
+
+.celda-libre {
+    background: var(--surface-sunken);
+}
+
+.celda-libre.is-evitada {
+    background: repeating-linear-gradient(
+        -45deg,
+        var(--surface-sunken),
+        var(--surface-sunken) 4px,
+        var(--warn-bg) 4px,
+        var(--warn-bg) 8px
+    );
+}
+
+.celda-descarga {
+    background: var(--warn-bg);
+    color: var(--warn-texto);
+}
+
+.celda-ocupada {
+    background: var(--tono-0-bg);
+    border-left: 3px solid var(--tono-0-linea);
+    /* Ancla del rayado de `.is-ajena`, que va en un pseudoelemento absoluto. */
+    position: relative;
+}
+
+/* Una hora tomada por otra coordinación: se distingue de la propia porque no se
+   resuelve igual. La propia se mueve cambiando el horario; esta hay que ir a
+   negociarla, y verlo de un vistazo es todo el valor de la hoja. */
+.celda-ocupada.is-ajena {
+    background: var(--warn-bg);
+    border-left-color: var(--warn-texto);
+}
+
+/* El rayado hace la diferencia visible sin depender del color: en una rejilla
+   de setenta y cinco celdas, dos tonos parecidos del mismo verde no se
+   distinguen de un vistazo, que es justo para lo que sirve la hoja. */
+.celda-ocupada.is-ajena::after {
+    background: repeating-linear-gradient(
+        -45deg,
+        transparent 0 5px,
+        color-mix(in srgb, var(--warn-texto) 16%, transparent) 5px 10px
+    );
+    content: "";
+    inset: 0;
+    pointer-events: none;
+    position: absolute;
+}
+
+.celda-ocupada.is-ajena /* Una hora que tiene otra coordinación se puede pedir: que se note que es
+   pulsable, o nadie descubre que se puede. */
+.celda-ocupada.is-pedible {
+    cursor: pointer;
+}
+
+.celda-ocupada.is-pedible:hover {
+    outline: 2px solid var(--warn-texto);
+    outline-offset: -2px;
+}
+
+.celda-carrera {
+    color: var(--warn-texto);
+}
+
+.celda-carrera {
+    color: var(--info-texto);
+    display: block;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+}
+
+.celda-detalle {
+    color: var(--text-suave);
+    display: block;
+    font-size: 10.5px;
+}
+
+.leyenda-saturacion {
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    height: 15px;
+    width: 24px;
+}
+
+/* =========================================================================
+   Acceso
+   ========================================================================= */
+
+.portada {
+    align-items: center;
+    background: var(--bg);
+    display: flex;
+    justify-content: center;
+    min-height: 100%;
+    padding: var(--e5);
+}
+
+.acceso {
+    background: var(--surface);
+    border: 1px solid var(--border-soft);
+    border-radius: var(--radio-lg);
+    box-shadow: var(--sombra-md);
+    display: flex;
+    flex-direction: column;
+    gap: var(--e4);
+    max-width: 380px;
+    padding: var(--e6);
+    width: 100%;
+}
+
+.acceso-marca {
+    align-items: center;
+    display: flex;
+    gap: var(--e3);
+}
+
+.acceso-marca .marca-texto {
+    font-size: 24px;
+}
+
+.acceso-nota {
+    color: var(--text-tenue);
+    font-size: 13px;
+    margin-top: calc(var(--e4) * -1 + 2px);
+}
+
+.acceso .btn {
+    margin-top: var(--e2);
+}
+
+/* El nombre arriba y los botones debajo. En una sola fila, dos botones más el
+   nombre no caben en los 268px de la barra: el último quedaba cortado y
+   aparecía un desplazamiento horizontal. */
+.lateral-usuario {
+    display: flex;
+    flex-direction: column;
+    gap: var(--e2);
+    min-width: 0;
+}
+
+.lateral-usuario > div,
+.lateral-usuario > .lateral-usuario-nombre {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.lateral-usuario-nombre {
+    color: var(--text);
+    font-size: 13px;
+    font-weight: 600;
+}
+
+/* =========================================================================
+   Conciliación
+   ========================================================================= */
+
+.lista-solicitudes {
+    display: flex;
+    flex-direction: column;
+    gap: var(--e2);
+}
+
+.solicitud {
+    align-items: center;
+    background: var(--surface-alt);
+    border: 1px solid var(--border-soft);
+    border-radius: var(--radio-md);
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--e3);
+    justify-content: space-between;
+    padding: var(--e3) var(--e4);
+}
+
+.solicitud-que {
+    font-size: 14.5px;
+    font-weight: 550;
+}
+
+.solicitud-acciones {
+    display: flex;
+    flex: 0 0 auto;
+    gap: var(--e2);
+}
+
+/* --- formulario del docente --- */
+
+.acceso-ancho {
+    max-width: 640px;
+}
+
+/* La semana entera no cabe en la tarjeta del formulario. Solo se ensancha
+   cuando hay una rejilla que enseñar, para que la hoja de disponibilidad siga
+   siendo una columna estrecha y fácil de contestar. */
+.acceso-semana {
+    max-width: 1040px;
+}
+
+.acceso-titulo {
+    font-size: 20px;
+    font-weight: 660;
+    letter-spacing: -0.3px;
+}
+
+.dia-docente {
+    background: var(--surface-alt);
+    border-radius: var(--radio-sm);
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 8px 10px;
+}
+
+.dia-docente-fila {
+    align-items: center;
+    display: flex;
+    gap: var(--e2);
+}
+
+/* La preferencia se sangra bajo el día al que pertenece. */
+.dia-docente-preferencia {
+    padding-left: 26px;
+}
+
+.franja-evitar {
+    align-items: center;
+    color: var(--text-tenue);
+    cursor: pointer;
+    display: flex;
+    font-size: 12.5px;
     gap: 6px;
 }
 
-.formulario-error {
-    background: var(--error-bg);
-    border: 1px solid var(--error-border);
-    border-radius: var(--radius-sm);
-    color: var(--error-text);
+.franja-evitar input {
+    accent-color: var(--accent);
+    height: 15px;
+    width: 15px;
+}
+
+.area-csv {
+    background: var(--surface-alt);
+    border: 1px solid var(--border);
+    border-radius: var(--radio-md);
+    color: var(--text);
+    font-family: ui-monospace, "SF Mono", "Cascadia Mono", Menlo, monospace;
     font-size: 13px;
-    padding: 8px 12px;
+    line-height: 1.6;
+    padding: var(--e3);
+    resize: vertical;
+    width: 100%;
 }
 
-.formulario-acciones {
+.area-csv:focus {
+    background: var(--surface);
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-soft);
+    outline: none;
+}
+
+/* Un contador que pide atención, no uno que informa: son solicitudes que
+   alguien dejó esperando. */
+.lateral-item-conteo.is-aviso {
+    background: var(--error-bg);
+    color: var(--error-texto);
+}
+
+.lateral-item.is-activo .lateral-item-conteo.is-aviso {
+    background: var(--error-texto);
+    color: #fff;
+}
+
+.lista-historial {
     display: flex;
-    gap: 10px;
-    justify-content: flex-end;
+    flex-direction: column;
+    gap: 6px;
+    font-size: 13.5px;
 }
 
-/* ---------- accesibilidad y pantallas angostas ---------- */
-
-:focus-visible {
-    border-radius: var(--radius-sm);
-    outline: 2px solid var(--info-border);
-    outline-offset: 2px;
+.lista-historial li {
+    align-items: center;
+    border-bottom: 1px solid var(--border-soft);
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--e2);
+    padding-bottom: 6px;
 }
 
-@media (max-width: 640px) {
-    .topbar {
-        flex-wrap: wrap;
-        gap: 4px 16px;
+.lista-historial li:last-child {
+    border-bottom: 0;
+}
+
+.historial-momento {
+    color: var(--text-tenue);
+    flex: 0 0 130px;
+    font-size: 12.5px;
+    font-variant-numeric: tabular-nums;
+}
+
+.historial-nota {
+    color: var(--text-tenue);
+    font-size: 12.5px;
+    font-style: italic;
+    margin-left: auto;
+}
+
+/* Aviso de que el horario guardado dejó de corresponder con las horas
+   apartadas. Va dentro de la tarjeta y antes del cuerpo: es una advertencia
+   sobre todo lo que sigue, no un dato más. */
+.aviso-desfase {
+    margin: 0 var(--e5) var(--e5);
+    padding: var(--e3) var(--e4);
+    border: 1px solid var(--warn-borde);
+    border-left-width: 3px;
+    border-radius: var(--radio-sm);
+    background: var(--warn-bg);
+}
+
+.aviso-desfase-titulo {
+    margin: 0 0 var(--e1);
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--warn-texto);
+}
+
+.lista-perdidas {
+    margin: 10px 0 0;
+    padding: 0;
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    font-size: 0.85rem;
+}
+
+.lista-perdidas li {
+    display: flex;
+    gap: 8px;
+    align-items: baseline;
+    flex-wrap: wrap;
+}
+
+.select-chico {
+    height: 30px;
+    padding: 0 var(--e2);
+    border: 1px solid var(--border);
+    border-radius: var(--radio-sm);
+    background: var(--surface);
+    color: var(--text-suave);
+    font: inherit;
+    font-size: 0.82rem;
+}
+
+/* ---------------------------------------------------------------- impresión
+
+   El horario en papel es el producto que el coordinador reparte. En pantalla el
+   bloque no existe; al imprimir es lo único que se ve.
+
+   Se oculta el resto con `visibility` y no con `display`, y sin nombrar una
+   sola sección de la app: enumerar qué esconder es una lista que se
+   desactualiza en cuanto alguien agrega una pantalla, y el fallo no se nota
+   hasta que alguien imprime. Así lo nuevo queda oculto por omisión. */
+.impresion {
+    display: none;
+}
+
+/* Las dos cosas que trae el enlace del docente: lo que le tocó y lo que declara.
+   Son dos, no un menú, así que van como pestañas y no como barra lateral. */
+.pestanas-docente {
+    border-bottom: 1px solid var(--border-soft);
+    display: flex;
+    gap: var(--e1);
+}
+
+.pestanas-docente button {
+    align-items: center;
+    background: none;
+    border: 0;
+    border-bottom: 2px solid transparent;
+    color: var(--text-tenue);
+    cursor: pointer;
+    display: flex;
+    font: inherit;
+    font-weight: 600;
+    gap: var(--e2);
+    margin-bottom: -1px;
+    padding: var(--e2) var(--e3);
+}
+
+.pestanas-docente button:hover {
+    color: var(--text);
+}
+
+.pestanas-docente button.is-activo {
+    border-bottom-color: var(--accent);
+    color: var(--text);
+}
+
+.pestana-conteo {
+    background: var(--surface-sunken);
+    border-radius: 999px;
+    color: var(--text-suave);
+    font-size: 12px;
+    font-variant-numeric: tabular-nums;
+    padding: 1px 8px;
+}
+
+.horario-docente-cabeza {
+    align-items: flex-start;
+    display: flex;
+    gap: var(--e3);
+    justify-content: space-between;
+}
+
+/* La semana de un docente es más ancha que la tarjeta en un teléfono: se
+   desplaza ella sola en vez de empujar la página entera de lado. */
+.horario-docente-rejilla {
+    overflow-x: auto;
+}
+
+/* Cabeceras de tarjeta con más de un control: el buscador y las acciones. */
+.tarjeta-panel-acciones {
+    align-items: center;
+    display: flex;
+    flex: 0 1 auto;
+    flex-wrap: wrap;
+    gap: var(--e2);
+}
+
+/* Quién ha impartido una clase: se abre cuando hace falta y no ocupa sitio
+   mientras tanto, que es lo normal al asignar. */
+.historial-clase summary {
+    color: var(--text-suave);
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.historial-clase ul {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    list-style: none;
+    margin: var(--e2) 0 0;
+    padding: 0;
+}
+
+/* En flex y no en línea: entre un <span> y otro Vue no deja espacio, y el
+   resultado era "13 sep 2026Héctor Iván". El hueco lo pone el `gap`. */
+.historial-clase li {
+    align-items: baseline;
+    display: flex;
+    flex-wrap: wrap;
+    font-size: 13px;
+    gap: 5px;
+}
+
+/* Lo mismo para las celdas que combinan una pastilla con un aviso. */
+.celda-marcas {
+    align-items: center;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+/* Tabla de papel: sin bordes de pantalla ni zebra, con la retícula fina que se
+   lee bien impresa y encabezados que se repiten si la tabla parte de página. */
+.tabla-impresa {
+    border-collapse: collapse;
+    font-size: 10.5pt;
+    width: 100%;
+}
+
+.tabla-impresa th,
+.tabla-impresa td {
+    border-bottom: 1px solid #d4d8de;
+    padding: 4px 6px;
+    text-align: left;
+    vertical-align: top;
+}
+
+.tabla-impresa thead th {
+    border-bottom: 1.5px solid #1b2634;
+    font-size: 9pt;
+    letter-spacing: 0.4px;
+    text-transform: uppercase;
+}
+
+.tabla-impresa .numero {
+    font-variant-numeric: tabular-nums;
+    text-align: right;
+    white-space: nowrap;
+}
+
+.tabla-impresa .clave {
+    font-family: ui-monospace, "SF Mono", Menlo, monospace;
+    white-space: nowrap;
+}
+
+.tabla-impresa .grupo {
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+/* Cada grupo es su propio <tbody>: se evita que un grupo quede partido entre
+   dos páginas cuando cabe entero en la siguiente. */
+.tabla-impresa tbody {
+    break-inside: avoid;
+}
+
+@media print {
+    body * {
+        visibility: hidden;
     }
 
-    .screen-actions {
-        flex-wrap: wrap;
+    .impresion,
+    .impresion * {
+        visibility: visible;
     }
 
-    .escenario-card {
-        align-items: stretch;
-        flex-direction: column;
+    /* El bloque vive dentro del contenedor con scroll de la app. Se saca del
+       flujo para que empiece arriba del papel y no donde lo dejó el scroll. */
+    .impresion {
+        display: block;
+        position: absolute;
+        inset: 0 0 auto 0;
+        width: 100%;
     }
 
-    .escenario-actions {
-        justify-content: flex-end;
+    /* La app es una columna de alto fijo con su propio desplazamiento; en papel
+       no hay desplazamiento, y lo que sobresale se recorta sin avisar. */
+    html,
+    body,
+    #app,
+    .app,
+    .principal,
+    .contenido {
+        height: auto;
+        min-height: 0;
+        overflow: visible;
+        display: block;
+        background: #fff;
+        padding: 0;
     }
+
+    /* Los navegadores no imprimen fondos por omisión, y aquí el color de la
+       celda distingue especialidad de tronco común: sin él la rejilla en papel
+       pierde la única señal que la ordena de un vistazo. */
+    .impresion * {
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+
+    @page {
+        size: landscape;
+        margin: 12mm;
+    }
+
+    /* Si la tabla parte de página, los encabezados se repiten arriba: una
+       columna de cifras sin cabecera no se puede leer. */
+    .tabla-impresa thead {
+        display: table-header-group;
+    }
+
+    .hoja {
+        break-after: page;
+    }
+
+    .hoja:last-child {
+        break-after: auto;
+    }
+
+    .hoja-cabeza {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: var(--e4);
+        margin-bottom: var(--e3);
+        padding-bottom: var(--e2);
+        border-bottom: 2px solid #1b2634;
+    }
+
+    .hoja-titulo {
+        margin: 0;
+        font-size: 15pt;
+        font-weight: 650;
+    }
+
+    /* Capitalizado para la hoja del grupo, que enumera datos sueltos
+       ("vespertino · desarrollo web"). La del reparto es una frase con nombre
+       propio y fecha dentro, y ahí produce "Ingeniería En Sistemas · 13 De
+       Septiembre": se deja tal cual. */
+    .hoja-sub {
+        margin: 2px 0 0;
+        font-size: 9pt;
+        color: #5c6b7f;
+        text-transform: capitalize;
+    }
+
+    .hoja:has(.tabla-impresa) .hoja-sub {
+        text-transform: none;
+    }
+
+    .hoja-meta {
+        text-align: right;
+        font-size: 9pt;
+    }
+
+    .hoja-meta p {
+        margin: 0;
+    }
+
+    /* Sin esto el pie se va solo a la página siguiente cuando la rejilla llena
+       la suya, y sale una hoja en blanco con una línea de letra chica. */
+    .hoja-pie {
+        margin: var(--e2) 0 0;
+        font-size: 7.5pt;
+        color: #8494a8;
+        break-before: avoid;
+    }
+
+    /* Solo la paridad se capitaliza: aplicarlo a la línea entera escribía
+       "Generado Con SchedulAI". */
+    .hoja-paridad {
+        text-transform: capitalize;
+    }
+
+    .impresion .rejilla-envoltura {
+        overflow: visible;
+        border: none;
+    }
+
+    .impresion .rejilla {
+        width: 100%;
+        font-size: 8pt;
+        table-layout: fixed;
+    }
+
+    .impresion .rejilla td,
+    .impresion .rejilla th {
+        padding: 3px 4px;
+    }
+
+    /* En pantalla la fila mide 78px y la rejilla se desplaza. En papel no hay
+       desplazamiento: lo que no cabe se va a la página siguiente, y una fila
+       suelta con su encabezado repetido es media hoja desperdiciada por cada
+       grupo vespertino. A 44px entran las trece filas del turno más largo. */
+    .impresion .rejilla tbody tr {
+        height: 44px;
+    }
+
+    /* Una fila partida entre dos páginas deja media clase arriba y media abajo. */
+    .impresion .rejilla tr {
+        break-inside: avoid;
+    }
+
+    .impresion .rejilla-materia {
+        font-size: 8pt;
+        font-weight: 600;
+    }
+
+    .impresion .rejilla-linea {
+        font-size: 7pt;
+    }
+}
+
+/* Carreras de un coordinador: se alternan pulsando, sin diálogo intermedio.
+   Son dos o tres códigos cortos, y un selector múltiple para eso es más
+   ceremonia que dato. */
+.fila-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--e1);
+}
+
+.chip-carrera {
+    padding: 3px var(--e2);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    background: var(--surface);
+    color: var(--text-tenue);
+    font: inherit;
+    font-size: 0.76rem;
+    font-weight: 600;
+    letter-spacing: 0.4px;
+    cursor: pointer;
+    transition: var(--transicion);
+}
+
+.chip-carrera:hover {
+    border-color: var(--accent-borde);
+    color: var(--text-suave);
+}
+
+.chip-carrera.is-activo {
+    border-color: var(--accent-borde);
+    background: var(--accent-soft);
+    color: var(--accent-texto);
+}
+
+.lateral-usuario-acciones {
+    display: flex;
+    gap: var(--e1);
+}
+
+.lateral-usuario-acciones .btn {
+    flex: 1;
+}
+
+/* Prioridad puesta: se marca el selector para que se vea de un vistazo quién la
+   tiene sin leer las treinta filas. */
+.select-chico.is-marcado {
+    border-color: var(--accent-borde);
+    background: var(--accent-soft);
+    color: var(--accent-texto);
+    font-weight: 600;
+}
+
+/* Dato que hace falta para que una comprobación sirva de algo. No es un error
+   —el horario sale igual— así que se marca, no se bloquea. */
+.input-chico.is-faltante {
+    border-color: var(--warn-borde);
+    background: var(--warn-bg);
+}
+
+.lista-invitadas {
+    display: flex;
+    flex-direction: column;
+    gap: var(--e2);
+}
+
+.invitada {
+    display: flex;
+    align-items: center;
+    gap: var(--e3);
+    padding: var(--e2) var(--e3);
+    border: 1px solid var(--border-soft);
+    border-radius: var(--radio-sm);
+    background: var(--surface-alt);
+    cursor: pointer;
+}
+
+.invitada-nombre {
+    font-weight: 600;
+    letter-spacing: 0.3px;
+    min-width: 64px;
+}
+
+/* Cuenta retirada: existe para que su historial tenga autor, pero ya no abre
+   nada. Se apaga en vez de esconderse, porque el departamento necesita saber
+   que está ahí. */
+.fila-retirada {
+    opacity: 0.55;
+}
+
+.chip-carrera.chip-editar {
+    border-style: dashed;
+    font-weight: 500;
+}
+
+/* Elegir carreras en un diálogo: con clave y nombre, que es como se reconocen.
+   Trece botones de cuatro letras en una fila de tabla no se leen. */
+.rejilla-carreras {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: var(--e2);
+    max-height: 340px;
+    overflow-y: auto;
+}
+
+.tarjeta-carrera {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: var(--e2) var(--e3);
+    border: 1px solid var(--border);
+    border-radius: var(--radio-sm);
+    background: var(--surface);
+    text-align: left;
+    font: inherit;
+    cursor: pointer;
+    transition: var(--transicion);
+}
+
+.tarjeta-carrera:hover {
+    border-color: var(--accent-borde);
+}
+
+.tarjeta-carrera.is-activo {
+    border-color: var(--accent);
+    background: var(--accent-soft);
+}
+
+.tarjeta-carrera-clave {
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    color: var(--text-suave);
+}
+
+.tarjeta-carrera.is-activo .tarjeta-carrera-clave {
+    color: var(--accent-texto);
+}
+
+.tarjeta-carrera-nombre {
+    font-size: 0.8rem;
+    color: var(--text-tenue);
+    line-height: 1.35;
+}
+
+/* Un bloque que se puede mover tiene que parecerlo: sin esto el coordinador no
+   descubre que la rejilla es editable. */
+.rejilla-clase.es-editable {
+    cursor: pointer;
+}
+
+.rejilla-clase.es-editable:hover,
+.rejilla-clase.es-editable:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: -2px;
+}
+
+.lista-simple {
+    margin: 0;
+    padding-left: var(--e4);
+    display: flex;
+    flex-direction: column;
+    gap: var(--e1);
+    font-size: 0.88rem;
+}
+
+/* Filtro del catálogo de materias en la ficha del docente. */
+.filtro-materias {
+    display: flex;
+    align-items: center;
+    gap: var(--e3);
+    margin-bottom: var(--e2);
+}
+
+.filtro-materias .input-busqueda {
+    flex: 1;
+    min-width: 0;
+}
+
+.filtro-solo {
+    display: flex;
+    align-items: center;
+    gap: var(--e1);
+    white-space: nowrap;
+    font-size: 0.85rem;
+    color: var(--text-suave);
+    cursor: pointer;
+}
+
+/* La carrera de la que viene la materia, cuando no es de todas. */
+.materia-check-nota {
+    color: var(--text-tenue);
+    font-size: 0.78rem;
+}
+
+/* Selector de carrera del catálogo. En fila y no en columna: trece carreras
+   apiladas empujaban la tabla entera fuera de la pantalla, que es lo que el
+   jefe de departamento viene a mirar. */
+.fila-carreras {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--e2);
+}
+
+.pastilla-carrera {
+    display: flex;
+    align-items: baseline;
+    gap: var(--e2);
+    padding: var(--e2) var(--e3);
+    border: 1px solid var(--border-soft);
+    border-radius: var(--radio-sm);
+    background: var(--surface-alt);
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+    transition: var(--transicion);
+}
+
+.pastilla-carrera:hover {
+    border-color: var(--accent-borde);
+}
+
+.pastilla-carrera.is-activo {
+    border-color: var(--accent);
+    background: var(--accent-soft);
+}
+
+.pastilla-clave {
+    font-weight: 700;
+    letter-spacing: 0.4px;
+}
+
+.pastilla-meta {
+    color: var(--text-tenue);
+    font-size: 0.82rem;
+    white-space: nowrap;
+}
+
+.lateral-item-conteo.is-aviso {
+    background: var(--error-bg);
+    color: var(--error-texto);
 }

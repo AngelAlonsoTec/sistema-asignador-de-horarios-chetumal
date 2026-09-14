@@ -1,0 +1,26 @@
+[package]
+name = "schedulai-engine"
+version = "0.1.0"
+edition = "2021"
+description = "Motor genético paralelo de asignación de horarios para SchedulAI"
+license = "MIT"
+
+# Sin dependencias externas a propósito: el motor solo usa la biblioteca
+# estándar. Esto hace que `cargo build` funcione sin red, que la imagen de
+# Docker se construya en segundos y que no haya árbol de dependencias que
+# auditar. El costo es JSON y HTTP escritos a mano, en json.rs y http.rs.
+[dependencies]
+
+[[bin]]
+name = "schedulai-engine"
+path = "src/main.rs"
+
+[[bin]]
+name = "salud"
+path = "src/bin/salud.rs"
+
+[profile.release]
+opt-level = 3
+lto = true
+codegen-units = 1
+panic = "abort"

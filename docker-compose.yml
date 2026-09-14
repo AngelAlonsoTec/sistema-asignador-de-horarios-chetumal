@@ -1,0 +1,73 @@
+# Orquestación de los tres servicios de SchedulAI.
+#
+#   docker compose up --build
+#
+# Solo el frontend queda expuesto al navegador. El backend publica su puerto
+# para poder inspeccionarlo con curl durante el desarrollo; el motor no lo
+# publica, porque únicamente el backend debe invocarlo.
+
+services:
+  engine:
+    build: ./engine
+    container_name: schedulai-engine
+    environment:
+      PUERTO: 7000
+      # Hilos del modelo de islas. Por omisión usa los núcleos disponibles.
+      # ISLAS: 8
+    expose:
+      - "7000"
+    healthcheck:
+      test: ["CMD", "/usr/local/bin/salud"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 5s
+    restart: unless-stopped
+
+  backend:
+    build: ./backend
+    container_name: schedulai-backend
+    environment:
+      PUERTO: 4000
+      MOTOR_URL: http://engine:7000
+      DATOS_DIR: /datos
+      # Marca la cookie de sesión como `Secure`. Solo con HTTPS delante: sobre
+      # http el navegador la descarta y nadie puede entrar.
+      # CON_TLS: 1
+      # Cada cuántas horas se respalda la base. 0 lo apaga.
+      HORAS_ENTRE_RESPALDOS: 12
+      # Registra cada petición con su patrón de ruta. Para ver qué usa quién.
+      # REGISTRAR_PETICIONES: 1
+    ports:
+      - "4000:4000"
+    volumes:
+      # Los escenarios viven fuera de la imagen: sobreviven a un rebuild.
+      - ./backend/data:/datos
+    depends_on:
+      engine:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://localhost:4000/api/salud').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 5s
+    restart: unless-stopped
+
+  frontend:
+    build: ./frontend
+    container_name: schedulai-frontend
+    environment:
+      # nginx del frontend reenvía /api a este destino.
+      BACKEND_URL: http://backend:4000
+    ports:
+      - "8080:80"
+      # Con TLS activo (ver frontend/nginx.conf.template), descomenta esto y
+      # monta el certificado. El backend necesita además CON_TLS=1.
+      # - "8443:443"
+    # volumes:
+    #   - ./tls:/etc/nginx/tls:ro
+    depends_on:
+      backend:
+        condition: service_healthy
+    restart: unless-stopped

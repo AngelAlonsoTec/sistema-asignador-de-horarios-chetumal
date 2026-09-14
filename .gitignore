@@ -1,1 +1,28 @@
+# Dependencias
+node_modules/
+
+# Compilados
+engine/target/
+frontend/dist/
+
+# Entorno
+.env
+.env.local
+
+# Editor y sistema operativo
+.vscode/
+.idea/
+.DS_Store
+
+# Entrevistas y material de investigación (no se publican)
 papers/
+
+# Base de datos y sus respaldos: binarios, y con datos de docentes reales.
+# backend/data/schedulai.db
+# backend/data/schedulai.db-shm
+# backend/data/schedulai.db-wal
+# backend/data/respaldos/
+
+invitacion.png
+logos.png
+sid.txt

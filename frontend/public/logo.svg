@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" role="img" aria-label="SchedulAI">
+  <g fill="#17a673">
+    <rect x="4" y="1.5" width="6.67" height="5" rx="2"/>
+    <rect x="12.67" y="1.5" width="6.67" height="5" rx="2"/>
+    <rect x="21.33" y="1.5" width="6.67" height="5" rx="2"/>
+    <rect x="4" y="14" width="6.67" height="5" rx="2"/>
+    <rect x="12.67" y="14" width="6.67" height="5" rx="2"/>
+    <rect x="21.33" y="14" width="6.67" height="5" rx="2"/>
+    <rect x="4" y="26.5" width="6.67" height="5" rx="2"/>
+    <rect x="12.67" y="26.5" width="6.67" height="5" rx="2"/>
+    <rect x="21.33" y="26.5" width="6.67" height="5" rx="2"/>
+  </g>
+  <g fill="#17a673" opacity="0.55">
+    <rect x="4" y="7.75" width="6" height="5" rx="2"/>
+    <rect x="22" y="20.25" width="6" height="5" rx="2"/>
+  </g>
+</svg>

@@ -1,0 +1,87 @@
+# Plantilla de nginx. `envsubst` la resuelve al arrancar el contenedor.
+#
+# TLS: por omisión solo escucha en el 80, que es lo que sirve en desarrollo.
+# Para el servidor del plantel hay un bloque 443 comentado abajo; al activarlo
+# hay que poner también `CON_TLS=1` en el backend, que es lo que marca la cookie
+# de sesión como `Secure`.
+
+server {
+    listen 80;
+    server_name _;
+
+    # Con TLS activo, esta línea manda todo a https y el bloque de abajo sirve.
+    # return 301 https://$host$request_uri;
+
+    root /usr/share/nginx/html;
+    index index.html;
+
+    gzip on;
+    gzip_types text/css application/javascript application/json image/svg+xml;
+    gzip_min_length 1024;
+
+    # El backend queda detrás del mismo origen. Generar un horario puede tardar
+    # bastante, así que los tiempos de espera son largos a propósito: cortar la
+    # petición a los sesenta segundos por omisión mataría corridas válidas.
+    location /api/ {
+        proxy_pass ${BACKEND_URL};
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_read_timeout 600s;
+        proxy_send_timeout 600s;
+    }
+
+    # Los archivos con huella digital en el nombre no cambian nunca; el
+    # index.html sí, y servirlo desde caché dejaría la aplicación vieja.
+    location /assets/ {
+        expires 1y;
+        add_header Cache-Control "public, immutable";
+    }
+
+    location / {
+        try_files $uri $uri/ /index.html;
+        add_header Cache-Control "no-cache";
+    }
+}
+
+# ---------------------------------------------------------------------- TLS
+#
+# Para activarlo:
+#   1. Monta el certificado en /etc/nginx/tls (ver docker-compose.yml).
+#   2. Descomenta este bloque y el `return 301` de arriba.
+#   3. Arranca el backend con CON_TLS=1.
+#
+# Un certificado de prueba, si no hay uno de la institución:
+#   openssl req -x509 -newkey rsa:2048 -nodes -days 365 \
+#     -keyout tls/schedulai.key -out tls/schedulai.crt -subj "/CN=schedulai.local"
+#
+# server {
+#     listen 443 ssl;
+#     http2 on;
+#     server_name _;
+#
+#     ssl_certificate     /etc/nginx/tls/schedulai.crt;
+#     ssl_certificate_key /etc/nginx/tls/schedulai.key;
+#     ssl_protocols       TLSv1.2 TLSv1.3;
+#
+#     # Sin esto el navegador aceptaría volver a http en la siguiente visita, y
+#     # la cookie `Secure` no llegaría: el usuario vería que no puede entrar.
+#     add_header Strict-Transport-Security "max-age=31536000" always;
+#
+#     root /usr/share/nginx/html;
+#     index index.html;
+#
+#     location /api/ {
+#         proxy_pass ${BACKEND_URL};
+#         proxy_http_version 1.1;
+#         proxy_set_header Host $host;
+#         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+#         proxy_set_header X-Forwarded-Proto $scheme;
+#         proxy_read_timeout 600s;
+#         proxy_send_timeout 600s;
+#     }
+#
+#     location /assets/ { expires 1y; add_header Cache-Control "public, immutable"; }
+#     location / { try_files $uri $uri/ /index.html; add_header Cache-Control "no-cache"; }
+# }
