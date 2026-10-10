@@ -485,6 +485,30 @@ async function main() {
             (await anon("/disponibilidad/inventado123")).estado >= 400);
     }
 
+    // El enlace es la credencial del docente: con él se reescribe lo que
+    // declaró. Una coordinación solo debe recibir los de su propia gente.
+    comprobar("el departamento ve los enlaces de toda la plantilla",
+        (enlaces.cuerpo ?? []).length === ((await depto("/docentes")).cuerpo ?? []).length,
+        `${(enlaces.cuerpo ?? []).length}`);
+    comprobar("y cada enlace dice en qué carreras puede dar clase",
+        (enlaces.cuerpo ?? []).every((e) => Array.isArray(e.carreras)));
+
+    const deLaCoordinacion = (await a.c("/enlaces")).cuerpo ?? [];
+    comprobar("una coordinación solo recibe los de quien puede dar sus materias",
+        deLaCoordinacion.length > 0 &&
+            deLaCoordinacion.length <= (enlaces.cuerpo ?? []).length &&
+            deLaCoordinacion.every((e) => e.carreras.some((c) => a.perfil.carreras.includes(c))),
+        `${deLaCoordinacion.length} de ${(enlaces.cuerpo ?? []).length}`);
+    // Lo que cierra el hueco: no basta con que la lista sea más corta, hace
+    // falta que el token de alguien ajeno no venga en ella.
+    const ajenos = (enlaces.cuerpo ?? []).filter(
+        (e) => !e.carreras.some((c) => a.perfil.carreras.includes(c))
+    );
+    comprobar("y ninguno de los ajenos, que son los que podría sobrescribir",
+        ajenos.length === 0 ||
+            !deLaCoordinacion.some((e) => ajenos.some((x) => x.token === e.token)),
+        `${ajenos.length} ajenos en la plantilla`);
+
     // ------------------------------------------------------ cierre de periodo
     titulo("Cierre de periodo");
     comprobar("lo cierra el departamento",

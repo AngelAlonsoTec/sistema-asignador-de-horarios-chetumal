@@ -111,19 +111,54 @@ export function enlaceDe(docenteId) {
     return db.prepare("SELECT * FROM docente_token WHERE docente_id = ?").get(docenteId);
 }
 
-/** Enlaces de toda la plantilla, para que el coordinador los reparta. */
-export function enlaces() {
+/**
+ * Enlaces para repartir, con las carreras donde cada quien puede dar clase.
+ *
+ * **Acotados a quien pregunta.** El token *es* la credencial: con él se lee el
+ * horario de esa persona y se escribe su disponibilidad. Devolver los treinta a
+ * cualquier coordinación significaba que quien lleva Turismo podía sobrescribir
+ * lo que declaró un docente que solo da clase en Sistemas. Una coordinación ve
+ * los de quien puede impartir alguna de sus materias; el departamento, los de
+ * toda la plantilla, porque la plantilla es del instituto.
+ *
+ * El criterio es la **autorización**, no el reparto: perseguir el formulario es
+ * trabajo del coordinador y le hace falta antes de repartir, cuando todavía no
+ * hay nadie asignado. Cuenta cualquier escenario de la carrera — si alguien
+ * puede dar algo que esa carrera imparte, su disponibilidad le importa.
+ */
+export function enlaces({ carreras = null } = {}) {
     const db = bd();
+
+    const porDocente = new Map();
+    for (const f of db
+        .prepare(
+            `SELECT DISTINCT dm.docente_id AS docenteId, m.carrera
+             FROM docente_materia dm JOIN materias m ON m.id = dm.materia_id
+             ORDER BY m.carrera`
+        )
+        .all()) {
+        if (!porDocente.has(f.docenteId)) porDocente.set(f.docenteId, []);
+        porDocente.get(f.docenteId).push(f.carrera);
+    }
+
+    const suyas = carreras === null ? null : new Set(carreras);
     const docentes = db.prepare("SELECT id, nombre FROM docentes ORDER BY nombre").all();
-    return docentes.map((d) => {
-        const t = enlaceDe(d.id);
-        return {
-            docenteId: d.id,
-            nombre: d.nombre,
-            token: t.token,
-            contestado: t.contestado
-        };
-    });
+
+    return docentes
+        .map((d) => ({ ...d, carreras: porDocente.get(d.id) ?? [] }))
+        .filter((d) => suyas === null || d.carreras.some((c) => suyas.has(c)))
+        .map((d) => {
+            const t = enlaceDe(d.id);
+            return {
+                docenteId: d.id,
+                nombre: d.nombre,
+                // Dónde puede dar clase. Con trece carreras, saber de quién es
+                // cada enlace es lo que hace repartible la lista.
+                carreras: d.carreras,
+                token: t.token,
+                contestado: t.contestado
+            };
+        });
 }
 
 /** Lo que ve el docente al abrir su enlace. Deliberadamente poco. */

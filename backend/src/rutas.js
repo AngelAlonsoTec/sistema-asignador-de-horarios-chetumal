@@ -656,9 +656,18 @@ async function liberarHoras(req, res, { carrera, id }) {
 
 // ---------------------------------------------------------------- disponibilidad
 
-/** Enlaces personales para repartir a la plantilla. */
+/**
+ * Enlaces personales para repartir a la plantilla.
+ *
+ * El token es la credencial del docente, así que la lista va acotada: una
+ * coordinación recibe los de quien puede impartir alguna de sus materias y el
+ * departamento los de todos. Antes salían los treinta para cualquiera, y con el
+ * enlace de alguien se puede reescribir lo que declaró. Ver
+ * `disponibilidad.enlaces`.
+ */
 async function listarEnlaces(req, res) {
-    responder(res, 200, disponibilidad.enlaces());
+    const carreras = req.usuario.rol === "departamento" ? null : req.usuario.carreras;
+    responder(res, 200, disponibilidad.enlaces({ carreras }));
 }
 
 async function abrirFormulario(req, res, { token }) {

@@ -783,7 +783,7 @@ configuración de generación, el ajuste a mano, reiniciar una contraseña, cerr
 sesión, resolver un choque propio. Una ruta que nadie llama es una que se rompe
 en silencio.
 
-Ahora son **224 comprobaciones y el 100 % de las 71 rutas**, estable en tres
+Ahora son **228 comprobaciones y el 100 % de las 71 rutas**, estable en tres
 corridas seguidas.
 
 Dos cosas salieron de escribirlas. Una: encadenar verificar y simular fallaba
@@ -1669,6 +1669,38 @@ de cada carrera, y por eso las dos cifras se pueden comparar.
 
 En pantalla sale en la misma pieza amarilla que ve el coordinador, con el mismo
 componente: el departamento y la coordinación leen la misma clase de aviso.
+
+### El formulario, con una coordinación · **HECHO** (2026-10-10)
+
+Ir a correr el piloto de disponibilidad con una sola coordinación destapó que
+`GET /api/enlaces` devolvía **los treinta tokens a cualquier coordinación**. El
+token *es* la credencial del docente: con él se lee su horario y se **escribe** su
+disponibilidad, así que quien lleva Turismo podía sobrescribir lo que declaró
+alguien que solo da clase en Sistemas. En un sistema cuyo principio es quién
+decide qué, eso es un hueco de autoridad, no una comodidad de la API.
+
+Ahora la lista va acotada a quien pregunta: una coordinación recibe los enlaces
+de quien puede impartir alguna de **sus** materias y el departamento los de toda
+la plantilla, porque la plantilla es del instituto. El criterio es la
+autorización y no el reparto, que es lo que hace falta antes de repartir, cuando
+todavía no hay nadie asignado. Y cada enlace dice en qué carreras puede dar
+clase esa persona, que con trece carreras es lo que vuelve repartible la lista:
+ISIC son los treinta, pero Turismo son tres.
+
+**Lo que midió el piloto.** Se corrió el ciclo completo por la API: la
+coordinación lista sus enlaces —30 de ISIC, 2 contestados—, un docente abre el
+suyo sin sesión, declara y se vuelve a generar. El resultado contradijo la
+hipótesis con la que se entró: hacer que un docente de tarde declarara la mañana
+completa **empeoró** el horario de ISIC —aptitud 18 801 a 25 750, diez horas no
+disponibles donde no había ninguna—, porque sus clases de los semestres altos se
+quedaron sin quien las diera. La declaración se devolvió a lo que la persona
+había dicho: la disponibilidad de alguien no se inventa desde aquí.
+
+Y de paso corrigió el diagnóstico de por qué el horario de ISIC no sale. Ocho
+semillas, 1 200 generaciones cada una: los empalmes, las materias repetidas y
+las horas no disponibles **cambian con la semilla** —son dificultad de búsqueda—
+pero `excesoMaterias: 1` aparece en las ocho. Eso no es búsqueda, es dato. Ver
+*El tope de materias se decide repartiendo*.
 
 ## Lo que queda
 

@@ -121,6 +121,26 @@ async function alternarEnlaces() {
     }
 }
 
+/**
+ * Cuántos han contestado en cada carrera que lleva esta coordinación.
+ *
+ * El total no sirve para perseguir el formulario: quien coordina tres carreras
+ * lo hace de una en una, y un docente autorizado en dos cuenta en las dos. La
+ * lista ya llega acotada a quien puede dar alguna de sus materias.
+ */
+const avanceDeEnlaces = computed(() =>
+    estado.carreras
+        .map((carrera) => {
+            const suyos = enlaces.value.filter((e) => e.carreras?.includes(carrera));
+            return {
+                carrera,
+                total: suyos.length,
+                contestaron: suyos.filter((e) => e.contestado).length
+            };
+        })
+        .filter((x) => x.total > 0)
+);
+
 function enlaceDe(token) {
     return `${window.location.origin}/?disponibilidad=${token}`;
 }
@@ -184,6 +204,16 @@ function dejariaHuerfanas(docente) {
             </span>
         </header>
 
+        <!-- El formulario se persigue carrera por carrera, no en bloque. -->
+        <div v-if="avanceDeEnlaces.length > 1" class="tarjeta-panel-cuerpo">
+            <p class="campo-ayuda" style="margin: 0">
+                <span v-for="(x, i) in avanceDeEnlaces" :key="x.carrera">
+                    <template v-if="i > 0"> · </template>
+                    <strong>{{ x.carrera }}</strong> {{ x.contestaron }}/{{ x.total }}
+                </span>
+            </p>
+        </div>
+
         <div class="tarjeta-panel-cuerpo">
             <label class="campo">
                 <span>Importar CSV</span>
@@ -217,6 +247,7 @@ function dejariaHuerfanas(docente) {
                 <thead>
                     <tr>
                         <th>Docente</th>
+                        <th>Puede dar clase en</th>
                         <th>Contestó</th>
                         <th>Enlace</th>
                     </tr>
@@ -224,6 +255,13 @@ function dejariaHuerfanas(docente) {
                 <tbody>
                     <tr v-for="e in enlaces" :key="e.docenteId">
                         <td class="celda-principal">{{ e.nombre }}</td>
+                        <td>
+                            <span
+                                v-for="c in e.carreras ?? []"
+                                :key="c"
+                                class="etiqueta-suave"
+                            >{{ c }}</span>
+                        </td>
                         <td>
                             <span v-if="e.contestado" class="texto-ok">sí</span>
                             <span v-else class="celda-tenue">pendiente</span>
