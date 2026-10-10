@@ -783,7 +783,7 @@ configuración de generación, el ajuste a mano, reiniciar una contraseña, cerr
 sesión, resolver un choque propio. Una ruta que nadie llama es una que se rompe
 en silencio.
 
-Ahora son **218 comprobaciones y el 100 % de las 70 rutas**, estable en tres
+Ahora son **220 comprobaciones y el 100 % de las 70 rutas**, estable en tres
 corridas seguidas.
 
 Dos cosas salieron de escribirlas. Una: encadenar verificar y simular fallaba
@@ -1620,6 +1620,25 @@ La ruta de la plantilla completa se queda para lo que es: un alta masiva o una
 baja —quien no viene se va, con su aviso si deja horas apartadas—. Y la
 verificación dejó de documentar el defecto para comprobar lo contrario: dos
 escrituras simultáneas a dos fichas, las dos sobreviven.
+
+### Lo que falta, también en el papel · **CORREGIDO** (2026-10-10)
+
+Las necesidades de contratación se veían en la pantalla de quien generaba el
+horario, y ahí se quedaban. La materia que nadie puede dar se aparta, así que la
+rejilla sale con un hueco — y **en papel un hueco no se distingue de una hora
+libre**. La hoja que recibe el alumno podía estar incompleta sin decirlo, que es
+peor que no entregarla: nadie revisa un horario buscando lo que no está.
+
+Los grupos del horario viajan ahora con las materias que cursan, no solo con las
+que les tocaron. La hoja compara las dos cosas y lo que falta sale con su clave,
+su nombre y sus horas, en un recuadro con borde: *"Faltan por asignar: SCH-1024
+Taller de Administración (4 h) — el grupo las cursa y este horario todavía no las
+incluye."*
+
+Se compara en vez de reenviar la necesidad porque así se cubre cualquier motivo,
+no solo el de la autorización: si una clase no se colocó, la hoja lo dice sea
+por lo que sea. Y un horario apartado antes de este cambio no trae con qué
+comparar, así que no avisa de nada — callar es mejor que inventar un faltante.
 
 ## Lo que queda
 

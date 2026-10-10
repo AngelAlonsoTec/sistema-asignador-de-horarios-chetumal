@@ -2748,6 +2748,19 @@ select.input-chico {
         break-before: avoid;
     }
 
+    /* Lo que el grupo cursa y el horario no trae. En papel un hueco en la
+       rejilla no se distingue de una hora libre, así que esto va con borde y en
+       negro: quien recibe la hoja tiene que ver que está incompleta. */
+    .hoja-faltan {
+        border: 1pt solid #1b2735;
+        border-radius: 2pt;
+        break-before: avoid;
+        font-size: 8pt;
+        line-height: 1.45;
+        margin: var(--e2) 0 0;
+        padding: 4pt 6pt;
+    }
+
     /* Solo la paridad se capitaliza: aplicarlo a la línea entera escribía
        "Generado Con SchedulAI". */
     .hoja-paridad {

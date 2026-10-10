@@ -993,8 +993,8 @@ async function ajustarHorario(req, res, { carrera, id }) {
         necesidades: validacion.necesidades,
         paridad: problema.paridad,
         rejilla: problema.rejilla,
-        grupos: problema.grupos.map(({ id: gid, clave, semestre, especialidad, turno, aulaClave, carrera: c }) => ({
-            id: gid, clave, semestre, especialidad, turno, aulaClave, carrera: c
+        grupos: problema.grupos.map(({ id: gid, clave, semestre, especialidad, turno, aulaClave, carrera: c, materias }) => ({
+            id: gid, clave, semestre, especialidad, turno, aulaClave, carrera: c, materias
         })),
         parametros: problema.parametros,
         avisosDelMotor
@@ -1119,7 +1119,7 @@ async function generarHorario(req, res, { carrera, id }) {
         generadoEn: new Date().toISOString(),
         paridad: problema.paridad,
         rejilla: problema.rejilla,
-        grupos: problema.grupos.map(({ id, clave, semestre, especialidad, turno, aulaClave, carrera }) => ({
+        grupos: problema.grupos.map(({ id, clave, semestre, especialidad, turno, aulaClave, carrera, materias }) => ({
             id,
             clave,
             semestre,
@@ -1128,7 +1128,12 @@ async function generarHorario(req, res, { carrera, id }) {
             aulaClave,
             // Solo en un horario conjunto: es lo que distingue al 1A de una
             // carrera del 1A de la otra.
-            carrera
+            carrera,
+            // Lo que el grupo cursa, que no es lo mismo que lo que el horario
+            // trae: una materia que nadie puede dar se aparta. Sin esto, la hoja
+            // impresa salía con un hueco donde debería ir una clase y nadie
+            // podía notar la diferencia entre eso y una hora libre.
+            materias
         })),
         parametros: problema.parametros,
         resumen: validacion.resumen,

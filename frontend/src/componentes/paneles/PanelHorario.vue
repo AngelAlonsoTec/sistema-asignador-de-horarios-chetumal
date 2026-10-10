@@ -1056,6 +1056,7 @@ async function generar() {
                 :escenario="estado.abierto.nombre"
                 :paridad="paridad ?? ''"
                 :alcance="alcanceImpresion"
+                :materias="datos.materias"
             />
 
             <section class="tarjeta-panel">

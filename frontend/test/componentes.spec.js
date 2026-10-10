@@ -141,6 +141,38 @@ describe("HorarioImprimible", () => {
         expect(deOtro.findAll("tbody tr")).toHaveLength(4); // 15:00 a 19:00
     });
 
+    test("la hoja avisa de lo que el grupo cursa y el horario no trae", () => {
+        // Nadie autorizado para "m9": la clase se apartó y la rejilla sale con
+        // un hueco que en papel no se distingue de una hora libre.
+        const conFaltante = {
+            ...resultado,
+            grupos: resultado.grupos.map((g) =>
+                g.id === "g1" ? { ...g, materias: ["m1", "m9"] } : g
+            )
+        };
+        const r = mount(HorarioImprimible, {
+            props: {
+                resultado: conFaltante,
+                tonos: new Map(),
+                alcance: "grupos",
+                materias: [
+                    { id: "m1", clave: "ACF-0901", nombre: "Cálculo", horasSemana: 5 },
+                    { id: "m9", clave: "SCH-1024", nombre: "Taller", horasSemana: 4 }
+                ]
+            }
+        });
+        const aviso = r.find(".hoja-faltan");
+        expect(aviso.exists()).toBe(true);
+        expect(aviso.text()).toContain("SCH-1024 Taller (4 h)");
+        expect(aviso.text()).not.toContain("ACF-0901");
+    });
+
+    test("un horario apartado sin las materias del grupo no inventa faltantes", () => {
+        // Los guardados antes de que el grupo viajara con su retícula no traen
+        // con qué comparar: callar es mejor que avisar de un faltante inventado.
+        expect(montar("grupos").find(".hoja-faltan").exists()).toBe(false);
+    });
+
     test("«ambos» imprime grupos y docentes; en pantalla no se ve nada", () => {
         expect(montar("ambos").findAll(".hoja")).toHaveLength(4);
         expect(montar("grupos").find(".impresion").exists()).toBe(true);

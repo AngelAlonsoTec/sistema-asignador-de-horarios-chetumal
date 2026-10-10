@@ -296,6 +296,24 @@ async function main() {
             (gen.cuerpo?.sesiones ?? []).length > 0 &&
             gen.cuerpo.sesiones.every((s) => s.horaFin > s.horaInicio));
 
+        // El grupo viaja con lo que cursa, no solo con lo que le tocó: la hoja
+        // impresa compara las dos cosas para avisar de lo que falta, y un hueco
+        // en la rejilla de papel no se distingue de una hora libre.
+        const conMaterias = (gen.cuerpo?.grupos ?? []).filter((g) => Array.isArray(g.materias));
+        comprobar("cada grupo del horario dice qué cursa",
+            conMaterias.length === (gen.cuerpo?.grupos ?? []).length &&
+                conMaterias.every((g) => g.materias.length > 0),
+            `${conMaterias.length} de ${(gen.cuerpo?.grupos ?? []).length}`);
+        comprobar("y con los datos completos no falta ninguna clase",
+            conMaterias.every((g) => {
+                const puestas = new Set(
+                    gen.cuerpo.sesiones
+                        .filter((x) => (x.grupoIds ?? [x.grupoId]).includes(g.id))
+                        .map((x) => x.materiaId)
+                );
+                return g.materias.every((m) => puestas.has(m));
+            }));
+
         const res = await a.c(`${E1}/reserva`, {
             metodo: "PUT",
             cuerpo: { paridad: "impares", sesiones: gen.cuerpo.sesiones, horario: gen.cuerpo }

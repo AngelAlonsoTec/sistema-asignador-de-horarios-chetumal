@@ -54,7 +54,7 @@ cd engine   && cargo run --release              # motor  :7000
 cd engine   && cargo test --release             # 70 pruebas
 cd backend  && npm start                        # API    :4000
 cd frontend && npm install && npm run dev       # web    :5173
-cd frontend && npm test                         # 26 + 19 pruebas
+cd frontend && npm test                         # 26 + 21 pruebas
 ```
 
 ## Servicios

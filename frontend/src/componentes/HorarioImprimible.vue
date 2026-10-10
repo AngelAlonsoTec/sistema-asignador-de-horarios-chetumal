@@ -20,16 +20,40 @@ const props = defineProps({
     escenario: { type: String, default: "" },
     paridad: { type: String, default: "" },
     /** "grupos", "docentes" o "ambos". */
-    alcance: { type: String, default: "grupos" }
+    alcance: { type: String, default: "grupos" },
+    /**
+     * La retícula, para poder nombrar lo que falta. Un horario apartado antes
+     * de que los grupos viajaran con sus materias no trae con qué comparar, y
+     * entonces no se avisa de nada: es preferible a inventar un faltante.
+     */
+    materias: { type: Array, default: () => [] }
 });
 
 const sesionesDe = (predicado) => props.resultado.sesiones.filter(predicado);
 
+const porId = computed(() => new Map(props.materias.map((m) => [m.id, m])));
+
+/**
+ * Materias que el grupo cursa y el horario no trae.
+ *
+ * La hoja impresa es lo que llega al alumno, y un hueco en la rejilla no se
+ * distingue de una hora libre. Si una clase se quedó fuera —porque nadie está
+ * autorizado para darla y hay que contratar— tiene que decirlo el papel, no
+ * solo la pantalla de quien generó.
+ */
+const faltantesDe = (grupo, sesiones) => {
+    if (!Array.isArray(grupo.materias)) return [];
+    const puestas = new Set(sesiones.map((s) => s.materiaId));
+    return grupo.materias
+        .filter((id) => !puestas.has(id))
+        .map((id) => porId.value.get(id) ?? { id, clave: id, nombre: id });
+};
+
 const porGrupo = computed(() =>
-    props.resultado.grupos.map((grupo) => ({
-        grupo,
-        sesiones: sesionesDe((s) => (s.grupoIds ?? [s.grupoId]).includes(grupo.id))
-    }))
+    props.resultado.grupos.map((grupo) => {
+        const sesiones = sesionesDe((s) => (s.grupoIds ?? [s.grupoId]).includes(grupo.id));
+        return { grupo, sesiones, faltantes: faltantesDe(grupo, sesiones) };
+    })
 );
 
 /**
@@ -81,7 +105,7 @@ const conDocentes = computed(() => props.alcance !== "grupos");
 <template>
     <div class="impresion">
         <template v-if="conGrupos">
-            <article v-for="{ grupo, sesiones } in porGrupo" :key="grupo.id" class="hoja">
+            <article v-for="{ grupo, sesiones, faltantes } in porGrupo" :key="grupo.id" class="hoja">
                 <header class="hoja-cabeza">
                     <div>
                         <!-- En un horario conjunto el 1A de una carrera y el
@@ -107,6 +131,15 @@ const conDocentes = computed(() => props.alcance !== "grupos");
                     :turno="grupo.turno"
                     :tonos="tonos"
                 />
+
+                <p v-if="faltantes.length" class="hoja-faltan">
+                    <strong>Faltan por asignar:</strong>
+                    <span v-for="(m, i) in faltantes" :key="m.id">
+                        <template v-if="i > 0"> · </template>{{ m.clave }} {{ m.nombre }}<template
+                            v-if="m.horasSemana"> ({{ m.horasSemana }} h)</template>
+                    </span>
+                    — el grupo las cursa y este horario todavía no las incluye.
+                </p>
 
                 <p class="hoja-pie">
                     Periodo <span class="hoja-paridad">{{ paridad }}</span> · Generado con SchedulAI
