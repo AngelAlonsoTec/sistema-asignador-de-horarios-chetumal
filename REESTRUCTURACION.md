@@ -1428,6 +1428,12 @@ escritura**. `PUT /api/docentes` manda la plantilla entera, así que si dos
 personas la editan a la vez gana quien guarda después. Está escrito ahora donde
 antes se prometía de más.
 
+> **Eso se arregló después.** La pantalla ya no manda la plantilla entera por
+> cambiarle una ficha a uno: hay ruta para un nombramiento solo, y dos ediciones
+> simultáneas a dos docentes distintos sobreviven las dos. La ruta completa se
+> queda para el alta masiva y la baja, que es lo que describe el párrafo
+> siguiente. Ver *Un nombramiento a la vez*.
+
 **Que el motor no responda.** Se paró el contenedor y se pulsó Generar. Respondía
 503 —no 500— en menos de cuatro segundos, y todo lo que no es el motor seguía en
 pie: el catálogo, la plantilla, las cuentas, las peticiones. Pero en pantalla
@@ -1666,7 +1672,11 @@ componente: el departamento y la coordinación leen la misma clase de aviso.
 
 ## Lo que queda
 
-**Nada de código.** Lo que falta son datos y despliegue:
+**De código, una sola cosa: probarlo en un navegador de verdad.** Las veintiuna
+pruebas de componentes corren sobre happy-dom, que no es Firefox ni Chrome. Lo
+que más expuesto está es justo lo que un DOM simulado no comprueba: la hoja
+impresa vive de `@media print`, `break-before` y columnas, y nadie ha mandado
+todavía un horario a una impresora. El resto son datos y despliegue:
 
 - **Las retículas reales de las trece carreras.** Las de ISIC e ITIC son
   realistas en tamaño y forma pero no son el plan oficial; las otras once son
@@ -1700,6 +1710,13 @@ Y tres que abrió el mapeo del departamento:
   cubre el turno de la mañana. Se arregla con los formularios reales, no desde
   aquí: inventarle a alguien una hora que no declaró es exactamente lo que el
   formulario viene a evitar.
+
+Y lo que esas dos últimas producen juntas, medido: el horario de ISIC **sigue
+saliendo infactible** por un empalme y siete horas de una sola persona. La causa
+no es el algoritmo: tres materias de primero —Ética, Fundamentos de Investigación
+y Taller de Administración— tienen tres autorizados cada una y **solo uno declara
+mañanas**, con los dos grupos de primero en matutino. La autorización y la
+disponibilidad no se cruzan en el banco de pruebas.
 
 **Y una precisión sobre `antiguedad`, `nivel` y `creditos`**: sí se muestran —la
 antigüedad junto al selector de prioridad, el nivel en el nombramiento, los
