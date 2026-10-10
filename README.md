@@ -717,6 +717,23 @@ cd backend && npm test         # 150 pruebas
 Herramientas de datos en `backend/herramientas/`. Las migraciones tienen modo
 simulación: sin `--escribir` solo muestran lo que harían.
 
+Para correr el piloto de disponibilidad sin esperar a que treinta personas
+contesten, `simular-disponibilidad.js` contesta el formulario en su nombre —por
+el enlace personal de cada quien, el mismo camino que una persona— con un modelo
+escrito en la cabecera del archivo y una semilla que lo hace repetible. Sin
+`--aplicar` solo enseña lo que declararía; al aplicar guarda lo que había y
+`--restaurar` lo devuelve, incluida la marca de quién había contestado:
+
+```bash
+node herramientas/simular-disponibilidad.js                     # solo enseña
+node herramientas/simular-disponibilidad.js --aplicar --faltan=4
+node herramientas/simular-disponibilidad.js --restaurar=data/respaldos/disponibilidad-….json
+```
+
+**Es una simulación y la disponibilidad real solo la da cada persona.** Sirve
+para medir: lo primero que midió es que una declaración realista deja el problema
+**más apretado** que el banco sembrado, no menos.
+
 Las de verificación entran con cada cuenta y, como el sistema obliga a estrenar
 contraseña, cada pasada deja la suya. Para volver a la de arranque después de
 correrlas:

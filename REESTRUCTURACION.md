@@ -1728,6 +1728,41 @@ comisiones, plazas mixtas, nombramientos en trámite—. Lo dice la misma secci�
 del reglamento donde viven los topes: *avisos, no bloqueos*. Lo que no podía
 seguir siendo es invisible.
 
+### El piloto de disponibilidad, simulado · **MEDIDO** (2026-10-10)
+
+Esperar a que treinta personas contesten no es una opción para medir, y sembrar
+las declaraciones por detrás tampoco: el banco que traía el sistema se capturó
+cuando la tarde empezaba a las 14:00, así que contradecía su propia rejilla.
+`herramientas/simular-disponibilidad.js` contesta el formulario en nombre de la
+plantilla **por el enlace personal de cada quien** —el mismo camino que una
+persona, no un `INSERT`— con el modelo escrito en la cabecera del archivo, una
+semilla que lo hace repetible y un respaldo que lo deshace.
+
+El modelo no re-inventa el turno: quien tenía mañanas declara mañanas, y lo que
+cambia es el borde. Quien tiene plaza declara su turno entero; quien es de
+asignatura declara una ventana de `horasMax × holgura`, porque cobra por hora
+impartida y no está el día completo. La holgura es un parámetro y no un supuesto
+escondido: con 1, la declaración *es* el horario y no deja nada que resolver.
+
+**Y el resultado fue el contrario del esperado.** Con la declaración realista el
+horario de ISIC sale **peor**, no mejor, y de forma constante: ocho semillas,
+`horasSobreMaximo: 5` en las ocho, que antes no aparecía en ninguna. Las
+declaraciones del banco eran generosas —35 y 40 h por persona— y una realista son
+1 010 h contra 1 125. Con 672 h de carga en el plantel y 593 de tope
+contractual, estrechar la disponibilidad aprieta lo que ya estaba apretado.
+
+La medición dejó el diagnóstico de ISIC en una sola persona: **Ricardo Nava
+Cortés, 4 materias con tope de 3 y 29 h con tope de 24.** El departamento lo
+tiene fijado en diez clases de ISIC; el motor respeta lo fijado y lo compensa
+cargándole más horas cuando la disponibilidad de los demás se estrecha. No es el
+algoritmo ni el formulario: es el reparto.
+
+Dos cosas que la propia herramienta dejó claras al escribirla. Una: deshacer no
+es contestar, así que el respaldo guarda también **quién había contestado** —sin
+eso, revertir dejaba a los treinta marcados y el avance del piloto mentía—. Otra:
+la simulación se aplicó, se midió y se **devolvió** al estado que tenía. El
+sistema queda como estaba y la medición está escrita aquí.
+
 ## Lo que queda
 
 **De código, una sola cosa: probarlo en un navegador de verdad.** Las veintiuna
@@ -1765,9 +1800,9 @@ Y tres que abrió el mapeo del departamento:
 - **La disponibilidad declarada del banco está contra el corte viejo.** Quince
   docentes declararon 07:00–14:00 y quince 14:00–22:00, capturado cuando la tarde
   empezaba a las 14:00. Con el corte real a las 13:00 queda una hora que solo
-  cubre el turno de la mañana. Se arregla con los formularios reales, no desde
-  aquí: inventarle a alguien una hora que no declaró es exactamente lo que el
-  formulario viene a evitar.
+  cubre el turno de la mañana. La real la dan las personas; para medir mientras
+  tanto está `simular-disponibilidad.js`, que la expresa sobre la rejilla
+  correcta con un modelo escrito y una semilla.
 
 El horario de ISIC **sigue saliendo infactible**, y la causa medida no es la que
 se escribió primero aquí. Ocho semillas con mil doscientas generaciones cada una:
