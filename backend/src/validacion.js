@@ -1,17 +1,23 @@
 /**
  * Comprobaciones previas a generar un horario.
  *
- * La regla es que **no se genera nada con datos incompletos**. Antes había
- * advertencias: el motor entregaba un horario imposible y explicaba por qué.
- * Eso es peor que no entregar nada, porque un horario con materias sin docente
- * parece un resultado y no lo es, y quien lo revisa pierde el tiempo buscando
- * el error en la propuesta en vez de en los datos.
+ * Tres categorías, y lo que las separa es qué se puede hacer al respecto:
  *
- * Los bloqueos impiden generar. Las advertencias no: describen configuraciones
- * legítimas que conviene revisar.
+ * - **Bloqueos.** Faltan datos. No se genera nada: un horario sacado de datos
+ *   incompletos parece un resultado y no lo es, y quien lo revisa pierde el
+ *   tiempo buscando el error en la propuesta en vez de en los datos.
+ * - **Necesidades.** Los datos están completos y no alcanzan. No falta
+ *   capturar: falta gente. El mapeo del problema que entregó el departamento lo
+ *   resuelve así —*"en caso de que no haya maestro para cubrir alguna materia
+ *   por esta razón u otra, se deja esa materia para contratar a una persona por
+ *   horas. Entonces se marca como una necesidad"*—, y es lo correcto: el
+ *   horario sale con lo que se puede cubrir y lo que falta se entrega con
+ *   nombre y con horas, que es lo que el departamento necesita para contratar.
+ *   Bloquear aquí dejaba sin horario justo al plantel que tiene el déficit.
+ * - **Advertencias.** Configuraciones legítimas que conviene revisar.
  *
- * Cada bloqueo dice en qué sección se arregla, para que la interfaz pueda
- * llevar directo ahí en lugar de dejar al usuario buscándolo.
+ * Cada bloqueo y cada necesidad dicen en qué sección se atienden, para que la
+ * interfaz pueda llevar directo ahí en lugar de dejar al usuario buscándolo.
  */
 
 import { contarDocentesPorMateria } from "./cobertura.js";
@@ -19,6 +25,7 @@ import { semestresDe } from "./periodo.js";
 
 export function validarParaHorario({ datos, aulas, rejilla, grupos, paridad, ocupadas = [] }) {
     const bloqueos = [];
+    const necesidades = [];
     const advertencias = [];
 
     const activos = new Set(semestresDe(paridad));
@@ -33,7 +40,7 @@ export function validarParaHorario({ datos, aulas, rejilla, grupos, paridad, ocu
         });
         // Sin materias del periodo, el resto de las comprobaciones no aporta:
         // fallarían todas y enterrarían la única que importa.
-        return { listo: false, bloqueos, advertencias, resumen: resumenVacio(paridad) };
+        return { listo: false, bloqueos, necesidades, advertencias, resumen: resumenVacio(paridad) };
     }
 
     if (aulas.length === 0) {
@@ -69,13 +76,56 @@ export function validarParaHorario({ datos, aulas, rejilla, grupos, paridad, ocu
     const aProgramar = delPeriodo.filter((materia) => enGrupos.has(materia.id));
     const conteo = contarDocentesPorMateria(aProgramar, datos.docentes);
 
+    // Las materias que nadie puede dar no bloquean: se apartan del horario y se
+    // reportan como necesidad más abajo, cuando ya se sabe cuántas horas son.
     const sinDocente = aProgramar.filter((materia) => conteo.get(materia.id) === 0);
-    if (sinDocente.length > 0) {
+    const idsSinDocente = new Set(sinDocente.map((materia) => materia.id));
+
+    // Salvo que no quede ninguna: apartarlas todas no deja horario que generar,
+    // y eso sí es un bloqueo. No es el déficit de plantilla del que habla el
+    // mapeo —es una plantilla que no cubre nada— y se arregla capturando.
+    if (aProgramar.length > 0 && sinDocente.length === aProgramar.length) {
         bloqueos.push({
-            codigo: "materias-sin-docente",
-            mensaje: `${sinDocente.length} materias de este periodo no tienen ningún docente capacitado.`,
+            codigo: "sin-materias-con-docente",
+            mensaje:
+                `Ninguna de las ${aProgramar.length} materias del periodo tiene quien la dé: ` +
+                "no queda nada que programar.",
             seccion: "materias",
             detalle: sinDocente.map((materia) => `${materia.clave} · ${materia.nombre}`)
+        });
+    }
+
+    // Fijar a alguien que no está autorizado para la materia no es media
+    // decisión: el motor respeta lo que el departamento fija y no lo cambia, así
+    // que la clase sale marcada como no capacitada y el horario entero queda
+    // infactible sin que el coordinador pueda hacer nada con él. Y no se arregla
+    // contratando —la materia sí tiene quien la dé—, así que es un bloqueo y no
+    // una necesidad: hay que autorizar a esa persona o repartir la clase a otra.
+    const porId = new Map(aProgramar.map((materia) => [materia.id, materia]));
+    const autorizadas = new Map(
+        datos.docentes.map((docente) => [docente.id, new Set(docente.materiasCapacitadas ?? [])])
+    );
+    const nombreDocente = new Map(datos.docentes.map((d) => [d.id, d.nombre ?? d.id]));
+    const malAsignadas = [];
+    for (const grupo of grupos) {
+        for (const [materiaId, docenteId] of Object.entries(grupo.asignaciones ?? {})) {
+            if (!porId.has(materiaId) || autorizadas.get(docenteId)?.has(materiaId)) continue;
+            const materia = porId.get(materiaId);
+            malAsignadas.push(
+                `${materia.clave} · ${materia.nombre} en ${grupo.clave}: ` +
+                    `${nombreDocente.get(docenteId) ?? docenteId} no está autorizado`
+            );
+        }
+    }
+    if (malAsignadas.length > 0) {
+        bloqueos.push({
+            codigo: "asignacion-sin-autorizacion",
+            mensaje:
+                `${malAsignadas.length} clases están asignadas a alguien que no está autorizado ` +
+                "para esa materia. El motor no puede cambiarlas, así que el horario saldría sin " +
+                "poder aplicarse.",
+            seccion: "materias",
+            detalle: malAsignadas
         });
     }
 
@@ -115,10 +165,16 @@ export function validarParaHorario({ datos, aulas, rejilla, grupos, paridad, ocu
     const horasDe = new Map(aProgramar.map((materia) => [materia.id, materia.horasSemana]));
     const noCaben = [];
     let horasTotales = 0;
+    // Las horas que hay que contratar, no las materias: una materia que cursan
+    // tres grupos son tres clases, y se contratan las tres.
+    let horasSinDocente = 0;
 
     for (const grupo of grupos) {
         const horas = grupo.materias.reduce((suma, id) => suma + (horasDe.get(id) ?? 0), 0);
         horasTotales += horas;
+        horasSinDocente += grupo.materias
+            .filter((id) => idsSinDocente.has(id))
+            .reduce((suma, id) => suma + (horasDe.get(id) ?? 0), 0);
 
         const turno = rejilla.turnos.find((t) => t.id === grupo.turno);
         const ranuras = turno ? (turno.horaFin - turno.horaInicio) * rejilla.dias.length : 0;
@@ -235,13 +291,37 @@ export function validarParaHorario({ datos, aulas, rejilla, grupos, paridad, ocu
         });
     }
 
-    if (horasTotales > capacidad) {
-        bloqueos.push({
+    // ---- necesidades ----
+
+    // Lo que sí se va a programar: lo apartado por no tener quien lo dé no
+    // llega al motor, así que tampoco cuenta contra la capacidad.
+    const horasProgramables = horasTotales - horasSinDocente;
+
+    if (sinDocente.length > 0) {
+        necesidades.push({
+            codigo: "materias-sin-docente",
+            mensaje:
+                `${sinDocente.length} materias no tienen a nadie autorizado para darlas ` +
+                `(${horasSinDocente} h/semana). Se quedan fuera del horario: hay que autorizar ` +
+                "a alguien de la plantilla o contratar por horas.",
+            seccion: "materias",
+            horas: horasSinDocente,
+            detalle: sinDocente.map(
+                (materia) => `${materia.clave} · ${materia.nombre}: ${materia.horasSemana} h`
+            )
+        });
+    }
+
+    if (horasProgramables > capacidad) {
+        const faltan = horasProgramables - capacidad;
+        necesidades.push({
             codigo: "capacidad-docente",
             mensaje:
-                `La carga del periodo (${horasTotales} h/semana) excede la capacidad docente ` +
-                `máxima (${capacidad} h/semana).`,
+                `Faltan ${faltan} h/semana de plantilla: lo que queda por programar son ` +
+                `${horasProgramables} h y la capacidad máxima de los docentes es ${capacidad} h. ` +
+                "El horario sale con esas horas encima del máximo de alguien hasta que se contrate.",
             seccion: "docentes",
+            horas: faltan,
             detalle: []
         });
     }
@@ -291,6 +371,7 @@ export function validarParaHorario({ datos, aulas, rejilla, grupos, paridad, ocu
     return {
         listo: bloqueos.length === 0,
         bloqueos,
+        necesidades,
         advertencias,
         resumen: {
             paridad,
@@ -302,6 +383,9 @@ export function validarParaHorario({ datos, aulas, rejilla, grupos, paridad, ocu
             clases,
             sinAsignar,
             horasTotales,
+            // Lo que de verdad se le pide al motor: la carga menos lo apartado.
+            horasSinDocente,
+            horasProgramables,
             capacidadDocente: capacidad
         }
     };
@@ -320,6 +404,8 @@ function resumenVacio(paridad) {
         clases: 0,
         sinAsignar: 0,
         horasTotales: 0,
+        horasSinDocente: 0,
+        horasProgramables: 0,
         capacidadDocente: 0
     };
 }

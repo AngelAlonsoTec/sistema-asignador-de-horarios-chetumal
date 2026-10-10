@@ -13,28 +13,43 @@
  */
 
 import { ErrorHttp } from "./http.js";
+import { contarDocentesPorMateria } from "./cobertura.js";
 import { depurar } from "./fusiones.js";
 import { esParidadValida, paridadSugerida, semestresDe } from "./periodo.js";
+import { MAX_HORAS_DIA_DOCENTE } from "./tecnm.js";
 
 /**
- * Turno matutino 07:00-14:00, vespertino 14:00-22:00.
+ * Turno matutino 07:00-13:00, vespertino 13:00-22:00.
  *
  * El día no se acota por costumbre: el **artículo 157** del Reglamento Interior
  * de Trabajo del Personal Docente fija las actividades docentes diarias de las
  * 7 a las 22 horas, de lunes a viernes. El corte entre los dos turnos sí es del
- * plantel.
+ * plantel, y lo fija el mapeo del problema que entregó el departamento: TM de
+ * 07:00 a 13:00 y TV de 13:00 a 22:00. Antes aquí decía 14:00, que era una
+ * suposición; la mañana tiene seis horas, no siete.
  */
 const HORARIO_DE_TURNO = {
-    matutino: { horaInicio: 7, horaFin: 14 },
-    vespertino: { horaInicio: 14, horaFin: 22 }
+    matutino: { horaInicio: 7, horaFin: 13 },
+    vespertino: { horaInicio: 13, horaFin: 22 }
 };
 
 const DIAS_HABILES = ["lunes", "martes", "miercoles", "jueves", "viernes"];
 
 const LETRAS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
-/** Los semestres altos se imparten en vespertino; es donde cabe su carga. */
-const SEMESTRE_VESPERTINO_DESDE = 6;
+/**
+ * Desde qué semestre el grupo se sugiere en vespertino.
+ *
+ * El mapeo del departamento pone primero y segundo en TM y de tercero en
+ * adelante en TV, igual en las cuatro áreas. Y cuadra con la rejilla: la mañana
+ * tiene seis horas por cinco días —treinta ranuras— y una retícula de tercero
+ * ya pide veintiocho, que no se pueden acomodar sin dejar al grupo sin un hueco
+ * libre en la semana.
+ *
+ * Es una **sugerencia**: la línea de grupos la decide el coordinador, que es
+ * quien sabe de matrícula y de salones.
+ */
+const SEMESTRE_VESPERTINO_DESDE = 3;
 
 // ---------------------------------------------------------------- rejilla
 
@@ -68,7 +83,11 @@ export function construirRejilla(semestres, opciones = {}) {
         // Una materia no puede aparecer dos veces el mismo día (lo impide el
         // motor), así que el bloque es exactamente lo que se imparte en una
         // jornada y este tope es el de horas diarias.
-        duracionMaximaBloque: topeDeBloque(opciones.duracionMaximaBloque)
+        duracionMaximaBloque: topeDeBloque(opciones.duracionMaximaBloque),
+        // El otro tope diario: las horas de clase de una persona en un día. No
+        // se negocia desde la petición porque no es una preferencia de la
+        // coordinación sino la jornada laboral.
+        maxHorasDiaDocente: MAX_HORAS_DIA_DOCENTE
     };
 }
 
@@ -100,7 +119,11 @@ function normalizarRejilla(rejilla) {
             throw new ErrorHttp(422, `El turno "${turno.id}" termina antes de empezar.`);
         }
     }
-    return { ...rejilla, duracionMaximaBloque: topeDeBloque(rejilla.duracionMaximaBloque) };
+    return {
+        ...rejilla,
+        duracionMaximaBloque: topeDeBloque(rejilla.duracionMaximaBloque),
+        maxHorasDiaDocente: MAX_HORAS_DIA_DOCENTE
+    };
 }
 
 // ---------------------------------------------------------------- paridad
@@ -459,12 +482,25 @@ export function construirProblema({ datos, aulas, opciones = {}, ocupadas = [], 
     // esta versión siguen funcionando sin migración.
     const laboratorios = new Set(opciones.materiasLaboratorio ?? []);
     const enGrupos = new Set(grupos.flatMap((grupo) => grupo.materias));
-    const materias = materiasDelPeriodo(datos.materias, paridad)
+    const delPeriodo = materiasDelPeriodo(datos.materias, paridad)
         .filter((materia) => enGrupos.has(materia.id))
         .map((materia) => ({
             ...materia,
             requiereLaboratorio: laboratorios.has(materia.id) || materia.requiereLaboratorio === true
         }));
+
+    // Lo que nadie está autorizado a dar no se le manda al motor. Colocarlo
+    // obligaría a asignárselo a alguien sin autorización, y eso vuelve el
+    // horario infactible por construcción: saldría un resultado rojo que no es
+    // culpa del algoritmo ni se puede arreglar moviendo clases. Se aparta, y la
+    // validación lo entrega como necesidad de contratación con sus horas.
+    //
+    // Basta con quitarla de aquí: el grupo la sigue listando y el motor
+    // descarta las materias que no conoce, así que la clase simplemente no se
+    // programa. Sus horas sí se le dejan al grupo en el presupuesto de aula,
+    // porque cuando se contrate habrá que meterlas en ese mismo salón.
+    const conDocente = contarDocentesPorMateria(delPeriodo, datos.docentes);
+    const materias = delPeriodo.filter((materia) => conDocente.get(materia.id) > 0);
 
     return {
         paridad,

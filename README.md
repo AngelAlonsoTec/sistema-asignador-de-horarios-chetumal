@@ -51,10 +51,10 @@ Los escenarios viven en `backend/data/`, montado como volumen: sobreviven a un
 
 ```bash
 cd engine   && cargo run --release              # motor  :7000
-cd engine   && cargo test --release             # 67 pruebas
+cd engine   && cargo test --release             # 70 pruebas
 cd backend  && npm start                        # API    :4000
 cd frontend && npm install && npm run dev       # web    :5173
-cd frontend && npm test                         # 26 + 16 pruebas
+cd frontend && npm test                         # 26 + 19 pruebas
 ```
 
 ## Servicios
@@ -80,8 +80,8 @@ dependencias que auditar.
 Restricciones duras: capacitación docente, disponibilidad horaria del docente,
 empalmes de docente, grupo y aula, tipo y **capacidad** del espacio, aulas que
 usa otra carrera, permanencia del grupo en su aula, límites de materias y
-grupos, horas sobre el máximo, y una materia no puede repetirse el mismo día
-para el mismo grupo.
+grupos, horas sobre el máximo semanal, **más de ocho horas de clase en un mismo
+día**, y una materia no puede repetirse el mismo día para el mismo grupo.
 
 Esa última cubre dos reglas con una sola comprobación. El reglamento pide que
 una materia no pase de tres horas diarias y que esas horas vayan seguidas; como
@@ -485,11 +485,17 @@ Chetumal como a cualquier otro instituto del subsistema.
 | **Art. 147** | La carga se ajusta al número de su categoría "sin que la diferencia exceda de dos horas" | Tolerancia de ±2 h antes de avisar |
 | **Art. 155** | Asignatura: de 1 a 19 horas, y **nunca más de tres materias diferentes** | `maxMaterias` por omisión, y aviso si se captura más |
 | **Art. 156** | De carrera: 40, 30 o 20 horas, con el mismo tope de tres materias | Igual |
-| **Art. 157** | Actividades docentes **de 7 a 22 horas, de lunes a viernes** | Es la rejilla: matutino 7-14, vespertino 14-22 |
+| **Art. 157** | Actividades docentes **de 7 a 22 horas, de lunes a viernes** | Es la rejilla. El corte entre turnos no lo fija el reglamento sino el plantel: matutino 7-13, vespertino 13-22 |
 
 Nótese que **el titular da menos clase que el asistente**. No es un error de
 captura: a mayor categoría, más tiempo va a las otras funciones del artículo 27
 —programas de estudio, capacitación, tutorías— y menos al aula.
+
+Un tope más no sale del reglamento sino del mapeo del problema que entregó el
+departamento: **ocho horas de clase como máximo en un mismo día**. El reglamento
+fija la franja y el total semanal, pero no cuánto de ese total cabe en un día.
+Es `tecnm.MAX_HORAS_DIA_DOCENTE`, viaja al motor dentro de la rejilla, y ahí sí
+es restricción dura: nadie firma un horario con nueve horas seguidas un martes.
 
 **Son avisos, no bloqueos.** Un plantel real tiene comisiones, plazas mixtas y
 nombramientos en trámite; un sistema que se niegue a programar por eso no se usa.
@@ -564,7 +570,7 @@ franja horaria, no por turno completo. El sistema repartía un aula por grupo y
 por turno entero, que es más grueso que la realidad y dejaba dos carreras sin
 salón con veintidós grupos matutinos contra dieciséis aulas.
 
-Ahora el reparto es por **presupuesto de horas**: un aula de matutino tiene siete
+Ahora el reparto es por **presupuesto de horas**: un aula de matutino tiene seis
 horas por cinco días, y dos grupos la comparten si entre los dos caben. Primero
 se busca un salón vacío —nadie mete dos grupos en un aula habiendo una libre— y
 al compartir se elige **la más vacía**, no la primera que quepa: meter un grupo
@@ -703,7 +709,7 @@ la misma ruta de generación, y la validación devuelve entonces
 | `POST` | `/api/carreras/:c/escenarios/:id/horario/ajuste` | Reevalúa uno movido a mano |
 
 ```bash
-cd backend && npm test         # 140 pruebas
+cd backend && npm test         # 145 pruebas
 ```
 
 Herramientas de datos en `backend/herramientas/`. Las migraciones tienen modo
@@ -1022,8 +1028,9 @@ tarde, y por eso doce aulas alcanzan para más de doce grupos.
 
 La rejilla de tiempo y el número de grupos **no** se guardan: viajan en la
 petición. La rejilla se deduce de los turnos del escenario (matutino
-07:00-14:00, vespertino 14:00-22:00, lunes a viernes, bloques de 2 h) y los
-grupos se sugieren a uno por semestre y módulo, ajustables antes de generar.
+07:00-13:00, vespertino 13:00-22:00, lunes a viernes, bloques de 2 h) y los
+grupos se sugieren a uno por semestre y módulo —matutino hasta segundo,
+vespertino de tercero en adelante—, ajustables antes de generar.
 
 Está así a propósito: el número de grupos depende de la matrícula y la paridad
 depende del periodo, y ninguna de las dos pertenece a la definición de un
@@ -1093,14 +1100,16 @@ conciliación, con el motivo acordado.
 
 La generación se rechaza con `422` si algo falta. Los bloqueos actuales:
 
-- Materias del periodo sin ningún docente capacitado.
 - Materias que no caben en la semana: con tres horas por día, más de quince
   horas semanales necesitan más días de los que hay.
 - Más grupos en un turno que aulas disponibles.
 - Escenario sin materias en la paridad elegida, sin docentes o sin grupos.
 - Carrera sin espacios, o sin laboratorios habiendo materias que los requieren.
 - Un grupo con más horas de las que caben en su turno.
-- Carga total mayor que la capacidad docente máxima.
+- Clases fijadas en alguien que no está autorizado para esa materia: el motor
+  respeta lo que el departamento fija y no lo puede cambiar, así que el horario
+  saldría sin poder aplicarse.
+- Ninguna materia del periodo con quien la dé: no queda nada que programar.
 
 La interfaz consulta el mismo endpoint de validación y mantiene el botón
 deshabilitado, nombrando qué falta y llevando a la sección donde se arregla. El
@@ -1112,9 +1121,31 @@ explicando por qué. Es peor que no entregar nada: un horario con materias sin
 docente parece un resultado y no lo es, y quien lo revisa busca el error en la
 propuesta en vez de en los datos.
 
-Las **advertencias** siguen existiendo para lo que no bloquea: una especialidad
-con cero grupos cuyas materias no se programarán, o materias con un único
-docente capacitado.
+### Lo que falta no es un dato: es gente
+
+Dos cosas que antes bloqueaban no se arreglan capturando. Que ninguna persona
+esté autorizada para una materia, y que la carga pase de lo que la plantilla
+puede dar. Son **necesidades de contratación**, y el mapeo del problema que
+entregó el departamento las trata así: *"en caso de que no haya maestro para
+cubrir alguna materia por esta razón u otra, se deja esa materia para contratar a
+una persona por horas. Entonces se marca como una necesidad"*.
+
+El horario se genera con lo que sí se puede cubrir. La materia que nadie puede
+dar se aparta del problema que va al motor —colocarla obligaría a asignársela a
+alguien sin autorización, y eso la vuelve infactible por construcción— y sale
+reportada con su clave, su nombre y sus horas. Sus horas siguen contando para el
+presupuesto del aula del grupo: cuando se contrate, la clase irá a ese salón. El
+déficit de capacidad se mide contra lo que queda por programar, no contra la
+carga entera, para no contar dos veces las mismas horas.
+
+Con los números del propio mapeo la cuenta no es un caso raro: 616 horas de clase
+contra 516 de capacidad frente a grupo, **100 horas de déficit**, parejo entre las
+cuatro áreas. Bloquear ahí dejaba sin horario justo al plantel que tiene el
+problema.
+
+Las **advertencias** siguen existiendo para lo que no bloquea ni hay que
+contratar: una especialidad con cero grupos cuyas materias no se programarán, o
+materias con un único docente capacitado.
 
 ## Escala
 

@@ -50,7 +50,8 @@ const cliente = () => clienteHttp(API);
 const DURAS = new Set([
     "docenteNoCapacitado", "choqueDocente", "choqueGrupo", "choqueAula", "aulaInadecuada",
     "fueraDeAulaBase", "aulaInsuficiente", "aulaOcupadaPorOtros", "materiaRepetidaDia",
-    "horaNoDisponible", "excesoMaterias", "excesoGrupos", "horasSobreMaximo"
+    "horaNoDisponible", "excesoMaterias", "excesoGrupos", "horasSobreMaximo",
+    "horasDiaSobreMaximo"
 ]);
 const durasDe = (d) => Object.entries(d ?? {}).filter(([k, v]) => v > 0 && DURAS.has(k));
 
@@ -495,6 +496,16 @@ async function main() {
 
     const plantilla = (await a.c("/docentes")).cuerpo ?? [];
     comprobar("la plantilla docente se lee", plantilla.length > 0);
+
+    /**
+     * Quiénes están autorizados para esa materia, en el mismo orden en que la
+     * pantalla del departamento los ofrece. La API tampoco acepta a otros:
+     * fijar a quien no puede darla deja el horario infactible y el motor no lo
+     * puede arreglar.
+     */
+    const autorizados = (materiaId) =>
+        plantilla.filter((d) => (d.materiasCapacitadas ?? []).includes(materiaId));
+    const autorizadoPara = (materiaId) => autorizados(materiaId)[0];
     comprobar("y una coordinación no la reescribe",
         (await a.c("/docentes", { metodo: "PUT", cuerpo: plantilla })).estado === 403);
     comprobar("el departamento sí",
@@ -624,9 +635,14 @@ async function main() {
             deZZ1.filas.every((f) => f.materiaId && f.grupoClave && "docenteId" in f),
         JSON.stringify(deZZ1).slice(0, 90));
 
+    comprobar("y todas sus materias tienen a alguien autorizado para darlas",
+        (deZZ1?.filas ?? []).every((f) => autorizadoPara(f.materiaId)),
+        (deZZ1?.filas ?? []).filter((f) => !autorizadoPara(f.materiaId))
+            .map((f) => f.clave).join(", "));
+
     if (deZZ1?.filas?.length > 0) {
         const fila = deZZ1.filas[0];
-        const alguien = plantilla[0];
+        const alguien = autorizadoPara(fila.materiaId);
         const asignar = (docenteId, cliente = depto) =>
             cliente("/plantel/asignaciones", {
                 metodo: "PUT",
@@ -635,6 +651,14 @@ async function main() {
 
         comprobar("una coordinación no asigna", (await asignar(alguien.id, a.c)).estado === 403);
         comprobar("un docente inventado se rechaza", (await asignar("fantasma")).estado === 400);
+
+        // La pantalla solo ofrece a los autorizados; por la API tampoco vale.
+        const ajeno = plantilla.find(
+            (d) => !(d.materiasCapacitadas ?? []).includes(fila.materiaId)
+        );
+        comprobar("ni alguien que no esté autorizado para esa materia",
+            (await asignar(ajeno?.id)).estado === 409,
+            JSON.stringify((await asignar(ajeno?.id)).cuerpo).slice(0, 110));
 
         comprobar("el departamento pone a alguien al frente de la clase",
             (await asignar(alguien.id)).cuerpo?.docenteId === alguien.id);
@@ -787,7 +811,7 @@ async function main() {
             metodo: "PUT",
             cuerpo: {
                 carrera: "ZZ1", materiaId: clase.materiaId,
-                grupoClave: clase.grupoClave, docenteId: plantilla[0].id
+                grupoClave: clase.grupoClave, docenteId: autorizadoPara(clase.materiaId)?.id
             }
         });
 
@@ -803,11 +827,14 @@ async function main() {
                 cuerpo: { carrera: "ZZ1", materiaId: clase.materiaId, grupoClave: clase.grupoClave }
             })).estado === 400);
 
+        // El relevo también tiene que estar autorizado, y ser otro: aceptar
+        // dejando a la misma persona se rechaza con un 400.
+        const relevo = autorizados(clase.materiaId)[1];
         const pet = await a.c("/cambios", {
             metodo: "POST",
             cuerpo: {
                 carrera: "ZZ1", materiaId: clase.materiaId, grupoClave: clase.grupoClave,
-                propuesto: plantilla[1].id, motivo: "sus horas no coinciden con las del grupo"
+                propuesto: relevo?.id, motivo: "sus horas no coinciden con las del grupo"
             }
         });
         comprobar("la coordinación pide el cambio", pet.estado === 201, JSON.stringify(pet.cuerpo).slice(0, 100));
@@ -832,12 +859,12 @@ async function main() {
             metodo: "POST", cuerpo: { acepta: true, respuesta: "va" }
         });
         comprobar("el departamento acepta y reasigna de una vez",
-            acepta.cuerpo?.estado === "aceptada" && acepta.cuerpo?.asignado === plantilla[1].id,
+            acepta.cuerpo?.estado === "aceptada" && acepta.cuerpo?.asignado === relevo?.id,
             JSON.stringify(acepta.cuerpo).slice(0, 110));
         comprobar("y el catálogo ya lo refleja",
             (await depto("/plantel/catalogo/ZZ1")).cuerpo.filas
                 .find((f) => f.materiaId === clase.materiaId && f.grupoClave === clase.grupoClave)
-                ?.docenteId === plantilla[1].id);
+                ?.docenteId === relevo?.id);
         comprobar("responder dos veces da 409",
             (await depto(`/cambios/${pet.cuerpo.id}/responder`, {
                 metodo: "POST", cuerpo: { acepta: false }
@@ -1004,15 +1031,16 @@ async function main() {
     const vivo = (await depto("/plantel/catalogo/ZZ1")).cuerpo;
     if (vivo?.filas?.length > 0) {
         const suya = vivo.filas[0];
+        const suyo = autorizadoPara(suya.materiaId);
         await depto("/plantel/asignaciones", {
             metodo: "PUT",
             cuerpo: {
                 carrera: "ZZ1", materiaId: suya.materiaId,
-                grupoClave: suya.grupoClave, docenteId: plantilla[0].id
+                grupoClave: suya.grupoClave, docenteId: suyo?.id
             }
         });
         const antes = ((await depto("/plantel/carga")).cuerpo ?? [])
-            .find((c) => c.docenteId === plantilla[0].id)?.clases ?? 0;
+            .find((c) => c.docenteId === suyo?.id)?.clases ?? 0;
 
         // La coordinación quita esa materia de la retícula.
         const escenario = (await a.c(`/carreras/ZZ1/escenarios/${global.escZZ1}`)).cuerpo.datos;
@@ -1034,7 +1062,7 @@ async function main() {
             (roto.huerfanas ?? []).some((h) => h.materiaId === suya.materiaId),
             JSON.stringify(roto.huerfanas ?? []).slice(0, 110));
         const despues = ((await depto("/plantel/carga")).cuerpo ?? [])
-            .find((c) => c.docenteId === plantilla[0].id)?.clases ?? 0;
+            .find((c) => c.docenteId === suyo?.id)?.clases ?? 0;
         comprobar("y deja de contar para la carga: era una clase que ya no existe",
             despues === antes - 1, `${antes} -> ${despues}`);
 
@@ -1043,7 +1071,7 @@ async function main() {
         comprobar("si la clase vuelve, la decisión vuelve con ella",
             (await depto("/plantel/catalogo/ZZ1")).cuerpo.filas
                 .find((f) => f.materiaId === suya.materiaId && f.grupoClave === suya.grupoClave)
-                ?.docenteId === plantilla[0].id);
+                ?.docenteId === suyo?.id);
         await depto("/plantel/asignaciones", {
             metodo: "PUT",
             cuerpo: {
@@ -1241,7 +1269,7 @@ async function main() {
                     metodo: "PUT",
                     cuerpo: {
                         carrera: "ZZ1", materiaId: f.materiaId,
-                        grupoClave: f.grupoClave, docenteId: plantilla[0].id
+                        grupoClave: f.grupoClave, docenteId: autorizadoPara(f.materiaId)?.id
                     }
                 })
             )
@@ -1249,9 +1277,13 @@ async function main() {
         comprobar("varias asignaciones simultáneas entran todas",
             aLaVez.every((r) => r.estado === 200),
             aLaVez.map((r) => r.estado).join(","));
+        // Las cuatro exactas, no un conteo: cada una fue a una persona distinta
+        // según quién estuviera autorizado para su materia.
+        const cuatro = new Set(deZZ1Ahora.slice(0, 4).map((f) => `${f.materiaId}|${f.grupoClave}`));
         comprobar("y el catálogo las refleja todas",
             (await depto("/plantel/catalogo/ZZ1")).cuerpo.filas
-                .filter((f) => f.docenteId === plantilla[0].id).length >= aLaVez.length);
+                .filter((f) => cuatro.has(`${f.materiaId}|${f.grupoClave}`) && f.docenteId)
+                .length === cuatro.size);
 
         // Guardar la plantilla entera a la vez: la base tiene que quedar
         // consistente. Lo que **no** se evita es que un cambio pise al otro —el

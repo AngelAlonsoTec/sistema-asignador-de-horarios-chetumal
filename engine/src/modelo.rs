@@ -30,6 +30,13 @@ pub struct Rejilla {
     /// Horas seguidas como máximo en un mismo bloque. Una materia de 5 h se
     /// reparte en 2+2+1 con el valor 2.
     pub duracion_maxima_bloque: u8,
+    /// Horas de clase que un docente puede dar en un mismo día.
+    ///
+    /// El otro tope diario, y no el mismo que el anterior: aquél limita una
+    /// materia frente a un grupo, éste limita la jornada de una persona. Son
+    /// las ocho horas laborables del día; el máximo semanal es su contrato y
+    /// viaja en cada docente.
+    pub max_horas_dia_docente: u8,
 }
 
 impl Rejilla {
@@ -198,6 +205,8 @@ pub struct Pesos {
     pub exceso_grupos: f64,
     pub horas_bajo_minimo: f64,
     pub horas_sobre_maximo: f64,
+    /// Horas de más en la jornada de un día. Ver `Rejilla::max_horas_dia_docente`.
+    pub horas_dia_sobre_maximo: f64,
     pub hora_evitada: f64,
     pub hueco_grupo: f64,
     pub hueco_docente: f64,
@@ -231,6 +240,10 @@ impl Default for Pesos {
             exceso_grupos: 300.0,
             horas_bajo_minimo: 20.0,
             horas_sobre_maximo: 100.0,
+            // Igual que el semanal: son la misma clase de violación —horas de
+            // más sobre un tope que no es del algoritmo sino del contrato— y
+            // ordenarlas entre sí sería inventar una jerarquía que nadie fijó.
+            horas_dia_sobre_maximo: 100.0,
             hora_evitada: 10.0,
             hueco_grupo: 3.0,
             // Más que el del grupo: el alumno con una hora libre se queda en el
@@ -263,6 +276,7 @@ impl Pesos {
             exceso_grupos: v.real_o("excesoGrupos", d.exceso_grupos),
             horas_bajo_minimo: v.real_o("horasBajoMinimo", d.horas_bajo_minimo),
             horas_sobre_maximo: v.real_o("horasSobreMaximo", d.horas_sobre_maximo),
+            horas_dia_sobre_maximo: v.real_o("horasDiaSobreMaximo", d.horas_dia_sobre_maximo),
             hora_evitada: v.real_o("horaEvitada", d.hora_evitada),
             hueco_grupo: v.real_o("huecoGrupo", d.hueco_grupo),
             hueco_docente: v.real_o("huecoDocente", d.hueco_docente),
@@ -541,7 +555,11 @@ fn leer_rejilla(v: &Valor) -> Result<Rejilla, String> {
     }
 
     let duracion = v.usize_o("duracionMaximaBloque", 2).clamp(1, 8) as u8;
-    Ok(Rejilla { dias, turnos, duracion_maxima_bloque: duracion })
+    // Sin el campo se asumen las ocho horas: es la regla, no una preferencia, y
+    // un problema guardado antes de que existiera el campo se rige por ella
+    // igual. Para desactivarla hay que pedir las 24 explícitamente.
+    let jornada = v.usize_o("maxHorasDiaDocente", 8).clamp(1, 24) as u8;
+    Ok(Rejilla { dias, turnos, duracion_maxima_bloque: duracion, max_horas_dia_docente: jornada })
 }
 
 fn leer_materias(xs: &[Valor]) -> Result<Vec<Materia>, String> {
@@ -1012,6 +1030,10 @@ pub struct Diagnostico {
     pub exceso_grupos: u32,
     pub horas_bajo_minimo: u32,
     pub horas_sobre_maximo: u32,
+    /// Horas que a un docente le sobran de la jornada en algún día. Se cuentan
+    /// las horas que pisa, no los bloques: dos clases encimadas son una hora de
+    /// jornada, y el empalme ya se castiga por su cuenta.
+    pub horas_dia_sobre_maximo: u32,
     pub hora_evitada: u32,
     /// Horas libres intercaladas entre dos clases del mismo grupo en un día.
     pub huecos: u32,
@@ -1038,6 +1060,7 @@ impl Diagnostico {
             && self.exceso_materias == 0
             && self.exceso_grupos == 0
             && self.horas_sobre_maximo == 0
+            && self.horas_dia_sobre_maximo == 0
     }
 
     pub fn a_json(&self) -> Valor {
@@ -1057,6 +1080,7 @@ impl Diagnostico {
             ("excesoGrupos", json::numero(self.exceso_grupos)),
             ("horasBajoMinimo", json::numero(self.horas_bajo_minimo)),
             ("horasSobreMaximo", json::numero(self.horas_sobre_maximo)),
+            ("horasDiaSobreMaximo", json::numero(self.horas_dia_sobre_maximo)),
             ("horaEvitada", json::numero(self.hora_evitada)),
             ("huecos", json::numero(self.huecos)),
             ("huecosDocente", json::numero(self.huecos_docente)),
@@ -1244,6 +1268,7 @@ mod pruebas {
             dias: vec!["lunes".into(), "martes".into(), "miercoles".into()],
             turnos: vec![Turno { id: "m".into(), hora_inicio: 7, hora_fin: 14 }],
             duracion_maxima_bloque: 3,
+            max_horas_dia_docente: 8,
         };
         let sesiones = construir_sesiones(&grupos, &materias, &rejilla, &[]);
         assert_eq!(sesiones.iter().map(|s| s.duracion).collect::<Vec<_>>(), vec![2, 2, 1]);
@@ -1257,6 +1282,7 @@ mod pruebas {
             dias: vec!["lunes".into(), "martes".into()],
             turnos: vec![Turno { id: "m".into(), hora_inicio: 7, hora_fin: 12 }],
             duracion_maxima_bloque: 2,
+            max_horas_dia_docente: 8,
         };
         // 5 horas (7..12) por 2 días.
         assert_eq!(rejilla.casillas(), 10);
@@ -1277,6 +1303,7 @@ mod pruebas {
             dias: vec!["lunes".into()],
             turnos: vec![Turno { id: "m".into(), hora_inicio: 7, hora_fin: 12 }],
             duracion_maxima_bloque: 2,
+            max_horas_dia_docente: 8,
         };
         // Un bloque de 0 a 23 se recorta a las horas que la rejilla tiene.
         let bloques = json::leer(r#"[{"dia":"lunes","inicio":0,"fin":23},
@@ -1465,5 +1492,20 @@ mod pruebas {
             "grupos":[{"id":"g1","turno":"m","materias":["m1"]}]
         }"#;
         assert!(Problema::leer(entrada).unwrap_err().contains("rango de horas"));
+    }
+
+    /// Un problema guardado antes de que existiera el campo se rige por la
+    /// regla igual: las ocho horas no son una preferencia del motor.
+    #[test]
+    fn sin_jornada_declarada_se_asumen_ocho_horas() {
+        let entrada = r#"{
+            "rejilla":{"dias":["lunes"],"turnos":[{"id":"m","horaInicio":7,"horaFin":14}]},
+            "materias":[{"id":"m1","horasSemana":2}],
+            "aulas":[{"id":"a1"}],
+            "docentes":[{"id":"d1","materiasCapacitadas":["m1"]}],
+            "grupos":[{"id":"g1","turno":"m","materias":["m1"]}]
+        }"#;
+        let p = Problema::leer(entrada).unwrap();
+        assert_eq!(p.rejilla.max_horas_dia_docente, 8);
     }
 }

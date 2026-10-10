@@ -22,6 +22,16 @@ function docente(id, nombre) {
     ).run(id, nombre);
 }
 
+/**
+ * Autoriza a alguien para una materia, que es lo que el departamento hace antes
+ * de repartirla: sin la autorización, asignarla se rechaza.
+ */
+function autorizar(docenteId, materiaId) {
+    bd().prepare(
+        "INSERT OR IGNORE INTO docente_materia (docente_id, materia_id) VALUES (?, ?)"
+    ).run(docenteId, materiaId);
+}
+
 // ------------------------------------------------------------------ respaldos
 
 test("un respaldo se revisa antes de restaurarlo, y uno inservible se rechaza", async () => {
@@ -888,6 +898,8 @@ async function prepararCatalogo() {
     ).run();
     docente("dcat1", "Docente Cat 1");
     docente("dcat2", "Docente Cat 2");
+    autorizar("dcat1", "uu1");
+    autorizar("dcat2", "uu1");
     // Dos grupos de primero: 1A y 1B, que es lo que hace interesante el reparto.
     const config = await import("../src/config-escenario.js");
     config.guardar({
@@ -961,6 +973,7 @@ test("la carga de un docente suma lo de todas las carreras", async () => {
         `INSERT OR IGNORE INTO materias (carrera,escenario_id,id,clave,nombre,semestre,horas_semana)
          VALUES ('WWW','base','ww1','WW-1','Otra',1,5)`
     ).run();
+    autorizar("dcat1", "ww1");
     enTransaccion((db) =>
         catalogoMod.asignar(db, {
             carrera: "WWW", materiaId: "ww1", grupoClave: "1A", docenteId: "dcat1"
@@ -985,6 +998,10 @@ test("una asignación sin clase deja de contar, pero se nombra", async () => {
     // decisión queda sin clase a la que aplicarse. No se borra —si el grupo
     // vuelve, sigue valiendo— pero contarla daba una carga con clases que ya no
     // existen, que es peor que no contarla.
+    //
+    // La autorización se queda igual que la asignación: cuando se repartió, la
+    // materia existía.
+    autorizar("dcat1", "no-existe");
     enTransaccion((db) =>
         catalogoMod.asignar(db, {
             carrera: "UUU", materiaId: "no-existe", grupoClave: "9Z", docenteId: "dcat1"
@@ -1007,6 +1024,36 @@ test("una asignación sin clase deja de contar, pero se nombra", async () => {
             carrera: "UUU", materiaId: "no-existe", grupoClave: "9Z", docenteId: null
         })
     );
+});
+
+test("no se reparte una clase a quien no está autorizado para la materia", async () => {
+    // El motor respeta lo que el departamento fija y no lo puede cambiar, así
+    // que la clase saldría marcada como "docente no capacitado" y el horario
+    // entero quedaría sin poder aplicarse.
+    docente("dcat3", "Docente Cat 3");
+    assert.throws(
+        () =>
+            enTransaccion((db) =>
+                catalogoMod.asignar(db, {
+                    carrera: "UUU", materiaId: "uu1", grupoClave: "1A", docenteId: "dcat3"
+                })
+            ),
+        /Docente Cat 3 no está autorizado/
+    );
+
+    // Y no queda a medias: la transacción se deshizo entera.
+    const c = await catalogoMod.porCarrera("UUU");
+    assert.ok(!c.filas.some((f) => f.docenteId === "dcat3"));
+
+    // Autorizándolo primero, que es el orden, entra sin problema.
+    autorizar("dcat3", "uu1");
+    enTransaccion((db) =>
+        catalogoMod.asignar(db, {
+            carrera: "UUU", materiaId: "uu1", grupoClave: "1A", docenteId: "dcat3"
+        })
+    );
+    const despues = await catalogoMod.porCarrera("UUU");
+    assert.equal(despues.filas.find((f) => f.grupoClave === "1A").docenteId, "dcat3");
 });
 
 test("repartir una materia entera es una sola escritura, no una por grupo", async () => {

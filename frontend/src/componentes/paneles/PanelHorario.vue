@@ -1,11 +1,12 @@
 <script setup>
 import { ref, computed, watch, onMounted } from "vue";
 import {
-    estado, generarHorario, validarHorario, irASeccion,
+    estado, generarHorario, validarHorario,
     reservarHoras, liberarHoras, horarioApartado,
     configEscenario, guardarConfigEscenario, ajustarHorario
 } from "../../estado.js";
 import { api } from "../../api.js";
+import ListaPendientes from "../ListaPendientes.vue";
 import RejillaHorario from "../RejillaHorario.vue";
 import HorarioImprimible from "../HorarioImprimible.vue";
 import DialogoModal from "../DialogoModal.vue";
@@ -28,6 +29,7 @@ const ETIQUETAS = {
     excesoGrupos: "Exceso de grupos",
     horasBajoMinimo: "Horas bajo el mínimo",
     horasSobreMaximo: "Horas sobre el máximo",
+    horasDiaSobreMaximo: "Más de 8 h en un día",
     horaEvitada: "Horas que pidió evitar",
     huecos: "Horas muertas de grupo",
     huecosDocente: "Horas muertas de docente"
@@ -47,7 +49,8 @@ const DURAS = new Set([
     "horaNoDisponible",
     "excesoMaterias",
     "excesoGrupos",
-    "horasSobreMaximo"
+    "horasSobreMaximo",
+    "horasDiaSobreMaximo"
 ]);
 
 const SECCIONES = { materias: "Materias", docentes: "Docentes", aulas: "Aulas y laboratorios" };
@@ -141,7 +144,6 @@ function cambiarEscenarioInvitado(carrera, escenarioId) {
 
 const fusionesEntreCarreras = computed(() => validacion.value?.fusionesEntreCarreras ?? []);
 const esConjunta = computed(() => validacion.value?.conjunta === true);
-const bloqueoAbierto = ref(null);
 
 const parametros = ref({
     generaciones: 600,
@@ -255,6 +257,16 @@ const horasAhorradas = computed(() =>
 const TURNOS_POR_OMISION = [{ id: "matutino" }, { id: "vespertino" }];
 const turnos = computed(() => validacion.value?.rejilla?.turnos ?? TURNOS_POR_OMISION);
 const listo = computed(() => validacion.value?.listo === true);
+
+/**
+ * Lo que no se arregla capturando: falta gente. Las dos necesidades se suman
+ * porque son horas distintas —unas no tienen a nadie autorizado, las otras no
+ * caben en la plantilla— y hay que cubrir las dos.
+ */
+const necesidades = computed(() => validacion.value?.necesidades ?? []);
+const horasPorContratar = computed(() =>
+    necesidades.value.reduce((suma, n) => suma + (n.horas ?? 0), 0)
+);
 
 /**
  * Pide al servidor el estado de preparación. La regla de qué falta vive solo en
@@ -672,7 +684,7 @@ async function generar() {
                         <span>
                             {{ validacion.resumen.materias }} materias en
                             {{ validacion.resumen.grupos }} grupos ·
-                            {{ validacion.resumen.horasTotales }} h/semana contra
+                            {{ validacion.resumen.horasProgramables }} h/semana contra
                             {{ validacion.resumen.capacidadDocente }} h de capacidad docente.
                         </span>
                         <!-- Cuánto de lo que va a salir lo decidió el
@@ -683,32 +695,30 @@ async function generar() {
                         </span>
                     </div>
 
-                    <ul v-else class="lista-bloqueos">
-                        <li v-for="bloqueo in validacion.bloqueos" :key="bloqueo.codigo">
-                            <div class="bloqueo-fila">
-                                <span class="bloqueo-mensaje">{{ bloqueo.mensaje }}</span>
-                                <div class="bloqueo-acciones">
-                                    <button
-                                        v-if="bloqueo.detalle.length"
-                                        type="button"
-                                        class="btn btn-chico"
-                                        @click="bloqueoAbierto = bloqueoAbierto === bloqueo.codigo ? null : bloqueo.codigo"
-                                    >
-                                        {{ bloqueoAbierto === bloqueo.codigo ? "Ocultar" : `Ver ${bloqueo.detalle.length}` }}
-                                    </button>
-                                    <button
-                                        v-if="SECCIONES[bloqueo.seccion]"
-                                        type="button"
-                                        class="btn btn-chico"
-                                        @click="irASeccion(bloqueo.seccion, bloqueo.codigo === 'materias-sin-docente' ? 'sin-docente' : null)"
-                                    >Ir a {{ SECCIONES[bloqueo.seccion] }}</button>
-                                </div>
-                            </div>
-                            <ul v-if="bloqueoAbierto === bloqueo.codigo" class="bloqueo-detalle">
-                                <li v-for="linea in bloqueo.detalle" :key="linea">{{ linea }}</li>
-                            </ul>
-                        </li>
-                    </ul>
+                    <ListaPendientes
+                        v-else
+                        :items="validacion.bloqueos"
+                        :secciones="SECCIONES"
+                        tono="bloqueo"
+                    />
+
+                    <!-- Las necesidades salen con los datos completos o sin
+                         ellos: no impiden generar, y si se escondieran detrás
+                         de un bloqueo el departamento no sabría que tiene que
+                         contratar hasta haber arreglado otra cosa. -->
+                    <div v-if="necesidades.length" class="bloque-necesidades">
+                        <div class="necesidades-cabeza">
+                            <span class="necesidades-marca">Para contratar</span>
+                            <span class="detalle-meta">
+                                {{ horasPorContratar }} h/semana que la plantilla no cubre
+                            </span>
+                        </div>
+                        <ListaPendientes
+                            :items="validacion.necesidades"
+                            :secciones="SECCIONES"
+                            tono="necesidad"
+                        />
+                    </div>
 
                     <p v-if="validacion.horasAjenas > 0" class="campo-ayuda">
                         Otras carreras ya apartaron horas de estos docentes; el horario se genera

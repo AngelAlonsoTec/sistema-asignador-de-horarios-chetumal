@@ -114,11 +114,24 @@ const SEMESTRES = [{ turnos: ["matutino", "vespertino"] }];
 
 test("la rejilla pone horas a los turnos nombrados en el escenario", () => {
     const rejilla = construirRejilla(SEMESTRES);
+    // El corte es a las 13:00, como lo fija el mapeo del departamento: la
+    // mañana son seis horas, no siete.
     assert.deepEqual(rejilla.turnos, [
-        { id: "matutino", horaInicio: 7, horaFin: 14 },
-        { id: "vespertino", horaInicio: 14, horaFin: 22 }
+        { id: "matutino", horaInicio: 7, horaFin: 13 },
+        { id: "vespertino", horaInicio: 13, horaFin: 22 }
     ]);
     assert.equal(rejilla.dias.length, 5);
+    // La jornada del docente viaja en la rejilla: es quien reparte los días.
+    assert.equal(rejilla.maxHorasDiaDocente, 8);
+});
+
+test("una rejilla explícita no se queda sin la jornada del docente", () => {
+    // No es negociable desde la petición: es la jornada laboral, no una
+    // preferencia de la coordinación.
+    const rejilla = construirRejilla(SEMESTRES, {
+        rejilla: { dias: ["lunes"], turnos: [{ id: "unico", horaInicio: 8, horaFin: 12 }] }
+    });
+    assert.equal(rejilla.maxHorasDiaDocente, 8);
 });
 
 test("un turno desconocido falla en vez de inventarse un horario", () => {
@@ -485,26 +498,45 @@ test("un escenario completo pasa la validación", () => {
     assert.deepEqual(r.resumen.semestres, [1, 7]);
 });
 
-test("una materia sin docente bloquea la generación", () => {
+test("una materia sin docente es una necesidad de contratación, no un bloqueo", () => {
     const r = validarParaHorario(
         escenario({ datos: { docentes: [{ id: "d1", horasMax: 40, materiasCapacitadas: ["m1"] }] } })
     );
-    assert.equal(r.listo, false);
-    const bloqueo = r.bloqueos.find((b) => b.codigo === "materias-sin-docente");
-    assert.ok(bloqueo);
-    assert.equal(bloqueo.seccion, "materias");
+    // El horario sale: lo que no se puede cubrir se aparta y se reporta.
+    assert.equal(r.listo, true, JSON.stringify(r.bloqueos));
+    const necesidad = r.necesidades.find((n) => n.codigo === "materias-sin-docente");
+    assert.ok(necesidad, JSON.stringify(r.necesidades));
+    assert.equal(necesidad.seccion, "materias");
     // El detalle nombra exactamente cuáles, para poder ir a arreglarlas.
-    assert.ok(bloqueo.detalle.some((d) => d.includes("M2")));
+    assert.ok(necesidad.detalle.some((d) => d.includes("M2")));
+    // Y cuántas horas hay que contratar, que es lo que el departamento usa.
+    assert.ok(necesidad.horas > 0);
+    assert.equal(r.resumen.horasSinDocente, necesidad.horas);
+    assert.equal(
+        r.resumen.horasProgramables,
+        r.resumen.horasTotales - r.resumen.horasSinDocente
+    );
+});
+
+test("si ninguna materia tiene quien la dé no queda nada que programar", () => {
+    const r = validarParaHorario(escenario({ datos: { docentes: [{ id: "d1", horasMax: 40 }] } }));
+    assert.equal(r.listo, false);
+    assert.ok(r.bloqueos.some((b) => b.codigo === "sin-materias-con-docente"));
 });
 
 test("solo se exige cobertura de los semestres que se imparten", () => {
-    // "p8" no tiene docente, pero es de octavo: en impares no debe bloquear.
+    // "p8" no tiene docente, pero es de octavo: en impares no debe aparecer.
     const sinP8 = validarParaHorario(escenario({ paridad: "impares" }));
     assert.equal(sinP8.listo, true);
+    assert.deepEqual(sinP8.necesidades, []);
 
+    // En pares sí aparece, y como es la única materia del periodo no queda nada
+    // que programar: ahí el déficit vuelve a ser un bloqueo.
     const conP8 = validarParaHorario(escenario({ paridad: "pares" }));
     assert.equal(conP8.listo, false);
-    assert.ok(conP8.bloqueos.some((b) => b.codigo === "materias-sin-docente"));
+    const bloqueo = conP8.bloqueos.find((b) => b.codigo === "sin-materias-con-docente");
+    assert.ok(bloqueo, JSON.stringify(conP8.bloqueos));
+    assert.ok(bloqueo.detalle.some((d) => d.includes("P8")));
 });
 
 test("sin aulas, sin docentes o sin grupos no se genera", () => {
@@ -519,6 +551,26 @@ test("sin aulas, sin docentes o sin grupos no se genera", () => {
     assert.ok(
         validarParaHorario(escenario({ grupos: [] })).bloqueos.some((b) => b.codigo === "sin-grupos")
     );
+});
+
+test("una clase fijada en alguien sin autorización bloquea", () => {
+    // d2 solo puede m1 y t7. Fijarlo en m2 saldría del motor como "docente no
+    // capacitado" sin que el coordinador pueda cambiarlo.
+    const grupos = construirGrupos(RETICULA, ESPECIALIDADES, REJILLA, "impares", {
+        asignaciones: new Map([["m2|1A", "d2"]])
+    });
+    const r = validarParaHorario(escenario({ grupos }));
+    assert.equal(r.listo, false);
+    const bloqueo = r.bloqueos.find((b) => b.codigo === "asignacion-sin-autorizacion");
+    assert.ok(bloqueo, JSON.stringify(r.bloqueos));
+    assert.ok(bloqueo.detalle[0].includes("1A"), bloqueo.detalle[0]);
+    assert.ok(bloqueo.detalle[0].includes("Docente dos"), bloqueo.detalle[0]);
+
+    // Con el que sí está autorizado, nada que decir.
+    const bien = construirGrupos(RETICULA, ESPECIALIDADES, REJILLA, "impares", {
+        asignaciones: new Map([["m2|1A", "d1"]])
+    });
+    assert.equal(validarParaHorario(escenario({ grupos: bien })).listo, true);
 });
 
 test("una materia de laboratorio sin laboratorios registrados bloquea", () => {
@@ -541,10 +593,14 @@ test("un grupo que no cabe en su turno bloquea", () => {
     assert.ok(bloqueo.detalle[0].includes("1A"));
 });
 
-test("una carga mayor que la capacidad docente bloquea", () => {
+test("una carga mayor que la capacidad docente es una necesidad, y dice cuántas horas", () => {
     const flacos = DOCENTES_OK.map((d) => ({ ...d, horasMax: 2 }));
     const r = validarParaHorario(escenario({ datos: { docentes: flacos } }));
-    assert.ok(r.bloqueos.some((b) => b.codigo === "capacidad-docente"));
+    assert.equal(r.listo, true, JSON.stringify(r.bloqueos));
+    const necesidad = r.necesidades.find((n) => n.codigo === "capacidad-docente");
+    assert.ok(necesidad, JSON.stringify(r.necesidades));
+    assert.equal(necesidad.horas, r.resumen.horasProgramables - r.resumen.capacidadDocente);
+    assert.equal(necesidad.seccion, "docentes");
 });
 
 test("una especialidad sin grupos avisa pero no bloquea", () => {
@@ -671,6 +727,30 @@ test("el problema solo lleva las materias del periodo que algún grupo cursa", (
     );
     assert.equal(problema.materias.some((m) => m.id === "p8"), false);
     assert.equal(problema.materias.every((m) => typeof m.requiereLaboratorio === "boolean"), true);
+});
+
+test("el problema deja fuera lo que nadie puede dar, y el grupo lo sigue pidiendo", () => {
+    const problema = construirProblema({
+        datos: {
+            materias: RETICULA,
+            // Nadie está autorizado para "m2" ni para las de séptimo.
+            docentes: [{ id: "d1", horasMax: 40, materiasCapacitadas: ["m1", "t7"] }],
+            semestres: SEMESTRES,
+            especialidades: ESPECIALIDADES
+        },
+        aulas: [{ id: "a1", tipo: "aula" }],
+        opciones: { paridad: "impares" }
+    });
+
+    // Asignarlas obligaría a poner a alguien sin autorización, y eso vuelve el
+    // horario infactible por construcción.
+    assert.deepEqual(problema.materias.map((m) => m.id).sort(), ["m1", "t7"]);
+
+    // El grupo las sigue listando: sus horas son suyas y el salón las necesita
+    // para cuando se contrate. El motor descarta las materias que no conoce.
+    const primero = problema.grupos.find((g) => g.semestre === 1);
+    assert.ok(primero.materias.includes("m2"));
+    assert.equal(primero.horasSemana, 8, "las 4 h de m2 siguen contando para el aula");
 });
 
 test("requiereLaboratorio se toma del escenario o de la petición", () => {

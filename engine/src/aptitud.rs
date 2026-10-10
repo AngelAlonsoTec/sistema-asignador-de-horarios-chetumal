@@ -247,9 +247,19 @@ impl<'p> Evaluador<'p> {
             }
         }
 
-        d.huecos = huecos_en(&self.ocupacion_grupo, self.p.grupos.len(), self.dias, self.horas);
-        d.huecos_docente =
-            huecos_en(&self.ocupacion_docente, self.p.docentes.len(), self.dias, self.horas);
+        d.huecos = jornada_en(&self.ocupacion_grupo, self.p.grupos.len(), self.dias, self.horas, None).0;
+        // La jornada del docente se mide en el mismo recorrido que sus huecos:
+        // las dos cosas se leen de la misma franja de un día y recorrerla dos
+        // veces costaría el doble en la función que más se ejecuta.
+        let (huecos, exceso) = jornada_en(
+            &self.ocupacion_docente,
+            self.p.docentes.len(),
+            self.dias,
+            self.horas,
+            Some(self.p.rejilla.max_horas_dia_docente as u32),
+        );
+        d.huecos_docente = huecos;
+        d.horas_dia_sobre_maximo = exceso;
 
         let duras = pesos.docente_no_capacitado * d.docente_no_capacitado as f64
             + pesos.choque_docente * d.choque_docente as f64
@@ -263,7 +273,8 @@ impl<'p> Evaluador<'p> {
             + pesos.hora_no_disponible * d.hora_no_disponible as f64
             + pesos.exceso_materias * d.exceso_materias as f64
             + pesos.exceso_grupos * d.exceso_grupos as f64
-            + pesos.horas_sobre_maximo * d.horas_sobre_maximo as f64;
+            + pesos.horas_sobre_maximo * d.horas_sobre_maximo as f64
+            + pesos.horas_dia_sobre_maximo * d.horas_dia_sobre_maximo as f64;
 
         // La disputa no entra en las duras: el horario se puede aplicar si el
         // otro coordinador cede. Pesa fuerte para que el motor la evite, pero
@@ -329,13 +340,30 @@ impl<'p> Evaluador<'p> {
 
 }
 
-/// Horas libres intercaladas entre la primera y la última clase de un día.
+/// Lo que se lee de la franja de un día: sus huecos y lo que se pasa del tope.
 ///
-/// Las horas antes de la primera y después de la última no cuentan: esas no son
-/// huecos, son el inicio y el final de la jornada. Sirve igual para grupos y
-/// para docentes porque las dos tablas de ocupación tienen la misma forma.
-fn huecos_en(ocupacion: &[u16], cuantos: usize, dias: usize, horas: usize) -> u32 {
-    let mut total = 0;
+/// **Huecos**: horas libres intercaladas entre la primera y la última clase.
+/// Las de antes de la primera y después de la última no cuentan: esas no son
+/// huecos, son el inicio y el final de la jornada.
+///
+/// **Exceso**: horas ocupadas por encima de `tope`, que solo tiene sentido para
+/// docentes —un grupo no tiene jornada laboral— y por eso llega como `Option`.
+/// Se cuentan las casillas pisadas y no los bloques colocados, así que dos
+/// clases encimadas suman una hora de jornada y no dos: el empalme es otra
+/// violación y ya se castiga aparte.
+///
+/// Las dos cosas salen del mismo recorrido porque las dos tablas de ocupación
+/// —grupos y docentes— tienen la misma forma, y esta función corre una vez por
+/// evaluación: separarlas duplicaría el recorrido más caro del evaluador.
+fn jornada_en(
+    ocupacion: &[u16],
+    cuantos: usize,
+    dias: usize,
+    horas: usize,
+    tope: Option<u32>,
+) -> (u32, u32) {
+    let mut huecos = 0;
+    let mut exceso = 0;
     for i in 0..cuantos {
         for dia in 0..dias {
             let base = (i * dias + dia) * horas;
@@ -343,11 +371,15 @@ fn huecos_en(ocupacion: &[u16], cuantos: usize, dias: usize, horas: usize) -> u3
             let primera = franja.iter().position(|&x| x > 0);
             let ultima = franja.iter().rposition(|&x| x > 0);
             if let (Some(a), Some(b)) = (primera, ultima) {
-                total += franja[a..=b].iter().filter(|&&x| x == 0).count() as u32;
+                huecos += franja[a..=b].iter().filter(|&&x| x == 0).count() as u32;
+                if let Some(tope) = tope {
+                    let ocupadas = franja[a..=b].iter().filter(|&&x| x > 0).count() as u32;
+                    exceso += ocupadas.saturating_sub(tope);
+                }
             }
         }
     }
-    total
+    (huecos, exceso)
 }
 
 #[cfg(test)]
@@ -419,6 +451,68 @@ mod pruebas {
         ];
         let (_, d) = e.evaluar_con_detalle(&cromosoma);
         assert_eq!(d.choque_grupo, 1);
+    }
+
+    /// Dos grupos distintos, el mismo docente, el mismo día: la jornada se le
+    /// pasa del tope aunque no haya empalme ni se pase del máximo semanal.
+    fn problema_de_jornada() -> Problema {
+        Problema::leer(
+            r#"{
+              "rejilla":{"dias":["lunes","martes"],
+                         "turnos":[{"id":"matutino","horaInicio":7,"horaFin":14}],
+                         "duracionMaximaBloque":2,
+                         "maxHorasDiaDocente":3},
+              "materias":[{"id":"m1","horasSemana":2},{"id":"m2","horasSemana":2}],
+              "aulas":[{"id":"a1","tipo":"aula"}],
+              "docentes":[{"id":"d1","horasMin":0,"horasMax":40,
+                           "materiasCapacitadas":["m1","m2"]}],
+              "grupos":[{"id":"g1","semestre":1,"turno":"matutino","materias":["m1"]},
+                        {"id":"g2","semestre":3,"turno":"matutino","materias":["m2"]}]
+            }"#,
+        )
+        .unwrap()
+    }
+
+    #[test]
+    fn la_jornada_del_docente_tiene_tope_diario() {
+        let p = problema_de_jornada();
+        assert_eq!(p.rejilla.max_horas_dia_docente, 3);
+        let mut e = Evaluador::nuevo(&p);
+
+        // Cuatro horas seguidas el lunes contra un tope de tres.
+        let seguidas = vec![
+            Gen { docente: 0, aula: 0, dia: 0, hora: 7 },
+            Gen { docente: 0, aula: 0, dia: 0, hora: 9 },
+        ];
+        let (costo, d) = e.evaluar_con_detalle(&seguidas);
+        assert_eq!(d.horas_dia_sobre_maximo, 1, "diagnóstico: {d:?}");
+        assert_eq!(d.choque_docente, 0, "no se pisan: son horas distintas");
+        assert_eq!(d.horas_sobre_maximo, 0, "el semanal son 4 de 40");
+        assert_eq!(costo, 100.0);
+        assert!(!d.factible(), "la jornada es una restricción dura");
+
+        // Las mismas cuatro horas repartidas en dos días ya caben.
+        let repartidas = vec![
+            Gen { docente: 0, aula: 0, dia: 0, hora: 7 },
+            Gen { docente: 0, aula: 0, dia: 1, hora: 7 },
+        ];
+        let (costo, d) = e.evaluar_con_detalle(&repartidas);
+        assert_eq!(d.horas_dia_sobre_maximo, 0);
+        assert_eq!(costo, 0.0, "diagnóstico: {d:?}");
+    }
+
+    /// Un empalme no infla la jornada: lo que cuenta son las horas que pisa.
+    #[test]
+    fn dos_clases_encimadas_son_una_hora_de_jornada() {
+        let p = problema_de_jornada();
+        let mut e = Evaluador::nuevo(&p);
+        let encimadas = vec![
+            Gen { docente: 0, aula: 0, dia: 0, hora: 7 },
+            Gen { docente: 0, aula: 0, dia: 0, hora: 7 },
+        ];
+        let (_, d) = e.evaluar_con_detalle(&encimadas);
+        assert_eq!(d.choque_docente, 2);
+        assert_eq!(d.horas_dia_sobre_maximo, 0, "dos horas de reloj, no cuatro");
     }
 
     #[test]

@@ -175,10 +175,42 @@ export async function resumen() {
 }
 
 /**
+ * Que esa persona pueda dar esa materia.
+ *
+ * La autorización materia-docente y el reparto los decide el mismo
+ * departamento, así que esto no es pedirle permiso a nadie: es el orden.
+ * Primero autorizar, luego repartir. Al revés, el motor respeta lo que el
+ * departamento fija y no lo puede cambiar, así que la clase sale marcada como
+ * "docente no capacitado" y el horario entero queda infactible por una decisión
+ * que nadie recuerda haber tomado. La pantalla del departamento ya solo ofrece
+ * a los autorizados; esto es lo que lo hace cierto también por la API.
+ */
+function exigirAutorizacion(db, docenteId, materiaId) {
+    // Dejar la clase sin nadie es legítimo: es el estado normal a medio repartir.
+    if (!docenteId) return;
+    if (db.prepare("SELECT 1 FROM docente_materia WHERE docente_id = ? AND materia_id = ?")
+        .get(docenteId, materiaId)) return;
+
+    const nombre =
+        db.prepare("SELECT nombre FROM docentes WHERE id = ?").get(docenteId)?.nombre ?? docenteId;
+    throw new ErrorHttp(
+        409,
+        `${nombre} no está autorizado para esa materia. Hay que autorizárselo primero en ` +
+            "su ficha, o darle la clase a alguien que ya lo esté."
+    );
+}
+
+/**
  * Asigna quién imparte una materia a un grupo. `docenteId` nulo la deja sin
  * asignar, que es un estado legítimo mientras el departamento reparte.
+ *
+ * Es el único sitio por donde pasa una asignación —la pantalla, el reparto en
+ * bloque y la aceptación de una petición acaban aquí—, y por eso la
+ * autorización se exige aquí y no en cada ruta.
  */
 export function asignar(db, { carrera, materiaId, grupoClave, docenteId, usuarioId, nota }) {
+    exigirAutorizacion(db, docenteId, materiaId);
+
     const antes =
         db
             .prepare(

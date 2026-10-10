@@ -41,6 +41,18 @@ export const AJUSTE_MAXIMO = 2;
 /** Artículo 157. La rejilla del sistema sale de aquí, no de una costumbre. */
 export const JORNADA = { horaInicio: 7, horaFin: 22, dias: 5 };
 
+/**
+ * Horas de clase que un docente puede dar en un mismo día.
+ *
+ * El reglamento fija la franja (art. 157) y el total semanal (art. 143 y
+ * siguientes), pero no dice cuánto de ese total cabe en un día. Lo dice el
+ * mapeo del problema que entregó el departamento: *"Horas máximo laborables:
+ * 8 hrs al día"*. Son horas de jornada, no de una materia —el tope de una
+ * materia frente a un grupo son tres y vive en la rejilla—, y viaja al motor
+ * dentro de ella porque es quien reparte los días.
+ */
+export const MAX_HORAS_DIA_DOCENTE = 8;
+
 /** Artículo 155: el nombramiento de asignatura va de 1 a 19 horas. */
 export const ASIGNATURA = { min: 1, max: 19 };
 

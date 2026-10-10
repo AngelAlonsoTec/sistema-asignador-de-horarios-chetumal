@@ -34,7 +34,8 @@ async function entrar(usuario) {
 
 const DURAS = new Set(["docenteNoCapacitado","choqueDocente","choqueGrupo","choqueAula",
   "aulaInadecuada","fueraDeAulaBase","aulaInsuficiente","aulaOcupadaPorOtros",
-  "materiaRepetidaDia","horaNoDisponible","excesoMaterias","excesoGrupos","horasSobreMaximo"]);
+  "materiaRepetidaDia","horaNoDisponible","excesoMaterias","excesoGrupos","horasSobreMaximo",
+  "horasDiaSobreMaximo"]);
 const durasDe = (d) => Object.entries(d ?? {}).filter(([k, v]) => v > 0 && DURAS.has(k));
 const hhmm = (h) => `${String(h).padStart(2, "0")}:00`;
 /** "1 clase" y no "1 clases": el relato se lee, no se parsea. */
@@ -185,10 +186,19 @@ async function main() {
     })).cuerpo;
     ve(`Antes de generar: ${v.listo ? "todo listo" : "falta algo"} · ` +
        `${v.resumen.grupos} grupos, ${v.resumen.materias} materias, ` +
-       `${v.resumen.horasTotales} h de ${v.resumen.capacidadDocente} disponibles`);
+       `${v.resumen.horasProgramables} h de ${v.resumen.capacidadDocente} disponibles`);
     for (const b of v.bloqueos ?? []) ve(`  BLOQUEA: ${b.mensaje}`);
+    // Lo que no se arregla capturando: falta gente, y el horario sale sin eso.
+    for (const n of v.necesidades ?? []) ve(`  POR CONTRATAR: ${n.mensaje}`);
     for (const a of (v.advertencias ?? []).slice(0, 2)) ve(`  aviso: ${a.mensaje.slice(0, 90)}`);
     if (v.horasAjenas > 0) ve(`Otras carreras ya pretenden ${v.horasAjenas} horas de esta plantilla`);
+
+    // Con un bloqueo no se genera nada, y sin horario no hay relato que contar.
+    // Decirlo y salir es mejor que reventar tres líneas más abajo.
+    if (!v.listo) {
+        ve("Con eso sin resolver no se genera nada: hay que atenderlo y volver a correr el relato.");
+        return;
+    }
 
     const fus = v.fusionesPosibles ?? [];
     if (fus.length > 0) {

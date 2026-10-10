@@ -781,7 +781,7 @@ configuración de generación, el ajuste a mano, reiniciar una contraseña, cerr
 sesión, resolver un choque propio. Una ruta que nadie llama es una que se rompe
 en silencio.
 
-Ahora son **213 comprobaciones y el 100 % de las 69 rutas**, estable en tres
+Ahora son **215 comprobaciones y el 100 % de las 69 rutas**, estable en tres
 corridas seguidas.
 
 Dos cosas salieron de escribirlas. Una: encadenar verificar y simular fallaba
@@ -908,6 +908,10 @@ declaró dos horas para una clase de cuatro: son sus dos registros y puede tener
 uno atrasado. El sistema entrega el horario, respeta la decisión y dice por dónde
 no cuadra —`docenteNoCapacitado`, `horaNoDisponible`, `horasSobreMaximo`— en vez
 de rechazarla o, peor, cambiarla por su cuenta.
+
+> **La primera de las dos se cerró después**, con una medición que no existía
+> cuando esto se escribió: asignar a quien no está autorizado no se nombra, se
+> rechaza. El resto de la regla sigue en pie. Ver *El mapeo del departamento*.
 
 **Y encontró el hueco que motivaba la prueba.** El ajuste a mano aceptaba
 cualquier docente de la plantilla. El coordinador podía deshacer en dos clics lo
@@ -1474,6 +1478,115 @@ de un 409 mudo.
 
 ---
 
+### El mapeo del departamento · **HECHO** (2026-10-09)
+
+Llegó `papers/Mapeo materias.xlsx`: el modelo del problema tal como lo plantea
+el departamento, en abstracto —cuatro áreas, ocho maestros cada una, siete
+semestres de cinco materias— y con las reglas escritas al lado. No trae datos
+reales; trae **las reglas y la forma**, que es lo que faltaba comprobar contra el
+código. Confirmó casi todo el modelo de datos y corrigió cuatro cosas.
+
+**El turno no se cortaba donde se corta.** Aquí decía matutino 07:00–14:00 y
+vespertino 14:00–22:00, con un comentario que admitía que el corte era del
+plantel y no del reglamento. El mapeo lo fija: **TM 07:00–13:00 y TV
+13:00–22:00**. La mañana tiene seis horas, no siete, y eso cambia el presupuesto
+de la rejilla: treinta ranuras por semana en vez de treinta y cinco. Con la
+configuración guardada de ISIC —primero, tercero y quinto por la mañana, 27, 28 y
+24 h— sigue cabiendo, y la batería entera pasó sin tocar nada más.
+
+Con el corte viene el otro dato de la misma hoja: **primero y segundo en TM, de
+tercero en adelante en TV**, igual en las cuatro áreas. Era un número puesto a
+ojo —`SEMESTRE_VESPERTINO_DESDE = 6`— y ahora tiene fuente. Es una sugerencia: la
+línea de grupos la decide el coordinador. Medido sobre el banco de pruebas, la
+sugerencia nueva sale **peor** que la guardada (42 horas no disponibles contra 7),
+y la causa es de los datos, no de la regla: quince de los treinta docentes
+declararon 07:00–14:00 y son los autorizados para varias materias de semestres
+altos, así que al mandar esos grupos a la tarde el motor los coloca donde esas
+personas no están. Nueve de esas horas son el borde: quien declaró 14:00–22:00 no
+cubre las 13:00, que ahora pertenecen a la tarde. **Las declaraciones del banco se
+capturaron contra el corte viejo**; las reales salen del formulario y no se
+inventan aquí.
+
+**La jornada diaria no estaba modelada.** *"Horas máximo laborables: 8 hrs al
+día"*. El motor tenía el tope semanal —el contrato— y el de una materia frente a
+un grupo —tres horas—, pero nada que impidiera dejarle a alguien nueve horas
+seguidas un martes. Es `Rejilla::max_horas_dia_docente`, viaja desde
+`tecnm.MAX_HORAS_DIA_DOCENTE`, y pesa como el tope semanal: la misma clase de
+violación, y ordenarlas entre sí sería inventar una jerarquía que nadie fijó. Se
+mide en el mismo recorrido que los huecos del docente, que ya pasaba por esa
+franja, así que no cuesta nada: cuenta **horas pisadas**, no bloques colocados,
+de modo que dos clases encimadas son una hora de jornada y no dos —el empalme ya
+se castiga aparte—. En el escenario de ISIC no ata: la jornada más larga es de
+seis horas.
+
+**El déficit de plantilla no es un error de captura.** La frase que más cambia el
+sistema está al pie de la hoja de maestros: *"estas Reglas son estrictas, en caso
+de que no haya maestro para cubrir alguna materia por esta razón u otra, se deja
+esa materia para contratar a una persona por horas. Entonces se marca como una
+necesidad"*. Y los números del propio mapeo dicen que el caso es la norma: 616
+horas de clase contra 516 de capacidad frente a grupo —con su propia fórmula,
+`(total/2)+2` para quien pasa de diez horas—, **100 horas de déficit, el 16 %**,
+repartido parejo entre las cuatro áreas, así que no se cierra prestando gente.
+
+Aquí había dos bloqueos que impedían generar: `materias-sin-docente` y
+`capacidad-docente`. Los dos se habrían disparado siempre con esos datos, y
+bloquear dejaba sin horario justo al plantel que tiene el déficit. Ahora son
+**necesidades**: una tercera categoría junto a los bloqueos y las advertencias, y
+lo que las separa es qué se puede hacer al respecto. Un bloqueo es que falta
+capturar; una necesidad es que falta gente. La materia que nadie puede dar se
+aparta del problema que va al motor —asignarla obligaría a poner a alguien sin
+autorización, y eso vuelve el horario infactible por construcción— y sale
+reportada con sus horas; el grupo la sigue listando y sus horas siguen contando
+para el presupuesto del aula, porque cuando se contrate habrá que meterlas en ese
+mismo salón. El déficit de capacidad se mide contra lo que de verdad queda por
+programar, no contra la carga entera, para no contar dos veces las mismas horas.
+El único bloqueo que queda de los dos es el caso extremo —**ninguna** materia del
+periodo tiene quien la dé—, que no es un déficit sino una plantilla que no cubre
+nada.
+
+**Y el hueco que encontró la medición.** El mapeo deriva la asignación
+materia-maestro de la tabla de autorizaciones, así que se fue a mirar cómo estaba
+eso aquí: `7` de las `95` asignaciones de la base de demostración fijaban a
+alguien **no autorizado** para esa materia. El efecto medido en el horario de
+ISIC: `docenteNoCapacitado: 19` sobre 101 bloques, infactible, con una aptitud de
+42 872 que ninguna semilla iba a arreglar. El motor respeta lo que el
+departamento fija y no lo puede cambiar; el que se quedaba con el horario rojo
+era el coordinador, que no había tomado la decisión y no tenía con qué deshacerla.
+Llevaba ahí semanas sin que nadie lo viera, porque el diagnóstico decía *19
+bloques* y no *estas siete clases*.
+
+La pantalla del departamento ya solo ofrecía a los autorizados —*"Solo salen
+quienes están autorizados para esa materia"*—; la API no. Ahora la regla vive en
+`catalogo.asignar`, que es **el único sitio por donde pasa una asignación**: la
+pantalla, el reparto en bloque de una materia y la aceptación de una petición de
+cambio acaban las tres ahí. Primero autorizar, luego repartir; las dos decisiones
+son del mismo departamento, así que no es pedirle permiso a nadie, es el orden. Y
+por si una fila vieja sobrevive, la validación previa la nombra con clave, grupo
+y persona en vez de dejar que el motor la traduzca a un número.
+
+Las siete filas de la demostración se dejaron **sin asignar** por la API, para
+que quedara en el historial de reparto: autorizar a alguien para una materia es
+un juicio académico que no toca a esta herramienta, y sin asignar es el estado
+normal a medio repartir —el motor elige entre los autorizados—. El horario de
+ISIC pasó de catorce violaciones duras a **una**.
+
+**Lo que el mapeo no cambió, y por qué.** Su fórmula de horas frente a grupo
+—`(total/2)+2`— coincide con la fila de titular del artículo 143 en 40 h → 22 y
+20 h → 12, pero ignora la categoría, y la tabla del reglamento es más fina: se
+queda la tabla, y `tecnm.revisar` sigue avisando cuando lo capturado no cuadra.
+Su prioridad de reparto es un número de 1 a 10 derivado del área y del contrato;
+la de aquí son tres niveles que pone el coordinador. Son dos cosas distintas con
+el mismo nombre —una regla institucional y un juicio de quien coordina— y
+mezclarlas a medias habría sido peor que dejarlas separadas. Y el **área** no
+existe como entidad: el mapeo organiza maestros, materias y prioridad por área, y
+aquí la unidad es la carrera, con `esDeOtraArea` como un sí o un no. Cuatro áreas
+no se corresponden con trece carreras sin que alguien diga qué es un área.
+
+Dos cosas de limpieza del archivo, por si se importa: las claves se repiten de
+copiar y pegar —dentro del área 1 el semestre 5 reusa las del 4, y las áreas 2 y
+3 comparten 25 de sus 35— así que colisionan en la llave primaria de `materias`;
+y las hojas *Materia-Maestros* y *Prioridades* traen el contenido cruzado.
+
 ## Lo que queda
 
 **Nada de código.** Lo que falta son datos y despliegue:
@@ -1490,6 +1603,25 @@ de un 409 mudo.
   alcanzan desde que se comparten por horas. Es un dato del banco de pruebas, no
   del sistema, pero es lo que decidirá si el piloto se hace con una coordinación
   o con todas.
+
+Y tres que abrió el mapeo del departamento:
+
+- **Qué es un área.** El mapeo organiza maestros, materias y prioridad de reparto
+  por área, y son cuatro. Aquí la unidad es la carrera, y son trece, con
+  `esDeOtraArea` como un sí o un no. Mientras nadie diga si un área agrupa
+  carreras o es un área de conocimiento, la prioridad que el mapeo deriva del
+  área no tiene dónde vivir.
+- **Prioridad de reparto: regla o juicio.** La del mapeo es un número de 1 a 10
+  que sale del área y de las horas contratadas —40 h del área 1 va séptimo, 5 h
+  va primero—. La del sistema son tres niveles que pone el coordinador para su
+  propia carrera. Si la que manda es la del mapeo, el nivel se calcula y no se
+  elige, y deja de ser del coordinador.
+- **La disponibilidad declarada del banco está contra el corte viejo.** Quince
+  docentes declararon 07:00–14:00 y quince 14:00–22:00, capturado cuando la tarde
+  empezaba a las 14:00. Con el corte real a las 13:00 queda una hora que solo
+  cubre el turno de la mañana. Se arregla con los formularios reales, no desde
+  aquí: inventarle a alguien una hora que no declaró es exactamente lo que el
+  formulario viene a evitar.
 
 **Y una precisión sobre `antiguedad`, `nivel` y `creditos`**: sí se muestran —la
 antigüedad junto al selector de prioridad, el nivel en el nombramiento, los

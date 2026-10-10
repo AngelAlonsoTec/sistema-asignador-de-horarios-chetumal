@@ -757,6 +757,7 @@ async function verNormativa(req, res) {
             maxMaterias: tecnm.MAX_MATERIAS,
             ajusteMaximo: tecnm.AJUSTE_MAXIMO,
             jornada: tecnm.JORNADA,
+            maxHorasDiaDocente: tecnm.MAX_HORAS_DIA_DOCENTE,
             asignatura: tecnm.ASIGNATURA,
             horasFrenteAGrupo: tecnm.HORAS_FRENTE_A_GRUPO,
             dedicaciones: tecnm.DEDICACIONES
@@ -956,6 +957,7 @@ async function ajustarHorario(req, res, { carrera, id }) {
         generadoEn: new Date().toISOString(),
         ajustado: true,
         resumen: validacion.resumen,
+        necesidades: validacion.necesidades,
         paridad: problema.paridad,
         rejilla: problema.rejilla,
         grupos: problema.grupos.map(({ id: gid, clave, semestre, especialidad, turno, aulaClave, carrera: c }) => ({
@@ -1097,6 +1099,10 @@ async function generarHorario(req, res, { carrera, id }) {
         })),
         parametros: problema.parametros,
         resumen: validacion.resumen,
+        // Lo que falta por contratar viaja con el horario, no solo antes de
+        // generarlo: es parte del resultado. Un horario al que le faltan clases
+        // porque nadie puede darlas tiene que decirlo donde se lee el horario.
+        necesidades: validacion.necesidades,
         // Las del backend son objetos con detalle; las del motor, texto suelto.
         // Se separan en vez de mezclarlas para que la interfaz no tenga que
         // adivinar de qué tipo es cada elemento.

@@ -63,7 +63,8 @@ const lista = (r) => (Array.isArray(r?.cuerpo) ? r.cuerpo : []);
 const DURAS = new Set([
     "docenteNoCapacitado", "choqueDocente", "choqueGrupo", "choqueAula", "aulaInadecuada",
     "fueraDeAulaBase", "aulaInsuficiente", "aulaOcupadaPorOtros", "materiaRepetidaDia",
-    "horaNoDisponible", "excesoMaterias", "excesoGrupos", "horasSobreMaximo"
+    "horaNoDisponible", "excesoMaterias", "excesoGrupos", "horasSobreMaximo",
+    "horasDiaSobreMaximo"
 ]);
 const durasDe = (d) => Object.entries(d ?? {}).filter(([k, v]) => v > 0 && DURAS.has(k));
 
@@ -378,27 +379,31 @@ async function nivelTres({ uno, escenarios }) {
     const E = escenarios.DD1;
 
     paso("Asignar a quien no está autorizado");
-    // El departamento decide las dos cosas —quién puede y quién imparte— así
-    // que esto es una incoherencia suya, no un permiso que falte. Se deja
-    // hacer, y el motor la nombra en vez de callarla.
-    comprobar("se permite: el departamento manda sobre su propio registro",
-        (await asignar("DD1", "dd_m2", "1A", "dd-caro")).cuerpo?.docenteId === "dd-caro");
-    let g = await generar(uno.c, "DD1", E);
-    let duras = Object.fromEntries(durasDe(g.cuerpo?.diagnostico));
-    comprobar("el horario lo marca como no capacitado",
-        (duras.docenteNoCapacitado ?? 0) > 0, JSON.stringify(duras));
-    comprobar("y el horario no es factible", g.cuerpo?.factible === false);
-    comprobar("aun así respeta la decisión: la clase es de Caro",
-        [...(quienImparte(g.cuerpo?.sesiones).get("1A|dd_m2") ?? [])].join() === "dd-caro");
-    await asignar("DD1", "dd_m2", "1A", null);
+    // El departamento decide las dos cosas —quién puede dar una materia y quién
+    // la imparte—, así que esto nunca fue un permiso que le faltara: es una
+    // incoherencia de su propio registro. Antes se dejaba pasar y el motor la
+    // nombraba, pero el precio lo pagaba quien no la había tomado: el motor
+    // respeta lo que el departamento fija y no lo puede cambiar, así que el
+    // horario entero salía infactible por una clase, y el coordinador no tenía
+    // con qué arreglarlo. Ahora se rechaza en el momento y se dice qué falta.
+    const fuera = await asignar("DD1", "dd_m2", "1A", "dd-caro");
+    comprobar("se rechaza: primero autorizar, luego repartir",
+        fuera.estado === 409 && /no está autorizado/.test(fuera.cuerpo?.error ?? ""),
+        JSON.stringify(fuera.cuerpo).slice(0, 110));
+    comprobar("y la clase no queda a medias",
+        ((await depto("/plantel/catalogo/DD1")).cuerpo.filas
+            .find((f) => f.materiaId === "dd_m2" && f.grupoClave === "1A")?.docenteId ?? null) === null);
+    anotar("La pantalla del departamento solo ofrece a los autorizados; esto es lo que lo hace " +
+        "cierto también por la API. Autorizar a Caro para esa materia o dársela a alguien que " +
+        "ya lo esté son las dos salidas, y las dos son del departamento.");
 
     paso("Asignar a quien no tiene horas");
     // Caro declaró dos horas el lunes. Una materia de cuatro no cabe, por mucho
     // que el motor la mueva: la contradicción es entre lo que el departamento
     // decidió y lo que el docente declaró.
     await asignar("DD1", "dd_m1", "1A", "dd-caro");
-    g = await generar(uno.c, "DD1", E);
-    duras = Object.fromEntries(durasDe(g.cuerpo?.diagnostico));
+    let g = await generar(uno.c, "DD1", E);
+    let duras = Object.fromEntries(durasDe(g.cuerpo?.diagnostico));
     comprobar("el motor lo reporta como horas no disponibles",
         (duras.horaNoDisponible ?? 0) > 0, JSON.stringify(duras));
     comprobar("y dice que no es factible", g.cuerpo?.factible === false);
@@ -684,7 +689,7 @@ async function nivelCuatro({ uno, dos, escenarios }) {
     const tarde = await uno.c(`/carreras/DD1/escenarios/${escenarios.DD1}/reserva`, { metodo: "DELETE" });
     comprobar("ya no se sueltan horas", tarde.estado === 409, `${tarde.estado}`);
     comprobar("pero el departamento sigue pudiendo repartir el siguiente periodo",
-        (await asignar("DD1", "dd_m3", "1A", "dd-beto")).estado === 200);
+        (await asignar("DD1", "dd_m3", "1A", "dd-ana")).estado === 200);
     anotar("Cerrar el periodo congela las horas, no las decisiones: quién imparte qué se " +
         "sigue administrando, porque es lo que se hereda al abrir el siguiente.");
     await depto("/periodos/impares/cerrar", { metodo: "DELETE" });

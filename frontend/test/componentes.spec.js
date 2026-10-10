@@ -12,6 +12,7 @@ import { mount } from "@vue/test-utils";
 
 import RejillaHorario from "../src/componentes/RejillaHorario.vue";
 import HorarioImprimible from "../src/componentes/HorarioImprimible.vue";
+import ListaPendientes from "../src/componentes/ListaPendientes.vue";
 import { alcanza } from "../src/dominio/turnos.js";
 
 const REJILLA = {
@@ -143,6 +144,50 @@ describe("HorarioImprimible", () => {
     test("«ambos» imprime grupos y docentes; en pantalla no se ve nada", () => {
         expect(montar("ambos").findAll(".hoja")).toHaveLength(4);
         expect(montar("grupos").find(".impresion").exists()).toBe(true);
+    });
+});
+
+describe("ListaPendientes", () => {
+    const NECESIDAD = {
+        codigo: "materias-sin-docente",
+        mensaje: "3 materias no tienen a nadie autorizado para darlas (11 h/semana).",
+        seccion: "materias",
+        horas: 11,
+        detalle: ["A · Uno: 4 h", "B · Dos: 4 h", "C · Tres: 3 h"]
+    };
+    const montar = (props) =>
+        mount(ListaPendientes, {
+            props: { secciones: { materias: "Materias" }, ...props }
+        });
+
+    test("el tono distingue un bloqueo de una necesidad", () => {
+        expect(montar({ items: [NECESIDAD], tono: "necesidad" }).find("ul").classes())
+            .toContain("lista-necesidad");
+        expect(montar({ items: [NECESIDAD], tono: "bloqueo" }).find("ul").classes())
+            .toContain("lista-bloqueo");
+    });
+
+    test("el detalle se abre y se cierra, y dice cuántos hay", () => {
+        const r = montar({ items: [NECESIDAD], tono: "necesidad" });
+        const ver = r.findAll("button").find((b) => b.text().startsWith("Ver"));
+        expect(ver.text()).toBe("Ver 3");
+        expect(r.find(".bloqueo-detalle").exists()).toBe(false);
+
+        return ver.trigger("click").then(async () => {
+            expect(r.findAll(".bloqueo-detalle li")).toHaveLength(3);
+            await r.findAll("button").find((b) => b.text() === "Ocultar").trigger("click");
+            expect(r.find(".bloqueo-detalle").exists()).toBe(false);
+        });
+    });
+
+    test("sin detalle y sin sección conocida no se ofrecen botones", () => {
+        // La necesidad de capacidad no tiene detalle: es una cifra, no una lista.
+        const r = montar({
+            items: [{ codigo: "capacidad-docente", mensaje: "Faltan 25 h.", seccion: "docentes", detalle: [] }],
+            tono: "necesidad"
+        });
+        expect(r.findAll("button")).toHaveLength(0);
+        expect(r.text()).toContain("Faltan 25 h.");
     });
 });
 
