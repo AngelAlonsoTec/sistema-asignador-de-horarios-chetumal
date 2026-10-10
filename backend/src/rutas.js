@@ -73,6 +73,7 @@ export const RUTAS = [
     ["DELETE", "/api/usuarios/:id", retirarUsuario],
     ["GET", "/api/docentes", listarDocentes],
     ["PUT", "/api/docentes", guardarDocentes],
+    ["PUT", "/api/docentes/:id", guardarDocente],
     ["POST", "/api/docentes/importar", importarDisponibilidad],
     ["PUT", "/api/docentes/:id/descargas", guardarDescargas],
     ["GET", "/api/enlaces", listarEnlaces],
@@ -337,6 +338,38 @@ async function guardarDocentes(req, res) {
     }
     await almacen.guardarDocentes(docentes);
     responder(res, 200, { guardados: docentes.length });
+}
+
+/**
+ * Un nombramiento, el suyo y nada más.
+ *
+ * La ruta de arriba manda la plantilla completa, y eso está bien para un alta
+ * masiva o una baja —quien no viene se va— pero no para corregirle las horas a
+ * una persona: el documento lleva a los otros veintinueve tal como estaban en
+ * la pantalla de quien guarda, y si alguien más editó mientras tanto, su cambio
+ * se pierde sin aviso. Por aquí se escribe solo el docente de la ruta.
+ *
+ * Lo que **no** se toca es su disponibilidad, que la declara él, ni sus
+ * descargas, que tienen su propia ruta. Las materias autorizadas sí: son del
+ * departamento, y van juntas porque se deciden en el mismo diálogo.
+ *
+ * Y lo que no venga en el cuerpo se queda como estaba, porque ningún formulario
+ * edita un nombramiento completo. Ver `almacen.guardarDocente`.
+ */
+async function guardarDocente(req, res, { id }) {
+    exigirDepartamento(
+        req,
+        "La plantilla docente es del instituto: la administra el departamento académico."
+    );
+    const cuerpo = await leerCuerpo(req);
+    if (!cuerpo || typeof cuerpo !== "object" || Array.isArray(cuerpo)) {
+        throw new ErrorHttp(400, "Se esperaba el nombramiento de un docente.");
+    }
+    if (cuerpo.nombre !== undefined && !String(cuerpo.nombre).trim()) {
+        throw new ErrorHttp(400, "El nombre no puede quedar vacío.");
+    }
+    // El id manda el de la ruta: así un cuerpo con otro id no renombra a nadie.
+    responder(res, 200, almacen.guardarDocente({ ...cuerpo, id }));
 }
 
 /**

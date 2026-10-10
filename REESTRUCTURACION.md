@@ -201,8 +201,10 @@ interfaz**, así que las rutas no cambiaron: el resto del backend no se enteró.
 Los JSON quedan como respaldo.
 
 Las escrituras que borran y reinsertan —la plantilla docente, un escenario, una
-reserva— van en transacción. Eso es lo que evita que dos coordinadores
-guardando a la vez se pisen.
+reserva— van en transacción. Eso es lo que evita que dos guardados simultáneos
+dejen la base a medias. Que un documento completo pise el cambio de otro es un
+problema distinto, y la transacción no lo resuelve: se arregló después, dándole
+ruta propia a cada nombramiento —ver *Un nombramiento a la vez*—.
 
 **Identidad.** `scrypt` para las contraseñas y bytes aleatorios para el token de
 sesión, todo con `node:crypto`. La cookie es `HttpOnly` y `SameSite=Lax`. La
@@ -781,7 +783,7 @@ configuración de generación, el ajuste a mano, reiniciar una contraseña, cerr
 sesión, resolver un choque propio. Una ruta que nadie llama es una que se rompe
 en silencio.
 
-Ahora son **215 comprobaciones y el 100 % de las 69 rutas**, estable en tres
+Ahora son **218 comprobaciones y el 100 % de las 70 rutas**, estable en tres
 corridas seguidas.
 
 Dos cosas salieron de escribirlas. Una: encadenar verificar y simular fallaba
@@ -1586,6 +1588,38 @@ Dos cosas de limpieza del archivo, por si se importa: las claves se repiten de
 copiar y pegar —dentro del área 1 el semestre 5 reusa las del 4, y las áreas 2 y
 3 comparten 25 de sus 35— así que colisionan en la llave primaria de `materias`;
 y las hojas *Materia-Maestros* y *Prioridades* traen el contenido cruzado.
+
+### Un nombramiento a la vez · **CORREGIDO** (2026-10-10)
+
+Editarle las horas a un docente mandaba la **plantilla entera**: el diálogo del
+departamento cargaba los treinta, cambiaba uno y hacía `PUT /api/docentes` con
+los treinta. Dos personas del departamento editando a la vez a dos docentes
+distintos se pisaban —la segunda en guardar devolvía al otro al estado que ella
+tenía en pantalla— y nadie se enteraba. Estaba medido y escrito como defecto
+conocido desde hacía semanas; lo que lo volvió urgente fue que ahora hay que
+autorizar antes de repartir, así que la captura de autorizaciones pasa
+obligatoriamente por esa escritura.
+
+`PUT /api/docentes/:id` escribe un nombramiento y nada más. Dos detalles que son
+el fondo del asunto, no comodidades de la API:
+
+- **Lo que no viene en el cuerpo no se toca.** Ningún formulario edita un
+  nombramiento completo: el diálogo lleva la categoría, la dedicación y los
+  topes, pero no la antigüedad ni el área de adscripción, que viajaban de rebote
+  en el documento. Reemplazar el recurso entero las habría borrado. La lectura y
+  la escritura van en la misma transacción, así que dos cambios al mismo docente
+  no se mezclan a medias.
+- **La disponibilidad no se escribe por aquí.** La declara el docente desde su
+  enlace. Si la ficha la reemplazara, guardar un nombramiento pisaría lo que el
+  docente contestó mientras el diálogo estaba abierto — el mismo defecto un
+  nivel más abajo. Las descargas siguen en su propia ruta; las autorizaciones sí
+  van con la ficha, porque son del departamento y se deciden en ese diálogo. Un
+  arreglo vacío las borra, que es una decisión; la ausencia del campo no.
+
+La ruta de la plantilla completa se queda para lo que es: un alta masiva o una
+baja —quien no viene se va, con su aviso si deja horas apartadas—. Y la
+verificación dejó de documentar el defecto para comprobar lo contrario: dos
+escrituras simultáneas a dos fichas, las dos sobreviven.
 
 ## Lo que queda
 

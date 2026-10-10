@@ -86,7 +86,16 @@ export const api = {
         pedir(`/api/cambios/${id}/responder`, { metodo: "POST", cuerpo }),
     retirarCambio: (id) => pedir(`/api/cambios/${id}`, { metodo: "DELETE" }),
 
-    guardarDocentes: (docentes) => pedir("/api/docentes", { metodo: "PUT", cuerpo: docentes }),
+    /**
+     * Un solo nombramiento. Lo que no va en el cuerpo se queda como estaba.
+     *
+     * No hay método para la plantilla completa: esa ruta existe en el backend
+     * para un alta masiva o una baja —las herramientas de datos la usan— y
+     * desde la pantalla no se escribe así, porque mandar los treinta por
+     * cambiarle uno es lo que hacía que dos ediciones simultáneas se pisaran.
+     */
+    guardarDocente: (id, docente) =>
+        pedir(`/api/docentes/${id}`, { metodo: "PUT", cuerpo: docente }),
 
     aulas: (carrera) => pedir(`/api/carreras/${carrera}/aulas`),
     /** Los espacios del plantel. Solo el departamento los guarda. */

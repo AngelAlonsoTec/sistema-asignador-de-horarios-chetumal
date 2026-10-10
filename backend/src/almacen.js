@@ -140,6 +140,90 @@ function exigirQueNoDejeATodosColgados(db, id, nombre) {
     );
 }
 
+/**
+ * El alta y la edición de un nombramiento, en un solo sitio para que las dos
+ * rutas que escriben plantilla no se separen.
+ */
+const SQL_DOCENTE = `INSERT INTO docentes
+    (id, nombre, categoria, nivel, horas_min, horas_max, max_materias, max_grupos,
+     antiguedad, carrera_base, es_de_otra_area, dedicacion)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    ON CONFLICT(id) DO UPDATE SET
+        dedicacion = excluded.dedicacion,
+        nombre = excluded.nombre, categoria = excluded.categoria,
+        nivel = excluded.nivel, horas_min = excluded.horas_min,
+        horas_max = excluded.horas_max, max_materias = excluded.max_materias,
+        max_grupos = excluded.max_grupos, antiguedad = excluded.antiguedad,
+        carrera_base = excluded.carrera_base,
+        es_de_otra_area = excluded.es_de_otra_area`;
+
+const SQL_AUTORIZA = "INSERT OR IGNORE INTO docente_materia (docente_id, materia_id) VALUES (?, ?)";
+
+/** Los argumentos de `SQL_DOCENTE`, para no repetir el orden en dos sitios. */
+const camposDe = (d) => [
+    d.id, d.nombre, d.categoria, d.nivel ?? null, d.horasMin ?? 0,
+    // El tope de materias por omisión es el del reglamento, no un número
+    // grande: capturar un docente sin decirlo no debería dejarle una carga que
+    // el artículo 155 no permite.
+    d.horasMax ?? 40, d.maxMaterias ?? MAX_MATERIAS, d.maxGrupos ?? 99,
+    d.antiguedad ?? null, d.carreraBase ?? null, d.esDeOtraArea ? 1 : 0,
+    d.dedicacion ?? null
+];
+
+const SQL_LEER_DOCENTE = `SELECT id, nombre, categoria, nivel,
+        horas_min AS horasMin, horas_max AS horasMax, max_materias AS maxMaterias,
+        max_grupos AS maxGrupos, antiguedad, carrera_base AS carreraBase,
+        es_de_otra_area AS esDeOtraArea, dedicacion
+    FROM docentes WHERE id = ?`;
+
+/**
+ * Guarda **un** nombramiento: su ficha y, si vienen, las materias que se le
+ * autorizan.
+ *
+ * Existe para no mandar la plantilla entera por cambiarle una hora a uno. Con
+ * el documento completo, dos personas del departamento editando a la vez a dos
+ * docentes distintos se pisaban: la segunda en guardar devolvía a los otros
+ * veintinueve al estado que tuviera cargado en pantalla. La verificación lo
+ * comprueba con dos escrituras simultáneas.
+ *
+ * **Lo que no se manda no se toca.** No es comodidad: ningún formulario edita
+ * un nombramiento completo. El diálogo del departamento lleva la categoría, la
+ * dedicación y los topes, pero no la antigüedad ni el área de adscripción, y
+ * reemplazar el documento entero las habría borrado. Por lo mismo no se escribe
+ * aquí la disponibilidad —la declara el docente desde su enlace— ni las
+ * descargas, que tienen su propia ruta: guardar una ficha no puede pisar lo que
+ * el docente contestó mientras el diálogo estaba abierto.
+ *
+ * La lectura y la escritura van en la misma transacción, así que dos cambios
+ * simultáneos al **mismo** docente no se mezclan a medias: uno espera al otro.
+ */
+export function guardarDocente(parche) {
+    return enTransaccion((db) => {
+        const previo = db.prepare(SQL_LEER_DOCENTE).get(parche.id);
+        const d = { ...previo };
+        for (const [campo, valor] of Object.entries(parche)) {
+            if (valor !== undefined) d[campo] = valor;
+        }
+        if (!previo && !d.categoria) {
+            throw new ErrorHttp(400, "Un nombramiento nuevo necesita categoría.");
+        }
+        db.prepare(SQL_DOCENTE).run(...camposDe(d));
+
+        // Un arreglo vacío sí borra las autorizaciones: es una decisión. Lo que
+        // no se interpreta es la ausencia del campo.
+        if (Array.isArray(parche.materiasCapacitadas)) {
+            db.prepare("DELETE FROM docente_materia WHERE docente_id = ?").run(d.id);
+            const autoriza = db.prepare(SQL_AUTORIZA);
+            for (const m of parche.materiasCapacitadas) autoriza.run(d.id, m);
+        }
+
+        const autorizadas = db
+            .prepare("SELECT count(*) n FROM docente_materia WHERE docente_id = ?")
+            .get(d.id).n;
+        return { id: d.id, nuevo: !previo, autorizadas };
+    });
+}
+
 export async function guardarDocentes(docentes) {
     enTransaccion((db) => {
         // **No se borra la plantilla para reinsertarla.** `asignacion` y
@@ -158,18 +242,7 @@ export async function guardarDocentes(docentes) {
             baja.run(id);
         }
 
-        const guardaDocente = db.prepare(`INSERT INTO docentes
-            (id, nombre, categoria, nivel, horas_min, horas_max, max_materias, max_grupos,
-             antiguedad, carrera_base, es_de_otra_area, dedicacion)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-            ON CONFLICT(id) DO UPDATE SET
-                dedicacion = excluded.dedicacion,
-                nombre = excluded.nombre, categoria = excluded.categoria,
-                nivel = excluded.nivel, horas_min = excluded.horas_min,
-                horas_max = excluded.horas_max, max_materias = excluded.max_materias,
-                max_grupos = excluded.max_grupos, antiguedad = excluded.antiguedad,
-                carrera_base = excluded.carrera_base,
-                es_de_otra_area = excluded.es_de_otra_area`);
+        const guardaDocente = db.prepare(SQL_DOCENTE);
         // Lo que sí es de este documento se reemplaza, pero por docente.
         const limpiaHorario = db.prepare("DELETE FROM docente_horario WHERE docente_id = ?");
         const limpiaDescarga = db.prepare("DELETE FROM docente_descarga WHERE docente_id = ?");
@@ -180,18 +253,10 @@ export async function guardarDocentes(docentes) {
         const insDescarga = db.prepare(
             "INSERT INTO docente_descarga (docente_id, dia, inicio, fin, motivo) VALUES (?, ?, ?, ?, ?)"
         );
-        const insAutoriza = db.prepare(
-            "INSERT OR IGNORE INTO docente_materia (docente_id, materia_id) VALUES (?, ?)"
-        );
+        const insAutoriza = db.prepare(SQL_AUTORIZA);
 
         for (const d of docentes) {
-            guardaDocente.run(d.id, d.nombre, d.categoria, d.nivel ?? null, d.horasMin ?? 0,
-                // El tope de materias por omisión es el del reglamento, no un
-                // número grande: capturar un docente sin decirlo no debería
-                // dejarle una carga que el artículo 155 no permite.
-                d.horasMax ?? 40, d.maxMaterias ?? MAX_MATERIAS, d.maxGrupos ?? 99,
-                d.antiguedad ?? null, d.carreraBase ?? null, d.esDeOtraArea ? 1 : 0,
-                d.dedicacion ?? null);
+            guardaDocente.run(...camposDe(d));
 
             limpiaHorario.run(d.id);
             limpiaDescarga.run(d.id);

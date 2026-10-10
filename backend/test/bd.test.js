@@ -1026,6 +1026,69 @@ test("una asignación sin clase deja de contar, pero se nombra", async () => {
     );
 });
 
+test("guardar un nombramiento no toca al resto ni borra lo que no se manda", async () => {
+    const almacen = await import("../src/almacen.js");
+    docente("dper1", "Per Uno");
+    docente("dper2", "Per Dos");
+
+    // Campos que el diálogo del departamento no edita y que viajaban de rebote
+    // en el documento completo. Si se perdieran aquí, el arreglo no serviría.
+    bd().prepare(
+        `UPDATE docentes SET antiguedad = 2011, carrera_base = 'CBAS', es_de_otra_area = 1,
+         horas_max = 22 WHERE id = 'dper1'`
+    ).run();
+    autorizar("dper1", "uu1");
+    bd().prepare(
+        `INSERT INTO docente_horario (docente_id, tipo, dia, inicio, fin)
+         VALUES ('dper1', 'declarada', 'lunes', 7, 13)`
+    ).run();
+
+    const r = almacen.guardarDocente({ id: "dper1", horasMax: 18, dedicacion: "medio tiempo" });
+    assert.equal(r.nuevo, false);
+
+    const fila = bd().prepare("SELECT * FROM docentes WHERE id = 'dper1'").get();
+    assert.equal(fila.horas_max, 18, "lo que se manda sí cambia");
+    assert.equal(fila.dedicacion, "medio tiempo");
+    assert.equal(fila.antiguedad, 2011, "la antigüedad no venía y no se pierde");
+    assert.equal(fila.carrera_base, "CBAS");
+    assert.equal(fila.es_de_otra_area, 1);
+
+    const cuantos = (tabla) =>
+        bd().prepare(`SELECT count(*) n FROM ${tabla} WHERE docente_id = 'dper1'`).get().n;
+    assert.equal(cuantos("docente_horario"), 1, "su disponibilidad la declara él, no esto");
+    assert.equal(cuantos("docente_materia"), 1, "sin el campo, las autorizaciones se quedan");
+
+    assert.equal(
+        bd().prepare("SELECT nombre FROM docentes WHERE id = 'dper2'").get().nombre,
+        "Per Dos",
+        "y el resto de la plantilla ni se entera"
+    );
+});
+
+test("un arreglo vacío de autorizaciones sí las quita: la ausencia no", async () => {
+    const almacen = await import("../src/almacen.js");
+    almacen.guardarDocente({ id: "dper1", materiasCapacitadas: [] });
+    assert.equal(
+        bd().prepare("SELECT count(*) n FROM docente_materia WHERE docente_id = 'dper1'").get().n,
+        0
+    );
+});
+
+test("un nombramiento nuevo se crea por la misma vía, y necesita categoría", async () => {
+    const almacen = await import("../src/almacen.js");
+    assert.throws(
+        () => almacen.guardarDocente({ id: "dper3", nombre: "Per Tres" }),
+        /necesita categoría/
+    );
+    const r = almacen.guardarDocente({
+        id: "dper3", nombre: "Per Tres", categoria: "Asignatura", materiasCapacitadas: ["uu1"]
+    });
+    assert.equal(r.nuevo, true);
+    assert.equal(r.autorizadas, 1);
+    // El tope de materias por omisión es el del reglamento, no un número grande.
+    assert.equal(bd().prepare("SELECT max_materias FROM docentes WHERE id = 'dper3'").get().max_materias, 3);
+});
+
 test("no se reparte una clase a quien no está autorizado para la materia", async () => {
     // El motor respeta lo que el departamento fija y no lo puede cambiar, así
     // que la clase saldría marcada como "docente no capacitado" y el horario

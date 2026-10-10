@@ -708,27 +708,18 @@ async function guardar() {
         if (!editando.value.nueva) {
             await api.guardarDescargas(editando.value.id, descargas.value);
         }
-        // La autorización va con la plantilla completa: es el mismo endpoint que
-        // usa el coordinador, y aquí se manda solo lo que cambió de este docente.
-        const base = editando.value.nueva
-            ? [...docentes.value, { ...editando.value, nueva: undefined }]
-            : docentes.value;
-        await api.guardarDocentes(
-            base.map((d) =>
-                d.id === editando.value.id
-                    ? {
-                          ...d,
-                          ...nombramiento.value,
-                          horasMin: Number(nombramiento.value.horasMin),
-                          horasMax: Number(nombramiento.value.horasMax),
-                          maxMaterias: Number(nombramiento.value.maxMaterias),
-                          maxGrupos: Number(nombramiento.value.maxGrupos),
-                          nombre: editando.value.nombre.trim(),
-                          materiasCapacitadas: autorizadas.value
-                      }
-                    : d
-            )
-        );
+        // Solo este docente. Mandar la plantilla completa llevaba a los otros
+        // veintinueve tal como estaban al abrir el diálogo, y el cambio de
+        // quien hubiera guardado mientras tanto se perdía sin aviso.
+        await api.guardarDocente(editando.value.id, {
+            ...nombramiento.value,
+            horasMin: Number(nombramiento.value.horasMin),
+            horasMax: Number(nombramiento.value.horasMax),
+            maxMaterias: Number(nombramiento.value.maxMaterias),
+            maxGrupos: Number(nombramiento.value.maxGrupos),
+            nombre: editando.value.nombre.trim(),
+            materiasCapacitadas: autorizadas.value
+        });
         if (editando.value.nueva && descargas.value.length > 0) {
             await api.guardarDescargas(editando.value.id, descargas.value);
         }

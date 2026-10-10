@@ -508,6 +508,10 @@ async function main() {
     const autorizadoPara = (materiaId) => autorizados(materiaId)[0];
     comprobar("y una coordinación no la reescribe",
         (await a.c("/docentes", { metodo: "PUT", cuerpo: plantilla })).estado === 403);
+    comprobar("ni un nombramiento suelto",
+        (await a.c(`/docentes/${plantilla[0].id}`, {
+            metodo: "PUT", cuerpo: { maxGrupos: 1, materiasCapacitadas: [] }
+        })).estado === 403);
     comprobar("el departamento sí",
         (await depto("/docentes", { metodo: "PUT", cuerpo: plantilla })).estado === 200);
     comprobar("vaciarla se niega",
@@ -1285,9 +1289,34 @@ async function main() {
                 .filter((f) => cuatro.has(`${f.materiaId}|${f.grupoClave}`) && f.docenteId)
                 .length === cuatro.size);
 
+        // Dos personas del departamento editando a la vez a dos docentes
+        // distintos. Con el documento completo la segunda en guardar devolvía
+        // al otro a su estado anterior; por la ruta de un solo nombramiento los
+        // dos cambios se quedan, y es el defecto que esto vino a cerrar.
+        const [uno, dos] = plantilla;
+        const aLaPar = await Promise.all([
+            depto(`/docentes/${uno.id}`, { metodo: "PUT", cuerpo: { maxGrupos: 7 } }),
+            depto(`/docentes/${dos.id}`, { metodo: "PUT", cuerpo: { maxGrupos: 8 } })
+        ]);
+        const tras = (id) => ((global.plantillaTras ?? []).find((d) => d.id === id));
+        global.plantillaTras = (await depto("/docentes")).cuerpo ?? [];
+        comprobar("dos nombramientos a la vez no se pisan",
+            aLaPar.every((r) => r.estado === 200) &&
+                tras(uno.id)?.maxGrupos === 7 && tras(dos.id)?.maxGrupos === 8,
+            `${aLaPar.map((r) => r.estado).join(",")} · ` +
+            `${tras(uno.id)?.maxGrupos}/${tras(dos.id)?.maxGrupos}`);
+        // Y lo que el formulario no manda sigue donde estaba: la disponibilidad
+        // la declara el docente, y guardarle la ficha no puede pisársela.
+        comprobar("y guardar una ficha no borra lo que no venía en ella",
+            tras(uno.id)?.materiasCapacitadas.length === uno.materiasCapacitadas.length &&
+                tras(uno.id)?.disponibilidad.declarada.length ===
+                    uno.disponibilidad.declarada.length,
+            `${tras(uno.id)?.materiasCapacitadas.length} autorizadas, ` +
+            `${tras(uno.id)?.disponibilidad.declarada.length} bloques`);
+
         // Guardar la plantilla entera a la vez: la base tiene que quedar
-        // consistente. Lo que **no** se evita es que un cambio pise al otro —el
-        // documento va completo— y eso es diseño, no un fallo de la base.
+        // consistente. Lo que **no** se evita por aquí es que un cambio pise al
+        // otro —el documento va completo— y para eso está la ruta de uno.
         const guardados = await Promise.all(
             ["A", "B", "C"].map((x) =>
                 depto("/docentes", {

@@ -670,7 +670,8 @@ tabla.
 | `POST` | `/api/usuarios/:id/clave` | Reiniciar la de quien la olvidó |
 | `DELETE` | `/api/usuarios/:id` | Retirar |
 | `GET` | `/api/docentes` | Plantilla del instituto |
-| `PUT` | `/api/docentes` | Administrarla. Solo departamento |
+| `PUT` | `/api/docentes` | Administrarla entera: alta masiva y baja. Solo departamento |
+| `PUT` | `/api/docentes/:id` | Un nombramiento. Lo que no va en el cuerpo no se toca |
 | `POST` | `/api/saturacion` | Hoja de horas catedrático de todos los docentes |
 | `POST` | `/api/saturacion/aulas` | La misma hoja, por espacio: qué carrera tiene cada hora |
 | `POST` | `/api/saturacion/historial` | Quién apartó, soltó o cedió cada hora |
@@ -709,7 +710,7 @@ la misma ruta de generación, y la validación devuelve entonces
 | `POST` | `/api/carreras/:c/escenarios/:id/horario/ajuste` | Reevalúa uno movido a mano |
 
 ```bash
-cd backend && npm test         # 145 pruebas
+cd backend && npm test         # 148 pruebas
 ```
 
 Herramientas de datos en `backend/herramientas/`. Las migraciones tienen modo
