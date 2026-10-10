@@ -409,3 +409,93 @@ export async function cargaPorDocente() {
         }))
         .sort((a, b) => b.horas - a.horas);
 }
+
+/**
+ * Lo que el plantel no puede cubrir con la plantilla que tiene.
+ *
+ * El déficit del que habla el mapeo del departamento es **del plantel, no de una
+ * carrera**: cada coordinación valida su horario contra el tope de toda la
+ * plantilla, así que ninguna ve por sí sola que las sumas no dan. El dato estaba
+ * —desglosado por docente en la carga acumulada— pero había que sumarlo a mano y
+ * nadie lo llamaba por su nombre.
+ *
+ * Dos necesidades, las mismas que la validación de un horario y por la misma
+ * razón: una materia que nadie puede dar no es lo mismo que una carga que no
+ * cabe en la plantilla. La primera se resuelve autorizando a alguien o
+ * contratando un perfil; la segunda, contratando horas. Y se miden disjuntas —el
+ * déficit se calcula sobre lo que sí tiene quien lo dé— para no contar dos veces
+ * las mismas horas.
+ *
+ * Las horas van por clase, así que una materia que dos grupos cursan juntos
+ * cuenta dos veces: la fusión se decide al generar y no vive en el catálogo. Es
+ * el mismo criterio que usa la validación de cada carrera.
+ */
+export async function necesidades() {
+    const db = bd();
+    const docentes = await almacen.leerDocentes();
+    const capacidad = docentes.reduce((suma, d) => suma + (d.horasMax ?? 0), 0);
+
+    const autorizados = new Map();
+    for (const d of docentes) {
+        for (const m of d.materiasCapacitadas ?? []) {
+            autorizados.set(m, (autorizados.get(m) ?? 0) + 1);
+        }
+    }
+
+    let clases = 0;
+    let horas = 0;
+    const sinNadie = new Map();
+
+    for (const { codigo } of db.prepare("SELECT codigo FROM carreras ORDER BY codigo").all()) {
+        const suyo = await porCarrera(codigo);
+        for (const f of suyo.filas) {
+            clases++;
+            horas += f.horasSemana;
+            if ((autorizados.get(f.materiaId) ?? 0) > 0) continue;
+
+            // Por materia y carrera, no por clase: lo que se contrata es quien
+            // pueda darla, y da igual que sean dos grupos o cinco.
+            const llave = `${codigo}|${f.materiaId}`;
+            const suya = sinNadie.get(llave) ??
+                { carrera: codigo, clave: f.clave, nombre: f.nombre, grupos: 0, horas: 0 };
+            suya.grupos++;
+            suya.horas += f.horasSemana;
+            sinNadie.set(llave, suya);
+        }
+    }
+
+    const horasSinAutorizado = [...sinNadie.values()].reduce((suma, m) => suma + m.horas, 0);
+    const cubribles = horas - horasSinAutorizado;
+    const lista = [];
+
+    if (sinNadie.size > 0) {
+        const grupos = [...sinNadie.values()].reduce((suma, m) => suma + m.grupos, 0);
+        lista.push({
+            codigo: "materias-sin-docente",
+            mensaje:
+                `${sinNadie.size} materias del plantel no tienen a nadie autorizado para darlas ` +
+                `(${grupos} clases, ${horasSinAutorizado} h/semana). Hay que autorizar a alguien ` +
+                "de la plantilla o contratar por horas.",
+            seccion: "catalogo",
+            horas: horasSinAutorizado,
+            detalle: [...sinNadie.values()]
+                .sort((a, b) => b.horas - a.horas)
+                .map((m) => `${m.carrera} · ${m.clave} ${m.nombre}: ${m.grupos} clases, ${m.horas} h`)
+        });
+    }
+
+    if (cubribles > capacidad) {
+        lista.push({
+            codigo: "capacidad-docente",
+            mensaje:
+                `Faltan ${cubribles - capacidad} h/semana de plantilla: lo que tiene quien lo dé ` +
+                `son ${cubribles} h y los topes de los ${docentes.length} nombramientos suman ` +
+                `${capacidad} h.`,
+            seccion: "plantilla",
+            horas: cubribles - capacidad,
+            detalle: []
+        });
+    }
+
+    return { clases, horas, horasSinAutorizado, cubribles, capacidad, necesidades: lista };
+}

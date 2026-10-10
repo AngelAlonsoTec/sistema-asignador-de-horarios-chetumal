@@ -651,6 +651,26 @@ async function main() {
     comprobar("con su conteo de clases y de huecos",
         resumen.every((c) => typeof c.clases === "number" && typeof c.sinAsignar === "number"));
 
+    // Lo que el plantel no cubre con su plantilla. Va aquí y no en la validación
+    // de una carrera porque el déficit es del plantel: cada coordinación compara
+    // su carga contra el tope de toda la plantilla y ninguna lo ve sola.
+    comprobar("una coordinación no ve las necesidades del plantel",
+        (await a.c("/plantel/necesidades")).estado === 403);
+    const nec = (await depto("/plantel/necesidades")).cuerpo;
+    comprobar("el departamento sí, con la cuenta completa",
+        Number.isInteger(nec?.clases) && Number.isInteger(nec?.horas) &&
+            Number.isInteger(nec?.capacidad),
+        JSON.stringify(nec).slice(0, 110));
+    // Las horas de lo que nadie puede dar no cuentan contra la capacidad: si no,
+    // la misma hora saldría en las dos necesidades.
+    comprobar("y las dos necesidades no se solapan",
+        nec?.cubribles === nec?.horas - nec?.horasSinAutorizado,
+        `${nec?.cubribles} = ${nec?.horas} - ${nec?.horasSinAutorizado}`);
+    const falta = (nec?.necesidades ?? []).find((x) => x.codigo === "capacidad-docente");
+    comprobar("y el déficit, si lo hay, es la resta exacta",
+        falta ? falta.horas === nec.cubribles - nec.capacidad : nec.cubribles <= nec.capacidad,
+        falta ? `${falta.horas} h` : "la plantilla alcanza");
+
     const deZZ1 = (await depto("/plantel/catalogo/ZZ1")).cuerpo;
     comprobar("el detalle trae una fila por materia y grupo",
         Array.isArray(deZZ1?.filas) &&

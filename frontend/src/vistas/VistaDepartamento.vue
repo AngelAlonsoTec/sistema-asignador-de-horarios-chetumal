@@ -14,6 +14,7 @@ import { api } from "../api.js";
 import LogoMarca from "../componentes/LogoMarca.vue";
 import ListaChecks from "../componentes/ListaChecks.vue";
 import DialogoModal from "../componentes/DialogoModal.vue";
+import ListaPendientes from "../componentes/ListaPendientes.vue";
 import DialogoClave from "../componentes/DialogoClave.vue";
 import { contiene } from "../dominio/texto.js";
 import { siguienteIdDocente } from "../dominio/edicion.js";
@@ -61,6 +62,8 @@ const buscaCatalogo = ref("");
 const asignando = ref(null);
 const buscaDocente = ref("");
 const carga = ref([]);
+/** Lo que el plantel no cubre con su plantilla. Solo el departamento contrata. */
+const necesidadesPlantel = ref(null);
 
 /**
  * Lo que las coordinaciones piden sobre el reparto.
@@ -112,10 +115,11 @@ async function responderPeticion(acepta) {
 }
 
 async function cargarCatalogo() {
-    [resumenCatalogo.value, carga.value, peticiones.value] = await Promise.all([
+    [resumenCatalogo.value, carga.value, peticiones.value, necesidadesPlantel.value] = await Promise.all([
         api.catalogo().catch(() => []),
         api.cargaDocentes().catch(() => []),
-        api.cambios().catch(() => [])
+        api.cambios().catch(() => []),
+        api.necesidadesPlantel().catch(() => null)
     ]);
     if (!carreraCatalogo.value && resumenCatalogo.value.length > 0) {
         // Se abre por la que más trabajo tiene: donde falta repartir.
@@ -1124,6 +1128,30 @@ const ocultas = computed(
                                     {{ c.huerfanas }} sin clase
                                 </span>
                             </button>
+                        </div>
+                    </div>
+
+                    <!-- El déficit es del plantel: cada coordinación compara su
+                         carga contra el tope de toda la plantilla, así que
+                         ninguna ve por sí sola que las sumas no dan. Y quien
+                         contrata es el departamento. -->
+                    <div
+                        v-if="necesidadesPlantel?.necesidades?.length"
+                        class="tarjeta-panel-cuerpo"
+                    >
+                        <div class="bloque-necesidades" style="margin-top: 0">
+                            <div class="necesidades-cabeza">
+                                <span class="necesidades-marca">Para contratar</span>
+                                <span class="detalle-meta">
+                                    {{ necesidadesPlantel.clases }} clases del plantel son
+                                    {{ necesidadesPlantel.horas }} h y los nombramientos suman
+                                    {{ necesidadesPlantel.capacidad }} h
+                                </span>
+                            </div>
+                            <ListaPendientes
+                                :items="necesidadesPlantel.necesidades"
+                                tono="necesidad"
+                            />
                         </div>
                     </div>
 

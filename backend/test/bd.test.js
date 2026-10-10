@@ -1026,6 +1026,50 @@ test("una asignación sin clase deja de contar, pero se nombra", async () => {
     );
 });
 
+test("el plantel dice qué no cubre su plantilla, y las dos necesidades no se solapan", async () => {
+    // Una carrera con una materia que nadie está autorizado a dar. El déficit de
+    // horas se mide sobre lo que sí tiene quien lo dé, así que estas horas no
+    // cuentan dos veces.
+    guardarCarrera(bd(), "NEC", "Carrera de necesidades");
+    bd().prepare(
+        "INSERT OR IGNORE INTO escenarios (carrera,id,nombre,fecha,es_base) VALUES ('NEC','base','Base','2026-10-10',1)"
+    ).run();
+    bd().prepare(
+        `INSERT OR IGNORE INTO materias (carrera,escenario_id,id,clave,nombre,semestre,horas_semana)
+         VALUES ('NEC','base','nec1','NEC-1','Sin nadie',1,5)`
+    ).run();
+    bd().prepare(
+        `INSERT OR IGNORE INTO semestres (carrera,escenario_id,id,periodo,semanas,turnos,estado)
+         VALUES ('NEC','base','s1','Agosto-Diciembre 2026',16,'["matutino"]','activo')`
+    ).run();
+    const config = await import("../src/config-escenario.js");
+    config.guardar({
+        carrera: "NEC",
+        escenarioId: "base",
+        paridad: "impares",
+        lineas: [{ semestre: 1, especialidadId: null, porTurno: { matutino: 2 }, alumnos: 20 }],
+        fusiones: [],
+        invitadas: []
+    });
+
+    const n = await catalogoMod.necesidades();
+
+    const sinNadie = n.necesidades.find((x) => x.codigo === "materias-sin-docente");
+    assert.ok(sinNadie, JSON.stringify(n.necesidades));
+    assert.ok(
+        sinNadie.detalle.some((d) => d.includes("NEC · NEC-1") && d.includes("2 clases")),
+        JSON.stringify(sinNadie.detalle)
+    );
+    assert.ok(sinNadie.horas >= 10, "dos grupos de 5 h");
+
+    // La invariante que evita contar las mismas horas en las dos necesidades.
+    assert.equal(n.cubribles, n.horas - n.horasSinAutorizado);
+
+    const falta = n.necesidades.find((x) => x.codigo === "capacidad-docente");
+    if (falta) assert.equal(falta.horas, n.cubribles - n.capacidad);
+    else assert.ok(n.cubribles <= n.capacidad, "sin necesidad, la plantilla alcanza");
+});
+
 test("guardar un nombramiento no toca al resto ni borra lo que no se manda", async () => {
     const almacen = await import("../src/almacen.js");
     docente("dper1", "Per Uno");

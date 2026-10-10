@@ -57,6 +57,7 @@ export const RUTAS = [
     ["GET", "/api/plantel/catalogo/:carrera", verCatalogoDe],
     ["PUT", "/api/plantel/asignaciones", guardarAsignacion],
     ["GET", "/api/plantel/carga", verCarga],
+    ["GET", "/api/plantel/necesidades", verNecesidades],
     ["GET", "/api/plantel/normativa", verNormativa],
     ["POST", "/api/plantel/asignaciones/materia", asignarMateriaCompleta],
     ["POST", "/api/plantel/asignaciones/historial", verHistorialReparto],
@@ -773,6 +774,19 @@ async function verCatalogoDe(req, res, { carrera }) {
 async function verCarga(req, res) {
     exigirDepartamento(req, "El catálogo lo administra el departamento académico.");
     responder(res, 200, await catalogo.cargaPorDocente());
+}
+
+/**
+ * Lo que no se cubre con la plantilla del instituto.
+ *
+ * Va aquí y no en la validación de un horario porque el déficit es del plantel:
+ * cada coordinación compara su carga contra el tope de **toda** la plantilla, así
+ * que ninguna ve por sí sola que las sumas no dan. Y es el departamento quien
+ * contrata. Ver `catalogo.necesidades`.
+ */
+async function verNecesidades(req, res) {
+    exigirDepartamento(req, "El catálogo lo administra el departamento académico.");
+    responder(res, 200, await catalogo.necesidades());
 }
 
 /**

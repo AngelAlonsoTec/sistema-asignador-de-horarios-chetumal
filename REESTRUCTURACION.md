@@ -783,7 +783,7 @@ configuración de generación, el ajuste a mano, reiniciar una contraseña, cerr
 sesión, resolver un choque propio. Una ruta que nadie llama es una que se rompe
 en silencio.
 
-Ahora son **220 comprobaciones y el 100 % de las 70 rutas**, estable en tres
+Ahora son **224 comprobaciones y el 100 % de las 71 rutas**, estable en tres
 corridas seguidas.
 
 Dos cosas salieron de escribirlas. Una: encadenar verificar y simular fallaba
@@ -1640,6 +1640,30 @@ no solo el de la autorización: si una clase no se colocó, la hoja lo dice sea
 por lo que sea. Y un horario apartado antes de este cambio no trae con qué
 comparar, así que no avisa de nada — callar es mejor que inventar un faltante.
 
+### El déficit es del plantel, no de una carrera · **HECHO** (2026-10-10)
+
+La necesidad de contratación se calculaba al validar el horario de una carrera, y
+ahí nunca aparecía la que importa: cada coordinación compara su carga contra el
+tope de **toda** la plantilla —593 h— y una carrera sola no llega. Para verla
+había que inflar los grupos a mano. El dato estaba, desglosado por docente en la
+carga acumulada, y había que sumarlo a mano y nadie lo llamaba por su nombre.
+
+`GET /api/plantel/necesidades` lo suma: 150 clases, 672 h de clase contra 593 h
+de topes contractuales, **faltan 79 h/semana**. Son las mismas dos necesidades
+que al validar una carrera y por la misma razón —una materia que nadie puede dar
+no es lo mismo que una carga que no cabe—, medidas disjuntas: el déficit de horas
+se calcula sobre lo que sí tiene quien lo dé, así que las horas de una materia
+sin autorizados no cuentan dos veces. La verificación comprueba esa invariante.
+
+Dos cosas que el número **no** dice, y conviene saberlo al leerlo: las horas van
+por clase, así que una materia que dos grupos cursan juntos cuenta dos veces —la
+fusión se decide al generar, no en el catálogo—, y el tope contractual no es lo
+mismo que la disponibilidad declarada. Es el mismo criterio que usa la validación
+de cada carrera, y por eso las dos cifras se pueden comparar.
+
+En pantalla sale en la misma pieza amarilla que ve el coordinador, con el mismo
+componente: el departamento y la coordinación leen la misma clase de aviso.
+
 ## Lo que queda
 
 **Nada de código.** Lo que falta son datos y despliegue:
@@ -1655,7 +1679,8 @@ comparar, así que no avisa de nada — callar es mejor que inventar un faltante
   672 horas y los treinta docentes suman 593 de tope contractual. Las aulas **sí**
   alcanzan desde que se comparten por horas. Es un dato del banco de pruebas, no
   del sistema, pero es lo que decidirá si el piloto se hace con una coordinación
-  o con todas.
+  o con todas. Desde `GET /api/plantel/necesidades` el sistema ya lo dice solo:
+  faltan 79 h.
 
 Y tres que abrió el mapeo del departamento:
 

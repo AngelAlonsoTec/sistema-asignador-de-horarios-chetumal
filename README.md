@@ -690,6 +690,7 @@ tabla.
 | `POST` | `/api/plantel/asignaciones/historial` | Quién ha tenido cada clase antes de quien la tiene |
 | `DELETE` | `/api/plantel/asignaciones/:carrera` | Vaciar el reparto de una carrera |
 | `GET` | `/api/plantel/carga` | Lo que cada docente junta en todo el instituto |
+| `GET` | `/api/plantel/necesidades` | Lo que el plantel no cubre con su plantilla |
 | `GET` | `/api/plantel/normativa` | Las reglas del reglamento y a quién no le cuadran |
 | `GET`/`PUT` | `/api/carreras/:carrera/prioridades` | Prioridad docente en esta carrera |
 | `GET`/`PUT` | `/api/carreras/:c/escenarios/:id/config` | Paridad, grupos y fusiones elegidos |
@@ -710,7 +711,7 @@ la misma ruta de generación, y la validación devuelve entonces
 | `POST` | `/api/carreras/:c/escenarios/:id/horario/ajuste` | Reevalúa uno movido a mano |
 
 ```bash
-cd backend && npm test         # 148 pruebas
+cd backend && npm test         # 149 pruebas
 ```
 
 Herramientas de datos en `backend/herramientas/`. Las migraciones tienen modo

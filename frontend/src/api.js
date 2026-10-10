@@ -139,6 +139,8 @@ export const api = {
     asignar: (cuerpo) => pedir("/api/plantel/asignaciones", { metodo: "PUT", cuerpo }),
     /** Lo que cada docente acumula en todo el instituto. */
     cargaDocentes: () => pedir("/api/plantel/carga"),
+    /** Lo que el plantel no cubre con su plantilla: horas y materias sin nadie. */
+    necesidadesPlantel: () => pedir("/api/plantel/necesidades"),
     /** Pedirle a otra coordinación las horas de un docente o de un salón. */
     solicitar: (cuerpo) => pedir("/api/solicitudes", { metodo: "POST", cuerpo }),
 
