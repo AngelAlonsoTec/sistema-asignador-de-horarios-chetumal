@@ -711,7 +711,7 @@ la misma ruta de generación, y la validación devuelve entonces
 | `POST` | `/api/carreras/:c/escenarios/:id/horario/ajuste` | Reevalúa uno movido a mano |
 
 ```bash
-cd backend && npm test         # 149 pruebas
+cd backend && npm test         # 150 pruebas
 ```
 
 Herramientas de datos en `backend/herramientas/`. Las migraciones tienen modo
@@ -1146,8 +1146,11 @@ cuatro áreas. Bloquear ahí dejaba sin horario justo al plantel que tiene el
 problema.
 
 Las **advertencias** siguen existiendo para lo que no bloquea ni hay que
-contratar: una especialidad con cero grupos cuyas materias no se programarán, o
-materias con un único docente capacitado.
+contratar: una especialidad con cero grupos cuyas materias no se programarán,
+materias con un único docente capacitado, o un reparto que le fija a alguien más
+materias de las que su nombramiento permite — eso último sale con nombre y
+claves, porque el motor respeta lo fijado y el exceso aparecería en todas las
+corridas.
 
 ## Escala
 

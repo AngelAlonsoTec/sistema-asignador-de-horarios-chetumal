@@ -573,6 +573,33 @@ test("una clase fijada en alguien sin autorización bloquea", () => {
     assert.equal(validarParaHorario(escenario({ grupos: bien })).listo, true);
 });
 
+test("el reparto por encima del tope de materias avisa, y dice que no es la semilla", () => {
+    // d1 puede con las cinco, así que fijarlo en tres le pasa su tope de dos. El
+    // motor respeta lo fijado y no lo puede mover: saldría con exceso siempre.
+    const docentes = DOCENTES_OK.map((d) => (d.id === "d1" ? { ...d, maxMaterias: 2 } : d));
+    const grupos = construirGrupos(RETICULA, ESPECIALIDADES, REJILLA, "impares", {
+        asignaciones: new Map([["m1|1A", "d1"], ["m2|1A", "d1"], ["t7|7A", "d1"]])
+    });
+    const r = validarParaHorario(escenario({ datos: { docentes }, grupos }));
+
+    // Aviso y no bloqueo: lo que sale del reglamento se avisa, porque un plantel
+    // real tiene excepciones y el horario se sigue pudiendo generar.
+    assert.equal(r.listo, true, JSON.stringify(r.bloqueos));
+    const aviso = r.advertencias.find((a) => a.codigo === "reparto-sobre-el-tope-de-materias");
+    assert.ok(aviso, JSON.stringify(r.advertencias.map((a) => a.codigo)));
+    assert.ok(aviso.detalle[0].includes("Docente uno"), aviso.detalle[0]);
+    assert.ok(aviso.detalle[0].includes("3 materias"), aviso.detalle[0]);
+    assert.ok(aviso.detalle[0].includes("su tope son 2"), aviso.detalle[0]);
+
+    // Con el tope que le corresponde no hay nada que decir.
+    assert.equal(
+        validarParaHorario(escenario({ grupos })).advertencias.some(
+            (a) => a.codigo === "reparto-sobre-el-tope-de-materias"
+        ),
+        false
+    );
+});
+
 test("una materia de laboratorio sin laboratorios registrados bloquea", () => {
     const materias = RETICULA.map((m) => (m.id === "m1" ? { ...m, requiereLaboratorio: true } : m));
     const r = validarParaHorario(escenario({ datos: { materias } }));

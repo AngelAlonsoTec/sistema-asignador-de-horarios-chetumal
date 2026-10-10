@@ -1702,6 +1702,32 @@ las horas no disponibles **cambian con la semilla** —son dificultad de búsque
 pero `excesoMaterias: 1` aparece en las ocho. Eso no es búsqueda, es dato. Ver
 *El tope de materias se decide repartiendo*.
 
+### El tope de materias se decide repartiendo · **CORREGIDO** (2026-10-10)
+
+El artículo 155 fija tres materias distintas por docente, el sistema lo tenía
+capturado como `maxMaterias` y el motor lo vigilaba con `excesoMaterias`. Lo que
+nadie vigilaba era el camino por el que se rompe: **el reparto**. El departamento
+fija a alguien en cuatro materias, el motor respeta lo fijado y no lo puede
+mover, y entonces el horario sale con el exceso en **todas** las corridas.
+
+Medido sobre ISIC con ocho semillas y mil doscientas generaciones cada una: los
+empalmes, las materias repetidas y las horas no disponibles cambian con la
+semilla; `excesoMaterias: 1` aparece en las ocho. Esa es la diferencia entre un
+dato y una búsqueda difícil, y era justo la que el coordinador no podía hacer:
+veía un número que no se movía y lo leía como un mal resultado del algoritmo.
+
+Ahora la validación lo dice antes de generar, con nombre, cuenta y claves:
+*"Ricardo Nava Cortés: 4 materias fijadas y su tope son 3 — ACF-0901, ACF-0904,
+AEF-1041, SCC-1013"*, y añade lo que ninguna corrida va a cambiar y las dos
+salidas que sí: pasarle una materia a alguien más, o subirle el tope.
+
+**Es aviso y no bloqueo**, a diferencia de la autorización. No es una distinción
+cómoda: una clase asignada a quien no está autorizado no se puede impartir, y un
+docente con una materia de más es una excepción que un plantel real tiene —
+comisiones, plazas mixtas, nombramientos en trámite—. Lo dice la misma sección
+del reglamento donde viven los topes: *avisos, no bloqueos*. Lo que no podía
+seguir siendo es invisible.
+
 ## Lo que queda
 
 **De código, una sola cosa: probarlo en un navegador de verdad.** Las veintiuna
@@ -1743,12 +1769,20 @@ Y tres que abrió el mapeo del departamento:
   aquí: inventarle a alguien una hora que no declaró es exactamente lo que el
   formulario viene a evitar.
 
-Y lo que esas dos últimas producen juntas, medido: el horario de ISIC **sigue
-saliendo infactible** por un empalme y siete horas de una sola persona. La causa
-no es el algoritmo: tres materias de primero —Ética, Fundamentos de Investigación
-y Taller de Administración— tienen tres autorizados cada una y **solo uno declara
-mañanas**, con los dos grupos de primero en matutino. La autorización y la
-disponibilidad no se cruzan en el banco de pruebas.
+El horario de ISIC **sigue saliendo infactible**, y la causa medida no es la que
+se escribió primero aquí. Ocho semillas con mil doscientas generaciones cada una:
+los empalmes, las materias repetidas y las horas no disponibles cambian de una
+corrida a otra —son dificultad de búsqueda en una instancia apretada— y
+`excesoMaterias: 1` sale en las ocho. Eso es dato: el departamento tiene a
+Ricardo Nava Cortés fijado en **cuatro materias de los semestres impares** con un
+tope de tres, y el motor respeta lo fijado. Ver *El tope de materias se decide
+repartiendo*.
+
+Lo que sí es cierto de las dos últimas, y aprieta la instancia sin decidirla:
+tres materias de primero —Ética, Fundamentos de Investigación y Taller de
+Administración— tienen tres autorizados cada una y **solo uno declara mañanas**,
+con los dos grupos de primero en matutino. La autorización y la disponibilidad no
+se cruzan en el banco de pruebas.
 
 **Y una precisión sobre `antiguedad`, `nivel` y `creditos`**: sí se muestran —la
 antigüedad junto al selector de prioridad, el nivel en el nombramiento, los

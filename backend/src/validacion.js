@@ -22,6 +22,7 @@
 
 import { contarDocentesPorMateria } from "./cobertura.js";
 import { semestresDe } from "./periodo.js";
+import { MAX_MATERIAS } from "./tecnm.js";
 
 export function validarParaHorario({ datos, aulas, rejilla, grupos, paridad, ocupadas = [] }) {
     const bloqueos = [];
@@ -354,6 +355,56 @@ export function validarParaHorario({ datos, aulas, rejilla, grupos, paridad, ocu
                 (conCupo > 0 ? ` (${conCupo} aulas sí tienen cupo registrado).` : "."),
             seccion: "generar",
             detalle: sinAlumnos.map((g) => `${g.clave} · semestre ${g.semestre}`)
+        });
+    }
+
+    // El tope de materias del artículo 155 lo puede romper el **reparto** sin que
+    // nadie lo note. El departamento fija a alguien en cuatro materias distintas,
+    // el motor respeta lo fijado y no lo puede mover, y entonces el horario sale
+    // con `excesoMaterias` en todas las corridas: medido sobre ISIC, ocho
+    // semillas con mil doscientas generaciones cada una, los empalmes y las horas
+    // no disponibles cambian con la semilla y el exceso de materias aparece en
+    // las ocho. El coordinador veía un número que no podía mover y lo leía como
+    // un mal resultado del algoritmo.
+    //
+    // Es aviso y no bloqueo, como el resto de lo que sale del reglamento: un
+    // plantel real tiene comisiones y plazas mixtas, y un sistema que se niegue a
+    // programar por eso no se usa. Lo que no puede es callarlo.
+    const materiasFijadas = new Map();
+    for (const grupo of grupos) {
+        for (const [materiaId, docenteId] of Object.entries(grupo.asignaciones ?? {})) {
+            if (!porId.has(materiaId)) continue;
+            if (!materiasFijadas.has(docenteId)) materiasFijadas.set(docenteId, new Set());
+            materiasFijadas.get(docenteId).add(materiaId);
+        }
+    }
+    const topeDe = new Map(
+        datos.docentes.map((d) => [d.id, d.maxMaterias ?? MAX_MATERIAS])
+    );
+    const pasados = [...materiasFijadas]
+        .map(([docenteId, suyas]) => ({
+            docenteId,
+            cuantas: suyas.size,
+            tope: topeDe.get(docenteId) ?? MAX_MATERIAS,
+            claves: [...suyas].map((id) => porId.get(id).clave).sort()
+        }))
+        .filter((x) => x.cuantas > x.tope)
+        .sort((a, b) => b.cuantas - a.cuantas);
+
+    if (pasados.length > 0) {
+        advertencias.push({
+            codigo: "reparto-sobre-el-tope-de-materias",
+            mensaje:
+                `${pasados.length} ${pasados.length === 1 ? "docente tiene" : "docentes tienen"} ` +
+                "fijadas más materias distintas de las que su nombramiento permite. El motor " +
+                "respeta lo que el departamento fija y no lo puede mover, así que el horario va a " +
+                "salir con ese exceso por muchas veces que se genere: hay que pasarle una materia " +
+                "a alguien más o subirle el tope a esa persona.",
+            detalle: pasados.map(
+                (x) =>
+                    `${nombreDocente.get(x.docenteId) ?? x.docenteId}: ${x.cuantas} materias ` +
+                    `fijadas y su tope son ${x.tope} — ${x.claves.join(", ")}`
+            )
         });
     }
 
