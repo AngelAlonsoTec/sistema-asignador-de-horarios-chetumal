@@ -17,11 +17,16 @@ frontend/dist/
 # Entrevistas y material de investigación (no se publican)
 papers/
 
-# Base de datos y sus respaldos: binarios, y con datos de docentes reales.
-# backend/data/schedulai.db
-# backend/data/schedulai.db-shm
-# backend/data/schedulai.db-wal
-# backend/data/respaldos/
+# Base de datos y sus respaldos.
+#
+# No es solo que sean binarios de 2 MB que ensucian cada diff: dentro van los
+# hashes y las sales de las contraseñas, los tokens de sesión vivos y el enlace
+# personal de cada docente. Publicarlos una vez es publicarlos para siempre.
+# Las semillas de datos —docentes.json, los escenarios en JSON— sí se versionan.
+backend/data/schedulai.db
+backend/data/schedulai.db-shm
+backend/data/schedulai.db-wal
+backend/data/respaldos/
 
 invitacion.png
 logos.png
